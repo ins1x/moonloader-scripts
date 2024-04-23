@@ -21,7 +21,7 @@ It introduces the ability to load Lua scripts into the game, has all the functio
 | [Bunnyhopfix](https://github.com/ins1x/moonloader-scripts/tree/main/luascripts/bunnyhopfix.lua) | Allow bunnyhop for roleplay servers |
 | [Clickwarp](https://github.com/ins1x/moonloader-scripts/tree/main/luascripts/clickwarp/) | Fork of original clickwarp by FYP updated for Absolute Play |
 | [DriftСameraLock](https://github.com/ins1x/moonloader-scripts/tree/main/luascripts/DriftСameraLock.lua) | Lock camera behind player on vehicle (DriftCam) |
-| [FriendsList](https://github.com/ins1x/moonloader-scripts/tree/main/luascripts/FriendsList.lua) | It notifies you when a friend comes online or quits |
+| [FriendsList](https://github.com/ins1x/moonloader-scripts/tree/main/friendslist/) | It notifies you when a friend comes online or quits |
 | [GangWarNotifer](https://github.com/ins1x/moonloader-scripts/tree/main/luascripts/GangWarNotifier.lua) | Notifies if gangwar has started for the territory |
 | [ImguiSnippets](https://github.com/ins1x/moonloader-scripts/tree/main/luascripts/snippets) | Templates for creating lua scripts for SAMP |
 | [Renderobjects](https://github.com/ins1x/moonloader-scripts/tree/main/luascripts/renderobjects) | A convenient tool for mappers, allows you to quickly find the desired object |
