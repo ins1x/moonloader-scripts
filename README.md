@@ -23,7 +23,6 @@ It introduces the ability to load Lua scripts into the game, has all the functio
 | [DriftСameraLock](https://github.com/ins1x/moonloader-scripts/tree/main/DriftСameraLock.lua) | Lock camera behind player on vehicle (DriftCam) |
 | [FriendsList](https://github.com/ins1x/moonloader-scripts/tree/main/friendslist/) | It notifies you when a friend comes online or quits |
 | [GangWarNotifer](https://github.com/ins1x/moonloader-scripts/tree/main/GangWarNotifier.lua) | Notifies if gangwar has started for the territory |
-| [ImguiSnippets](https://github.com/ins1x/moonloader-scripts/tree/main/snippets) | Templates for creating lua scripts for SAMP |
 | [Renderobjects](https://github.com/ins1x/moonloader-scripts/tree/main/renderobjects) | A convenient tool for mappers, allows you to quickly find the desired object |
 | [TrainingFix](https://github.com/ins1x/moonloader-scripts/tree/main/training-fixes) | Various fixes for the TRAINING server |
 | [ModCompatibilityChecker](https://github.com/ins1x/moonloader-scripts/tree/main/ModCompatibilityChecker.lua) | Checks the mods that can cause crashes |
