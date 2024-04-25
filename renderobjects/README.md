@@ -6,7 +6,6 @@
 
 A convenient minimalistic tool for mappers that allows you to quickly find the desired object.
 The tool will show all the objects you are interested in, indicating the model name, ID and distance.
-This script is a revised and improved version of the script from IPEK
 
 > In-game activation: */renderob*
 
