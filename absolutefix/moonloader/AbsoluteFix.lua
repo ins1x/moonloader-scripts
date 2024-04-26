@@ -3,7 +3,7 @@ script_name("AbsoluteFix")
 script_description("Set of fixes for Absolute Play servers")
 script_properties("work-in-pause")
 script_url("https://github.com/ins1x/useful-samp-stuff/tree/main/luascripts/absolutefix")
-script_version("3.0.4")
+script_version("3.0.5")
 
 -- script_moonloader(16) moonloader v.0.26
 -- forked from https://github.com/ins1x/AbsEventHelper v1.5
@@ -38,6 +38,7 @@ local ini = inicfg.load({
       hideattachesonaim = true,
 	  hidehousesmapicons = true,
       gamefixes = true,
+      grass = false,
       infinityrun = true,
       improvedrun = true,
       improvedbike = true,
@@ -54,6 +55,9 @@ local ini = inicfg.load({
       pmsoundfix = true,
 	  restoreremovedobjects = false,
 	  recontime = 20000,
+      shadows = false,
+      speedblur = false,
+      sunfix = false,
       vehvisualdmg = false
    },
 }, configIni)
@@ -73,6 +77,7 @@ local dialogIncoming = 0
 local clickedplayerid = nil
 local randomcolor = nil
 local lastObjectId = nil
+local lastResponsedDialogId = 0
 
 function main()
    if not isSampLoaded() or not isSampfuncsLoaded() then return end
@@ -434,6 +439,52 @@ function main()
 		 end
 	  end
 	  
+      -- fixes form Graphic settings dialog (id 1770)
+      if ini.settings.speedblur then
+         memory.fill(0x704E8A, 0xE8, 1, true)
+         memory.fill(0x704E8B, 0x11, 1, true)
+         memory.fill(0x704E8C, 0xE2, 1, true)
+         memory.fill(0x704E8D, 0xFF, 1, true)
+         memory.fill(0x704E8E, 0xFF, 1, true)
+      else
+         memory.fill(0x704E8A, 0x90, 1, true)
+         memory.fill(0x704E8B, 0x90, 1, true)
+         memory.fill(0x704E8C, 0x90, 1, true)
+         memory.fill(0x704E8D, 0x90, 1, true)
+         memory.fill(0x704E8E, 0x90, 1, true)
+      end
+      
+      if ini.settings.grass then
+	     memory.hex2bin("E8420E0A00", 0x53C159, 5) 
+	     memory.protect(0x53C159, 5, memory.unprotect(0x53C159, 5)) 
+	  else
+	     memory.fill(0x53C159, 0x90, 5, true)
+      end
+      
+      if ini.settings.sunfix then
+	     memory.hex2bin("E865041C00", 0x53C136, 5) 
+		 memory.protect(0x53C136, 5, memory.unprotect(0x53C136, 5))
+      else
+	     memory.fill(0x53C136, 0x90, 5, true)
+	  end
+      
+      if ini.settings.shadows then
+         memory.write(5497177, 233, 1, false)
+         memory.write(5489067, 492560616, 4, false)
+         memory.write(5489071, 0, 1, false)
+         memory.write(6186889, 33807, 2, false)
+         memory.write(7388587, 111379727, 4, false)
+         memory.write(7388591, 0, 2, false)
+         memory.write(7391066, 32081167, 4, false)
+         memory.write(7391070, -1869611008, 4, false)
+      else
+         memory.write(5497177, 195, 1, false)
+         memory.fill(5489067, 144, 5, false)
+         memory.write(6186889, 59792, 2, false)
+         memory.fill(7388587, 144, 6, false)
+         memory.fill(7391066, 144, 9, false)
+      end
+      
       -- Absolute Play Key Binds
       -- Sets hotkeys that are only available with the samp addon
       if ini.settings.keybinds then
@@ -617,7 +668,11 @@ function sampev.onServerMessage(color, text)
       -- if text:find("Ты не можешь уйти в АФК на улице") then
          -- return {color, text.." (Тут кругом маньяки)"}
       -- end
-      
+      if text:find("Необходим установленный SA-MP Addon для работы этого параметра") then
+         if lastResponsedDialogId == 1770 then 
+            return false
+         end
+      end
       if text:find("Клавиша Y") then
          if text:find("Основное меню") then
             return false
@@ -689,14 +744,37 @@ function sampev.onSetMapIcon(iconId, position, type, color, style)
 end
 
 function sampev.onSendDialogResponse(dialogId, button, listboxId, input)
+   lastResponsedDialogId = dialogId
+   
    if ini.settings.gamefixes then
       dialogs[dialogId] = {listboxId, input}
    end
    
+   -- Accessories dialog
    if dialogId == 100 and listboxId == 2 and button == 1 then
       sampAddChatMessage("Примечание: Стоимость 500$ за любой", -1)
    end
    
+   -- Graphics settings dialog
+   if dialogId == 1770 then
+      if listboxId == 0 then ini.settings.speedblur = not ini.settings.speedblur end
+      if listboxId == 1 then ini.settings.shadows = not ini.settings.shadows end
+      if listboxId == 2 then ini.settings.sunfix = not ini.settings.sunfix end
+      if listboxId == 3 then 
+         ini.settings.grass = not ini.settings.grass 
+         return false
+      end
+      inicfg.save(ini, configIni)
+   end
+   
+   -- Fix donate bug 
+   -- (filters only for numeric values in order to avoid incorrect transfer)
+   if dialogId == 1012 then
+      if not tonumber(input) then
+         sampAddChatMessage("Вы неправильно указали сумму перевода", 0xFFFF0000)
+         return false --(dialogId, button, listboxId, 0)
+      end
+   end
 end
 
 function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
@@ -769,6 +847,14 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
       return {dialogId, style, title, button1, button2, newtext}
    end
    
+   if dialogId == 1770 then
+      local newtext = 
+      "Эффект SpeedBlur\t"..(ini.settings.speedblur and '{00FF00}[Включен]' or '{FFFF00}[Отключен]').."\n"..
+      "Тени мира\t"..(ini.settings.shadows and '{00FF00}[Включены]' or '{FFFF00}[Отключены]').."\n"..
+      "Эффект солнца\t"..(ini.settings.sunfix and '{00FF00}[Включен]' or '{FFFF00}[Отключены]').."\n"..
+      "Трава\t"..(ini.settings.grass and '{00FF00}[Включена]' or '{FFFF00}[Отключена]').."\n"
+      return {dialogId, style, title, button1, button2, newtext}
+   end
 end
 
 function sampev.onSendClickPlayer(playerId, source)
