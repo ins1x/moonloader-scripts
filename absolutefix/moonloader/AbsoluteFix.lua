@@ -77,7 +77,6 @@ local dialogIncoming = 0
 local clickedplayerid = nil
 local randomcolor = nil
 local lastObjectId = nil
-local lastResponsedDialogId = 0
 
 function main()
    if not isSampLoaded() or not isSampfuncsLoaded() then return end
@@ -665,14 +664,10 @@ function sampev.onServerMessage(color, text)
          return false
       end
       
-      -- if text:find("Ты не можешь уйти в АФК на улице") then
-         -- return {color, text.." (Тут кругом маньяки)"}
-      -- end
-      if text:find("Необходим установленный SA-MP Addon для работы этого параметра") then
-         if lastResponsedDialogId == 1770 then 
-            return false
-         end
+      if text:find("Необходим установленный SA") then
+         return false
       end
+      
       if text:find("Клавиша Y") then
          if text:find("Основное меню") then
             return false
@@ -744,7 +739,6 @@ function sampev.onSetMapIcon(iconId, position, type, color, style)
 end
 
 function sampev.onSendDialogResponse(dialogId, button, listboxId, input)
-   lastResponsedDialogId = dialogId
    
    if ini.settings.gamefixes then
       dialogs[dialogId] = {listboxId, input}
@@ -756,7 +750,7 @@ function sampev.onSendDialogResponse(dialogId, button, listboxId, input)
    end
    
    -- Graphics settings dialog
-   if dialogId == 1770 then
+   if dialogId == 1770 and button == 1 then
       if listboxId == 0 then ini.settings.speedblur = not ini.settings.speedblur end
       if listboxId == 1 then ini.settings.shadows = not ini.settings.shadows end
       if listboxId == 2 then ini.settings.sunfix = not ini.settings.sunfix end

@@ -84,6 +84,8 @@
 * L - закрыть транспорт
 * H - перевернуть транспорт
 
+> Для Roleplay серверов бинды радара, телефона и прочие тоже восстановлены
+
 ## Как использовать
 - Установить [Moonloader](https://www.blast.hk/threads/13305/)  
 - Установить [SAMPFUNCS](https://www.blast.hk/threads/17/)  
@@ -96,16 +98,16 @@
 Протестировано на *SA-MP 0.3.7-R1, Moonloader 0.26, sampfuncs 5.4.1-final*  
 Основные функции будут работать и на других версиях, но некоторые мемхаки не адаптированы.
 
-> Скрипт **не работает с включенным античитом** Samp Addon, так как разработчик аддона фильтрует все скрипты по белому списку. Скрипт не заменяет [Samp Addon](https://sa-mp.ru/sampaddon), и не использует его возможности. 
+> Скрипт **не работает с включенным античитом** Samp Addon, так как разработчик аддона фильтрует все скрипты по белому списку.  
+Скрипт не заменяет [Samp Addon](https://sa-mp.ru/sampaddon), и не использует его возможности. 
 
 ## Дополнительно
-Вы можете установить другие дополнения и плагины с функционалом схожим с аддоном  
+Вы можете установить дополнительные модификации:
 
 * [Transparent Menu.asi - Прозрачное меню](https://libertycity.ru/files/gta-san-andreas/96340-transparent-menu.html)
 * [NormalMap.asi - Улучшенное освещение персонажей](https://www.blast.hk/threads/19173/)
 * [OutFitFix.asi - Исправляет сбои при предварительном просмотре textdraws](https://gtaforums.com/topic/759412-relsa-fixes-for-normalmapweapons-outfit-and-shell/)
 * [SAMP Graphic Restore.asi - Плагин отображает корректно абсолютно все прелести ENB Series в многопользовательской игре.](https://www.blast.hk/threads/25150/)
-* [Grass.asi - Возвращает траву и кусты](https://libertycity.net/files/gta-san-andreas/96677-samp-grass.html)
 * [StreamMemFix.asi - Повышает размер Stream Memory используемой игрой, что дает колоссальное приимущество в прорисовке текстур, поэтому они перестают пропадать.](https://libertycity.ru/files/gta-san-andreas/31883-sa-streammemfix-2.2.html)
 * [DwmComposition.asi - Плагин отключает переход windows на упрощенный стиль (Не использовать на windows 10!!)](https://www.blast.hk/threads/13368/)
 * [Widescreen-fix.asi - Исправляет проблемы с широкоформатными мониторами](https://gamemodding.com/ru/gta-san-andreas/others/45270-widescreen-fix.html)
@@ -114,43 +116,48 @@
 ## Config
 Все настройки хранятся в файле moonloader\config\AbsoluteFix.ini  
 ```INI
-    antiafk = true,
-    anticrash = true,
-    autoreconnect = true,
-    chatfilter = true,
-    dialogfix = true,
-    disablenotifications = true,
-    disablerecordnotifications = true,
-    fastload = true,
-    hideattachesonaim = true,
-    hidehousesmapicons = true,
-    gamefixes = true,
-    infinityrun = true,
-    improvedrun = true,
-    improvedbike = true,
-    improvedjetpack = true,
-    improvedairvehheight = true,
-    keybinds = true,
-    noeffects = false,
-    nologo = false,
-    noradio = false,
-    nogametext = false,
-    noweaponpickups = true,
-    mapfixes = true,
-    menupatch = true,
-    pmsoundfix = true,
-    restoreremovedobjects = false,
-    recontime = 15000,
-    vehvisualdmg = false
+      antiafk = true,
+      anticrash = true,
+	  autoreconnect = true,
+      chatfilter = true,
+      dialogfix = true,
+      disablenotifications = true,
+	  disablerecordnotifications = true,
+      fastload = true,
+      hideattachesonaim = true,
+	  hidehousesmapicons = true,
+      gamefixes = true,
+      grass = false,
+      infinityrun = true,
+      improvedrun = true,
+      improvedbike = true,
+      improvedjetpack = true,
+      improvedairvehheight = true,
+      keybinds = true,
+      noeffects = false,
+      nologo = false,
+	  noradio = false,
+      nogametext = false,
+	  noweaponpickups = true,
+      mapfixes = true,
+      menupatch = true,
+      pmsoundfix = true,
+	  restoreremovedobjects = false,
+	  recontime = 20000,
+      shadows = false,
+      speedblur = false,
+      sunfix = false,
+      vehvisualdmg = false
 ```
 
-> Скрипт предназначен для Absolute Play, дял других проектов попробуйте более функциональные скрипты с множеством фиксов
+> Скрипт предназначен для Absolute Play, для других проектов попробуйте более функциональные скрипты с множеством фиксов
 [GameFixer by Gorskin](https://vk.com/@gorskinscripts-gamefixer-obnovlenie-30)
 и [MixSets](https://www.mixmods.com.br/2022/03/sa-mixsets/)
 
 ## KnownBugs
-* При восстановлении серверных объектов удаленных через RemoveBuildings, теряется исходное положение некоторых объектов. Например автобусные остановки повернуты не в ту сторону
+* При восстановлении серверных объектов удаленных через RemoveBuildings, теряется исходное положение некоторых объектов.  
+Например автобусные остановки повернуты не в ту сторону, высота расположения объектов тоже может отличаться от оригинальной.
 
 ## Disclaimer
 Функционал был подобран из открытых источников, и не является результатом реверса Samp Addon.
-Этот скрипт не влючает в себя античит, и не может считаться полноценной заменой аддона.
+Этот скрипт не влючает в себя античит, и не может считаться полноценной заменой Samp Addon.
