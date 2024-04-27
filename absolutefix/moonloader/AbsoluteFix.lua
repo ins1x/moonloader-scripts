@@ -3,7 +3,7 @@ script_name("AbsoluteFix")
 script_description("Set of fixes for Absolute Play servers")
 script_properties("work-in-pause")
 script_url("https://github.com/ins1x/useful-samp-stuff/tree/main/luascripts/absolutefix")
-script_version("3.0.5")
+script_version("3.0.6")
 
 -- script_moonloader(16) moonloader v.0.26
 -- forked from https://github.com/ins1x/AbsEventHelper v1.5
@@ -769,6 +769,13 @@ function sampev.onSendDialogResponse(dialogId, button, listboxId, input)
          return false --(dialogId, button, listboxId, 0)
       end
    end
+   
+   -- fix incorrect weapon ammo input
+   if dialogId == 1431 and button == 1 then
+      if tonumber(input) > 10000 then
+         sampSendDialogResponse(1431, 1, 1, 1000)
+      end
+   end
 end
 
 function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
@@ -849,6 +856,7 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
       "Трава\t"..(ini.settings.grass and '{00FF00}[Включена]' or '{FFFF00}[Отключена]').."\n"
       return {dialogId, style, title, button1, button2, newtext}
    end
+   
 end
 
 function sampev.onSendClickPlayer(playerId, source)
