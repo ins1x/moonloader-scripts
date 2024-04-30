@@ -14,7 +14,6 @@ script_version("3.0.6")
 
 require 'lib.moonloader'
 local ffi = require"ffi"
-local keys = require 'vkeys'
 local sampev = require 'lib.samp.events'
 local memory = require 'memory'
 local encoding = require 'encoding'
@@ -346,7 +345,7 @@ function main()
     
 	  -- hide attachet object if player aiming by sniper rifle, camera, rpg
       if ini.settings.hideattachesonaim then
-	     if isKeyDown(VK_RBUTTON) then
+	     if isKeyDown(0x02) then
 		    if isCurrentCharWeapon(PLAYER_PED, 34) or isCurrentCharWeapon(PLAYER_PED, 43) or 
 			isCurrentCharWeapon(PLAYER_PED, 35) or isCurrentCharWeapon(PLAYER_PED, 36) then
 	           for i, objid in pairs(getAllObjects()) do
@@ -488,24 +487,24 @@ function main()
       -- Sets hotkeys that are only available with the samp addon
       if ini.settings.keybinds then
 	     -- fix Y menu call on spectate mode 
-	     if isKeyJustPressed(VK_Y) and isPlayerSpectating and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then 
+	     if isKeyJustPressed(0x59) and isPlayerSpectating and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then 
 		    sampSendChat("/menu")
 		 end
          
 		 -- When switching the language Alt+Shift Shift is no longer triggered and the player does not jump
-		 if isKeyDown(VK_LSHIFT) and isKeyJustPressed(VK_LMENU) and sampIsChatInputActive() and not isPauseMenuActive() and not isCharInAnyCar(PLAYER_PED) then
+		 if isKeyDown(0xA0) and isKeyJustPressed(0xA4) and sampIsChatInputActive() and not isPauseMenuActive() and not isCharInAnyCar(PLAYER_PED) then
 		    clearCharTasksImmediately(PLAYER_PED)
 			setPlayerControl(playerHandle, 1)
 			freezeCharPosition(PLAYER_PED, false)
          end		 
 		 
 		 -- The Tab key does not trigger a shot when aiming
-		 if isKeyDown(VK_RBUTTON) and isKeyDown(VK_TAB) and not isCharInAnyCar(PLAYER_PED) then
+		 if isKeyDown(0x02) and isKeyDown(0x09) and not isCharInAnyCar(PLAYER_PED) then
 		    clearCharTasksImmediately(PLAYER_PED)
 		 end 
 		 
-		 -- Open last chosen player dialog (only if samp addon not installed)
-	     if not isSampAddonInstalled and isKeyJustPressed(VK_B)
+		 -- Open last chosen player dialog on B key (only if samp addon not installed)
+	     if not isSampAddonInstalled and isKeyJustPressed(0x42)
 	     and not sampIsChatInputActive() and not isPauseMenuActive()
 	     and not sampIsDialogActive() and not isSampfuncsConsoleActive() then 
 		    if clickedplayerid then
@@ -516,53 +515,53 @@ function main()
 	     end 
 		 
 		 -- ALT + RMB show player stats
-		 if isKeyDown(VK_RBUTTON) and isKeyJustPressed(VK_MENU) and not sampIsChatInputActive() and not isPauseMenuActive() and isCharInAnyCar(PLAYER_PED) then
+		 if isKeyDown(0x02) and isKeyJustPressed(0x12) and not sampIsChatInputActive() and not isPauseMenuActive() and isCharInAnyCar(PLAYER_PED) then
 		    if(getClosestPlayerId() ~= -1) then
 			   sampSendChat(string.format("/cnfn %i", getClosestPlayerId()))
 			end
          end	
 		 
 		 if isAbsoluteRoleplay then
-            if isKeyJustPressed(VK_K) and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then sampSendChat("/gps") end
+            if isKeyJustPressed(0x4B) and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then sampSendChat("/gps") end
 		 else
-		    if isKeyJustPressed(VK_K) and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then sampSendChat("/vfibye2") end
+		    if isKeyJustPressed(0x4B) and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then sampSendChat("/vfibye2") end
 		 end	
          
 		 if isAbsoluteRoleplay then
-            if isKeyJustPressed(VK_P) and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then sampSendChat("/phone") end
+            if isKeyJustPressed(0x50) and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then sampSendChat("/phone") end
 		 
-            if isKeyJustPressed(VK_I) and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then sampSendChat("/inv") end
+            if isKeyJustPressed(0x49) and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then sampSendChat("/inv") end
 		 end
 		 
          if isPlayerSpectating then
-            if isKeyJustPressed(VK_N) and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then 
+            if isKeyJustPressed(0x4E) and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then 
                if lastObjectId ~= nil then
                   editObjectBySampId(lastObjectId, false)
                end
             end
          end
          
-         if isKeyJustPressed(VK_M) and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then sampSendChat("/vfibye") end
+         if isKeyJustPressed(0x4D) and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then sampSendChat("/vfibye") end
+         
+         if isKeyJustPressed(0x55) and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then sampSendChat("/anim") end
       
-         if isKeyJustPressed(VK_U) and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then sampSendChat("/anim") end
-      
-         if isKeyJustPressed(VK_J) and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then sampSendChat("/gjktn") end
+         if isKeyJustPressed(0x4A) and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then sampSendChat("/gjktn") end
 	     
 		 -- if Player in Vehicle
 	     if isCharInAnyCar(PLAYER_PED) then
-	        if isKeyJustPressed(VK_L) and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then sampSendChat("/lock") end
+	        if isKeyJustPressed(0x4C) and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then sampSendChat("/lock") end
 	        
             if not isAbsoluteRoleplay then
-               if isKeyJustPressed(VK_H) and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then  sampSendChat("/f") end
+               if isKeyJustPressed(0x48) and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then  sampSendChat("/f") end
                
-			   if isKeyJustPressed(VK_Z) and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then sampSendChat("/xbybnm") end
+			   if isKeyJustPressed(0x5A) and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then sampSendChat("/xbybnm") end
             end   
 		 end
 		 
 		 -- Switching textdraws with arrow buttons, mouse buttons, pgup-pgdown keys
-	     if isKeyJustPressed(VK_LEFT) or isKeyJustPressed(VK_XBUTTON1) or isKeyJustPressed(VK_PRIOR) and sampIsCursorActive() and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then sampSendClickTextdraw(36) end
+	     if isKeyJustPressed(0x25) or isKeyJustPressed(0x05) or isKeyJustPressed(0x21) and sampIsCursorActive() and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then sampSendClickTextdraw(36) end
 	  
-	     if isKeyJustPressed(VK_RIGHT) or isKeyJustPressed(VK_XBUTTON2) or isKeyJustPressed(VK_NEXT) and sampIsCursorActive() and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then sampSendClickTextdraw(37) end
+	     if isKeyJustPressed(0x27) or isKeyJustPressed(0x06) or isKeyJustPressed(0x22) and sampIsCursorActive() and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then sampSendClickTextdraw(37) end
       end 
 	  
       -- END main
