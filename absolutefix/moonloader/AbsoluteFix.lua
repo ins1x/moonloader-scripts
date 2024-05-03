@@ -3,7 +3,7 @@ script_name("AbsoluteFix")
 script_description("Set of fixes for Absolute Play servers")
 script_properties("work-in-pause")
 script_url("https://github.com/ins1x/useful-samp-stuff/tree/main/luascripts/absolutefix")
-script_version("3.0.6")
+script_version("3.0.7")
 
 -- script_moonloader(16) moonloader v.0.26
 -- forked from https://github.com/ins1x/AbsEventHelper v1.5
@@ -13,7 +13,6 @@ script_version("3.0.6")
 -- https://vk.com/@gorskinscripts-gamefixer-obnovlenie-30
 
 require 'lib.moonloader'
-local ffi = require"ffi"
 local sampev = require 'lib.samp.events'
 local memory = require 'memory'
 local encoding = require 'encoding'
@@ -105,7 +104,7 @@ function main()
          sampTextdrawDelete(2048)
          sampTextdrawDelete(420)
       end
-	  
+   
 	  if ini.settings.antiafk then
          -- dirty hack nop F1 and F4 keys functions
          memory.setuint8(getModuleHandle('samp.dll') + 0x67450, 0xC3, true)
@@ -535,9 +534,10 @@ function main()
 		 
          if isPlayerSpectating then
             if isKeyJustPressed(0x4E) and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then 
-               if lastObjectId ~= nil then
-                  editObjectBySampId(lastObjectId, false)
-               end
+               --if lastObjectId ~= nil then
+                  --editObjectBySampId(lastObjectId, false)
+               --end
+               enterEditObject()
             end
          end
          
@@ -594,11 +594,18 @@ function getClosestPlayerId()
     return closestId
 end
 
-function editObjectBySampId(id, playerobj) 
-   if isSampAvailable() then
-      ffi.cast("void (__thiscall*)(unsigned long, short int, unsigned long)", sampGetBase() + 0x6DE40)(readMemory(sampGetBase() + 0x21A0C4, 4), id, playerobj and 1 or 0)
-   end
-end
+
+function enterEditObject()
+   local bs = raknetNewBitStream()
+   raknetEmulRpcReceiveBitStream(27, bs)
+   raknetDeleteBitStream(bs)
+end 
+
+-- function editObjectBySampId(id, playerobj) 
+   -- if isSampAvailable() then
+      -- ffi.cast("void (__thiscall*)(unsigned long, short int, unsigned long)", sampGetBase() + 0x6DE40)(readMemory(sampGetBase() + 0x21A0C4, 4), id, playerobj and 1 or 0)
+   -- end
+-- end
 
 -- Hooks
 function sampev.onServerMessage(color, text)
