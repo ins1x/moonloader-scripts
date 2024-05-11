@@ -1,7 +1,7 @@
 script_name("TrainingSpawnPresets")
 script_author("1NS")
 script_url("https://training-server.com/")
-script_description("After first spawn it sets the skin, weather and time on TRAINING")
+script_description("After world spawn it sets the weather and time on TRAINING")
 -- encoding: windows-1251
 
 local sampev = require 'lib.samp.events'
@@ -28,8 +28,6 @@ end
 function sampev.onSendSpawn()
    if firstSpawn then 
       sampSendChat("/skin "..skinid)
-      sampSendChat("/weather "..weatherid)
-      sampSendChat("/time "..time)
       firstSpawn = false
    end
 end
@@ -38,6 +36,9 @@ function sampev.onServerMessage(color, text)
    if text:find("Виртуальный мир успешно создан") 
    or text:find("Вы создали пробный VIP мир") then 
       sampSendChat("/weather "..weatherid)
-      sampSendChat("/time "..time)
+      lua_thread.create(function()
+         wait(1000)
+         sampSendChat("/time "..time)
+      end)
    end
 end    
