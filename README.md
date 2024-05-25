@@ -17,7 +17,7 @@ It introduces the ability to load Lua scripts into the game, has all the functio
 | --- | --- |
 | [AbsoluteFix](https://github.com/ins1x/moonloader-scripts/tree/main/absolutefix) | A set of fixes and additions for Absolute Play servers |
 | [AutoForward](https://github.com/ins1x/moonloader-scripts/blob/main/AutoForward.lua) | Script for automatic movement by car (cruise control), and autoforward on foot |
-| [AbsEventHelper](https://github.com/ins1x/AbsEventHelper) | Assistant for mappers and event organizers on Absolute Play servers |
+| [AbsEventHelper](https://github.com/ins1x/moonloader-scripts/tree/main/abseventhelper) | Helper for event organizers on Absolute Play servers |
 | [Bunnyhopfix](https://github.com/ins1x/moonloader-scripts/tree/main/bunnyhopfix.lua) | Allow bunnyhop for roleplay servers |
 | [Clickwarp](https://github.com/ins1x/moonloader-scripts/tree/main/clickwarp/) | Fork of original clickwarp by FYP updated for Absolute Play |
 | [DriftСameraLock](https://github.com/ins1x/moonloader-scripts/tree/main/DriftСameraLock.lua) | Lock camera behind player on vehicle (DriftCam) |
@@ -25,6 +25,7 @@ It introduces the ability to load Lua scripts into the game, has all the functio
 | [GangWarNotifer](https://github.com/ins1x/moonloader-scripts/tree/main/GangWarNotifier.lua) | Notifies if gangwar has started for the territory |
 | [Renderobjects](https://github.com/ins1x/moonloader-scripts/tree/main/renderobjects) | A convenient tool for mappers, allows you to quickly find the desired object |
 | [TrainingFix](https://github.com/ins1x/moonloader-scripts/tree/main/training-fixes) | Various fixes for the TRAINING server |
+| [MappingToolkit](https://github.com/ins1x/MappingToolkit) | In-game assistant for mappers and event makers |
 | [ModCompatibilityChecker](https://github.com/ins1x/moonloader-scripts/tree/main/ModCompatibilityChecker.lua) | Checks the mods that can cause crashes |
 | [Nogametext](https://github.com/ins1x/moonloader-scripts/tree/main/nogametext.lua) | Hides annoying gametext in the middle of the screen on the UIF server |
 
