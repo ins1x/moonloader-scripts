@@ -24,7 +24,6 @@ It introduces the ability to load Lua scripts into the game, has all the functio
 | [FriendsList](https://github.com/ins1x/moonloader-scripts/tree/main/friendslist/) | It notifies you when a friend comes online or quits |
 | [GangWarNotifer](https://github.com/ins1x/moonloader-scripts/tree/main/GangWarNotifier.lua) | Notifies if gangwar has started for the territory |
 | [Renderobjects](https://github.com/ins1x/moonloader-scripts/tree/main/renderobjects) | A convenient tool for mappers, allows you to quickly find the desired object |
-| [TrainingFix](https://github.com/ins1x/moonloader-scripts/tree/main/training-fixes) | Various fixes for the TRAINING server |
 | [MappingToolkit](https://github.com/ins1x/MappingToolkit) | In-game assistant for mappers and event makers |
 | [ModCompatibilityChecker](https://github.com/ins1x/moonloader-scripts/tree/main/ModCompatibilityChecker.lua) | Checks the mods that can cause crashes |
 | [Nogametext](https://github.com/ins1x/moonloader-scripts/tree/main/nogametext.lua) | Hides annoying gametext in the middle of the screen on the UIF server |
