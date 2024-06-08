@@ -3,7 +3,7 @@ script_name("AbsoluteFix")
 script_description("Set of fixes for Absolute Play servers")
 script_properties("work-in-pause")
 script_url("https://github.com/ins1x/useful-samp-stuff/tree/main/luascripts/absolutefix")
-script_version("3.0.7")
+script_version("3.0.8")
 
 -- script_moonloader(16) moonloader v.0.26
 -- forked from https://github.com/ins1x/AbsEventHelper v1.5
@@ -35,6 +35,7 @@ local ini = inicfg.load({
       fastload = true,
       hideattachesonaim = true,
 	  hidehousesmapicons = true,
+      houseobjectsrotfix = true,
       gamefixes = true,
       grass = false,
       infinityrun = true,
@@ -56,6 +57,7 @@ local ini = inicfg.load({
       shadows = false,
       speedblur = false,
       sunfix = false,
+      snowoff = false,
       vehvisualdmg = false
    },
 }, configIni)
@@ -503,8 +505,7 @@ function main()
 		 end 
 		 
 		 -- Open last chosen player dialog on B key (only if samp addon not installed)
-	     if not isSampAddonInstalled and isKeyJustPressed(0x42)
-	     and not sampIsChatInputActive() and not isPauseMenuActive()
+	     if isKeyJustPressed(0x42) and not sampIsChatInputActive() and not isPauseMenuActive()
 	     and not sampIsDialogActive() and not isSampfuncsConsoleActive() then 
 		    if clickedplayerid then
 		       if sampIsPlayerConnected(clickedplayerid) then 
@@ -755,6 +756,17 @@ function sampev.onSendDialogResponse(dialogId, button, listboxId, input)
       sampAddChatMessage("Примечание: Стоимость 500$ за любой", -1)
    end
    
+   -- Corrects the placement of objects near the house. Sets the correct angle.
+   if dialogId == 100 and listboxId == 4 and button == 1 then
+      sampAddChatMessage("Примечание: Стоимость 1000$ за любой", -1)
+      if ini.settings.houseobjectsrotfix then
+         local angle = math.ceil(getCharHeading(PLAYER_PED))
+         local fixangle = 360/8 * math.floor(angle/45)
+         setCharHeading(PLAYER_PED, fixangle)
+         --print("src angle"..angle.."fixed angle: "..getCharHeading(PLAYER_PED))
+      end
+   end
+      
    -- Graphics settings dialog
    if dialogId == 1770 and button == 1 then
       if listboxId == 0 then ini.settings.speedblur = not ini.settings.speedblur end
@@ -824,6 +836,15 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
       end
    end
    
+   -- Hide clan dialog
+   -- if not isAbsoluteRoleplay and ini.settings.dialogfix then
+      -- if dialogId == 50 then
+         -- sampSendDialogResponse(50, 0, 1)
+         -- sampCloseCurrentDialogWithButton(0)
+         -- return false
+      -- end
+   -- end
+   
    if dialogId == 14 then
       local newtext = 
       "Оружие при появлении\t\n"..
@@ -877,6 +898,13 @@ end
 function sampev.onCreateObject(objectId, data)
    -- Fix Crash the game when creating a crane object 1382
    if data.modelId == 1382 then return false end
+   
+   -- Disable snowflakes
+   if ini.settings.snowoff then
+      if data.modelId == 18864 or data.modelId == 18863 then
+         return false
+      end
+   end
    
    if ini.settings.mapfixes then 
       -- Fix double created objects 

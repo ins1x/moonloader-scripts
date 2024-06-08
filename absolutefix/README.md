@@ -1,7 +1,7 @@
 <h1 align="center">AbsoluteFix</h1>
 <p align="center">
-    <img src="https://img.shields.io/badge/made%20for-GTA%20SA--MP-blue" >
-    <img src="https://img.shields.io/badge/Server-Absolute%20Play-red">
+    <a href="https://www.sa-mp.mp/"><img src="https://img.shields.io/badge/made%20for-GTA%20SA--MP-blue"></a>
+    <a href="https://gta-samp.ru/"><img src="https://img.shields.io/badge/Server-Absolute%20Play-red"></a>
 </p>
 
 Набор исправлений и дополнений для серверов [Absolute Play](https://sa-mp.ru/).  
@@ -116,38 +116,39 @@
 ## Config
 Все настройки хранятся в файле moonloader\config\AbsoluteFix.ini  
 ```INI
-      antiafk = true,
-      anticrash = true,
-	  autoreconnect = true,
-      chatfilter = true,
-      dialogfix = true,
-      disablenotifications = true,
-	  disablerecordnotifications = true,
-      fastload = true,
-      hideattachesonaim = true,
-	  hidehousesmapicons = true,
-      gamefixes = true,
-      grass = false,
-      infinityrun = true,
-      improvedrun = true,
-      improvedbike = true,
-      improvedjetpack = true,
-      improvedairvehheight = true,
-      keybinds = true,
-      noeffects = false,
-      nologo = false,
-	  noradio = false,
-      nogametext = false,
-	  noweaponpickups = true,
-      mapfixes = true,
-      menupatch = true,
-      pmsoundfix = true,
-	  restoreremovedobjects = false,
-	  recontime = 20000,
-      shadows = false,
-      speedblur = false,
-      sunfix = false,
-      vehvisualdmg = false
+   antiafk = true,                     Включить антиафк
+   anticrash = true,                   Включить антикрашер
+   autoreconnect = true,               Автореконнект
+   chatfilter = true,                  Фильтровать чат
+   dialogfix = true,                   Дополнять диалоги
+   disablenotifications = true,        Откючить спам уведомления в чате
+   disablerecordnotifications = true,  Отключить уведомления о рекордах
+   fastload = true,                    Бычтрая загрузка с пропуском загр. экранов
+   hideattachesonaim = true,           Скрывать аттачи при прицеливаннии 
+   hidehousesmapicons = true,          Скрывать иконки домов
+   gamefixes = true,                   Включить фиксы игры
+   grass = false,                      Включить отображение травы
+   infinityrun = true,                 Бесконечный бег
+   improvedrun = true,                 Улучшенный бег по всем поверхностям
+   improvedbike = true,                Улучшеное вождение байка, игрок не падает
+   improvedjetpack = true,             Улучшенный джетпак, снят лимит высоты
+   improvedairvehheight = true,        Улучшенный навык пилота, снят лимит высоты
+   keybinds = true,                    Включить горячие клавиши
+   noeffects = false,                  Отключить все эффекты
+   nologo = false,                     Скрыть логотип вверху справа над худом
+   noradio = false,                    Отключить радио в машине
+   nogametext = false,                 Отключить все раздражающие геймтексты на полэкрана
+   noweaponpickups = true,             Скрыть пикапы оружия
+   mapfixes = true,                    Включить фиксы маппинга (удаление дюпов объектов)
+   menupatch = true,                   Удаляет лишние секции из меню ESC
+   pmsoundfix = true,                  Включить звук при получении личных сообщений
+   restoreremovedobjects = false,      Восстанавливать удаленные объекты
+   recontime = 20000,                  Время переподключения на сервер
+   shadows = false,                    Включить тени
+   speedblur = false,                  Включить эффект размытия при разгоне на машине
+   sunfix = false,                     Включить эффект солнца  
+   snowoff = false,                    Отключить снежинки (убирает самп объекты со снегом)
+   vehvisualdmg = false                Отключить урон транспорта (визуально для вас)
 ```
 
 > Скрипт предназначен для Absolute Play, для других проектов попробуйте более функциональные скрипты с множеством фиксов
