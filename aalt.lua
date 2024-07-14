@@ -14,12 +14,16 @@ function main()
    while true do
       wait(0)
       -- 0xA5 is Right ALT key
-      if isKeyJustPressed(0xA5)
-      and not sampIsChatInputActive() and not sampIsDialogActive()
-      and not isPauseMenuActive() then 
+      if isKeyJustPressed(0xA5) then 
          state = not state
          lua_thread.create(function()
             while state do
+               if sampIsChatInputActive() or sampIsDialogActive()
+               or isPauseMenuActive() then 
+                  state = false
+                  wait(50)
+                  setVirtualKeyDown(0xA4, false)
+               end
                wait(50)
                -- 0xA4 is Left ALT key
                setVirtualKeyDown(0xA4, true)
