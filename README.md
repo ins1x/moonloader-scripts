@@ -27,5 +27,6 @@ It introduces the ability to load Lua scripts into the game, has all the functio
 | [MappingToolkit](https://github.com/ins1x/MappingToolkit) | In-game assistant for mappers and event makers |
 | [ModCompatibilityChecker](https://github.com/ins1x/moonloader-scripts/tree/main/ModCompatibilityChecker.lua) | Checks the mods that can cause crashes |
 | [Nogametext](https://github.com/ins1x/moonloader-scripts/tree/main/nogametext.lua) | Hides annoying gametext in the middle of the screen on the UIF server |
+| [STO-helper](https://github.com/ins1x/moonloader-scripts/tree/main/sto-helper) |  Assistant for service station mechanics at Arizona-Roleplay |
 
 > Disclaimer: All rights to modified scripts belong to their respective owners (specified in the description).
