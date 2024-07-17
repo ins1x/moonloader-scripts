@@ -3,7 +3,7 @@ script_name("STO Helper Lite")
 script_description("A helper for working at a service station")
 script_dependencies("imgui")
 script_url("https://github.com/ins1x/moonloader-scripts")
-script_version("0.2 beta")
+script_version("0.3 lite")
 -- script_moonloader(16) moonloader v.0.26
 -- tested on sa-mp client version: 0.3.7 R1
 -- activaton: F2 (show main menu) or command /sto
@@ -80,6 +80,7 @@ function imgui.OnDrawFrame()
       if openedTab == 0 then
       
          imgui.Text(u8"Помошник для механиков СТО на Arizona-Roleplay.")
+         imgui.Text(u8"Эксклюзивная версия для сервера Red-Rock.")
          imgui.Text(u8"Версия: "..tostring(thisScript().version))
          imgui.Spacing()
          imgui.Text(u8"Автор: 1NS (Insane_RedRock)")
@@ -109,7 +110,9 @@ function imgui.OnDrawFrame()
             lua_thread.create(function()
                sampSendChat("Здравствуйте, что необходимо сделать?")
                wait(ini.settings.sendchatdelay)
-               sampSendChat("/me Визуально осмотрел автомобиль")
+               if ini.settings.roleplayactions then
+                  sampSendChat("/me Визуально осмотрел автомобиль")
+               end
             end)
          end
          imgui.SameLine()
@@ -126,7 +129,7 @@ function imgui.OnDrawFrame()
          end
          imgui.SameLine()
          if imgui.Button(u8"Лицензия",imgui.ImVec2(175, 25)) then 
-            sampSendChat("Лиценизия имеется, улучшения поставить можем")
+            sampSendChat("Лицензированный механик, могу выполнять все виды работ")
          end
          
          if imgui.Button(u8"Не заправляем",imgui.ImVec2(175, 25)) then 
@@ -154,6 +157,18 @@ function imgui.OnDrawFrame()
                   wait(ini.settings.sendchatdelay)
                   sampSendChat("/me Ожидает")
                end
+            end)
+         end
+         
+         if imgui.Button(u8"Большой транспорт в ФК",imgui.ImVec2(175, 25)) then
+            lua_thread.create(function()
+               sampSendChat("Ваш транспорт слишком большой! Вам необходимо ехать на СТО в Форт Карсон.")
+            end)
+         end
+         imgui.SameLine()
+         if imgui.Button(u8"Займите платформу",imgui.ImVec2(175, 25)) then
+            lua_thread.create(function()
+               sampSendChat("Займите платформу, для начала обслуживания вашего транспорта")
             end)
          end
          
@@ -252,11 +267,11 @@ function imgui.OnDrawFrame()
          
          imgui.Text(u8"Шаблоны:")
          if imgui.Button(u8"СТО на РК (Red-Country)",imgui.ImVec2(175, 25)) then
-            input.adtext.v = u8"Работает СТО в Ред Кантри, только проф. механики"
+            input.adtext.v = u8"Работает СТО в Ред Кантри, только опытные механики"
          end
          imgui.SameLine()
          if imgui.Button(u8"СТО на ФК (Fort Carson)",imgui.ImVec2(175, 25)) then
-            input.adtext.v = u8"Работает СТО в Форт Карсон, только проф. механики"
+            input.adtext.v = u8"Работает СТО в Форт Карсон, только опытные механики"
          end
          imgui.Text(u8"Важно! Реклама в вип-чат разрешена с интервалом в 10 минут.")
          
@@ -281,7 +296,6 @@ function imgui.OnDrawFrame()
       elseif openedTab == 4 then
       
          imgui.Text(u8"Помошник для механиков СТО на Arizona-Roleplay.")
-         --imgui.Text(u8"Не содержит запрещенных фунцкций.")
          imgui.Spacing()
          if imgui.CollapsingHeader(u8"Лицензия механика") then
             imgui.Text(u8"Лицензия механика необходима чтобы выполнять")
@@ -308,6 +322,16 @@ function imgui.OnDrawFrame()
             imgui.Text(u8"С установки улучшений от $500 000 до $800 000")
             imgui.Text(u8"ЗП отличается в разных штатах.")
             imgui.Text(u8"Без устройства на СТО вы будете получать на 15% меньше.")
+         end
+         if imgui.CollapsingHeader(u8"Команды для механика на вызове") then
+            imgui.Text(u8"/repair - предложить починку автомобиля")
+            imgui.Text(u8"/refill - предложить заправить автомобиль")
+            imgui.Text(u8"/gcontract - подписать контракт с АЗС")
+         end
+         if imgui.CollapsingHeader(u8"Команды для работы в автомастерской") then
+            imgui.Text(u8"/tupdate - поставить заказанные компоненты на машину")
+            imgui.Text(u8"/repairdvig - починить двигатель")
+            imgui.Text(u8"/endtune - закончить работу с клиентом")
          end
          imgui.Spacing()
          
