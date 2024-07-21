@@ -1,7 +1,6 @@
-script_author("1NS")
 script_name("nopostfx")
 script_description("Disables post-processing (Post-FX) and fix dark timecycle")
-script_url("https://github.com/ins1x/useful-samp-stuff/tree/main/luascripts/")
+script_url("https://github.com/ins1x/moonloader-scripts")
 script_version("1.0")
 -- Tsi script is improved version classic nopostfx.asi
 -- include fixes for the dark timecycle

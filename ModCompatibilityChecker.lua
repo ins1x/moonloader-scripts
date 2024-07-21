@@ -1,7 +1,7 @@
 script_author("1NS")
 script_name("ModCompatibilityChecker")
 script_description("Checks the mods that can cause crashes")
-script_url("https://github.com/ins1x/useful-samp-stuff/tree/main/luascripts")
+script_url("https://github.com/ins1x/moonloader-scripts")
 script_version("1.2")
 -- script_moonloader(16) moonloader v.0.26
       

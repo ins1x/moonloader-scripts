@@ -1,6 +1,6 @@
-script_name("nogametext")
+script_name("noGameTexts")
 script_author("1NS")
-script_url("play.uifserver.net")
+script_url("https://github.com/ins1x/moonloader-scripts")
 script_description("Hide all annoying gametexts on UIF server")
 
 local sampev = require 'lib.samp.events'

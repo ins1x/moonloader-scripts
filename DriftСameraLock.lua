@@ -1,6 +1,6 @@
 script_name("DriftРЎameraLock")
 script_description("Lock camera behind player on vehicle (DriftCam)")
-script_url("https://github.com/ins1x/useful-samp-stuff")
+script_url("https://github.com/ins1x/moonloader-scripts")
 script_version(0.1)
 -- script_moonloader(16) moonloader v.0.26
 -- in-game deactivation: ALT + C
