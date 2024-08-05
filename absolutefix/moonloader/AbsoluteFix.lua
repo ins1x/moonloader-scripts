@@ -3,10 +3,8 @@ script_name("AbsoluteFix")
 script_description("Set of fixes for Absolute Play servers")
 script_properties("work-in-pause")
 script_url("https://github.com/ins1x/useful-samp-stuff/tree/main/luascripts/absolutefix")
-script_version("3.0.8")
-
+script_version("3.0.9")
 -- script_moonloader(16) moonloader v.0.26
--- forked from https://github.com/ins1x/AbsEventHelper v1.5
 
 -- If your don't play on Absolute Play servers
 -- recommend use more functional script GameFixer by Gorskin
@@ -199,6 +197,8 @@ function main()
          -- disable talking
          writeMemory(0x5EFFE7, 1, 0xEB, true)
          
+         -- disable the rocking of the body of cars 
+         writeMemory(0x6AC0F0, 2, 0x9090, true)
          -- windsound bugfix
          local windsoundfix = allocateMemory(4)
          writeMemory(windsoundfix, 4, 1, true)
@@ -668,6 +668,10 @@ function sampev.onServerMessage(color, text)
       end
       
       if text:find("Никто не смог решить вопрос терминала загадок") then
+         return false
+      end
+      
+      if text:find("В мире можно телепортироваться к объектам или на карте") then
          return false
       end
       
