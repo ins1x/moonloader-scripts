@@ -21,7 +21,6 @@ function onSendRpc(id, bitStream, priority, reliability, orderingChannel, shiftT
       local length = raknetBitStreamReadInt32(bitStream)
       local message = raknetBitStreamReadString(bitStream, length)
       if message:match("^ *$") or message:match("^%s%s*$") then
-         print("debug:"..message)
          return false
       end
    end
