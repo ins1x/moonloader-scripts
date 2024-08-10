@@ -15,6 +15,7 @@ It introduces the ability to load Lua scripts into the game, has all the functio
 
 | Name | Description |
 | --- | --- |
+| [Abike](https://github.com/ins1x/moonloader-scripts/tree/main/Abike.lua) | Pressing W on the bike automatically accelerates it |
 | [AbsoluteFix](https://github.com/ins1x/moonloader-scripts/tree/main/absolutefix) | A set of fixes and additions for Absolute Play servers |
 | [AutoForward](https://github.com/ins1x/moonloader-scripts/blob/main/AutoForward.lua) | Script for automatic movement by car (cruise control), and autoforward on foot |
 | [AbsEventHelper](https://github.com/ins1x/moonloader-scripts/tree/main/abseventhelper) | Helper for event organizers on Absolute Play servers |
@@ -22,12 +23,14 @@ It introduces the ability to load Lua scripts into the game, has all the functio
 | [DriftСameraLock](https://github.com/ins1x/moonloader-scripts/tree/main/DriftСameraLock.lua) | Lock camera behind player on vehicle (DriftCam) |
 | [FriendsList](https://github.com/ins1x/moonloader-scripts/tree/main/friendslist/) | It notifies you when a friend comes online or quits |
 | [GangWarNotifer](https://github.com/ins1x/moonloader-scripts/tree/main/GangWarNotifier.lua) | Notifies if gangwar has started for the territory |
+| [GPSoff](https://github.com/ins1x/moonloader-scripts/tree/main/gpsoff.lua) | Add cmd /gpsoff to disable /gps checkpoints |
 | [Renderobjects](https://github.com/ins1x/moonloader-scripts/tree/main/renderobjects) | A convenient tool for mappers, allows you to quickly find the desired object |
 | [MappingToolkit](https://github.com/ins1x/MappingToolkit) | In-game assistant for mappers and event makers |
 | [ModCompatibilityChecker](https://github.com/ins1x/moonloader-scripts/tree/main/ModCompatibilityChecker.lua) | Checks the mods that can cause crashes |
 | [noEmptyMessages](https://github.com/ins1x/moonloader-scripts/tree/main/noEmptyMessages.lua) | Ignores sending and receiving empty chat messages |
 | [noGameTexts](https://github.com/ins1x/moonloader-scripts/tree/main/noGameTexts.lua) | Hides annoying gametext in the middle of the screen on the UIF server |
 | [noPostFX.lua](https://github.com/ins1x/moonloader-scripts/tree/main/noEmptyMessages.lua) | Disables post-processing (Post-FX) and fix dark timecycle |
+| [separate-messages](https://github.com/ins1x/moonloader-scripts/tree/main/separate-messages) |  separate long chat messages at Arizona-Roleplay |
 | [STO-helper](https://github.com/ins1x/moonloader-scripts/tree/main/sto-helper) |  Assistant for service station mechanics at Arizona-Roleplay |
 
 > Disclaimer: All rights to modified scripts belong to their respective owners (specified in the description).
