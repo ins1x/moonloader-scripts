@@ -1,8 +1,7 @@
 Automatic transfer of messages that are too long to the second line.   
 
 Requirements: Moonloader (require 'lib.samp.events')  
-original version: https://www.blast.hk/threads/69714/  
-Author: Arizona RP | Useful things.  
+Author original version: https://www.blast.hk/threads/69714/  
 
 changed:  
 - unnecessary dependencies have been removed 
