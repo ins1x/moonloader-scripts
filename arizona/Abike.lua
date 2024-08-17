@@ -1,9 +1,9 @@
 script_name("Abike")
-script_description("Pressing W on the bike automatically accelerates it")
+script_description("Pressing W on the bike or skate automatically accelerates it")
 script_url("https://github.com/ins1x/moonloader-scripts")
 script_version("0.1")
 
-local bikeModel = {[481] = true, [509] = true, [510] = true}
+local bikeModel = {[481] = true, [509] = true, [510] = true, [15882] = true}
 
 function main()
    if not isSampLoaded() or not isSampfuncsLoaded() then return end
