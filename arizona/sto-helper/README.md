@@ -1,6 +1,6 @@
 # README
 
-![LOGO](https://raw.githubusercontent.com/ins1x/moonloader-scripts/main/sto-helper/demo.png)  
+![LOGO](https://raw.githubusercontent.com/ins1x/moonloader-scripts/main/arizona/sto-helper/demo.png)  
 
 Помошник для механиков СТО на Arizona-Roleplay  
 Эксклюзивная версия для сервера Red-Rock  
