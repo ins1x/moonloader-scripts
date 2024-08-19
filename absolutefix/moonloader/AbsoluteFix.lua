@@ -3,7 +3,7 @@ script_name("AbsoluteFix")
 script_description("Set of fixes for Absolute Play servers")
 script_properties("work-in-pause")
 script_url("https://github.com/ins1x/useful-samp-stuff/tree/main/luascripts/absolutefix")
-script_version("3.0.9")
+script_version("3.1.0")
 -- script_moonloader(16) moonloader v.0.26
 
 -- If your don't play on Absolute Play servers
@@ -75,6 +75,9 @@ local dialogIncoming = 0
 local clickedplayerid = nil
 local randomcolor = nil
 local lastObjectId = nil
+local hideEditObject = false
+local scaleEditObject = false
+local editResponse = 0 
 
 function main()
    if not isSampLoaded() or not isSampfuncsLoaded() then return end
@@ -491,6 +494,24 @@ function main()
 	     if isKeyJustPressed(0x59) and isPlayerSpectating and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then 
 		    sampSendChat("/menu")
 		 end
+         
+         -- hide edited object on hold ALT key
+         if isKeyDown(0x12) and editResponse > 0 and not sampIsChatInputActive() 
+         and not sampIsDialogActive() and not isPauseMenuActive() 
+         and not isSampfuncsConsoleActive() then
+	        hideEditObject = true
+	     else
+	 	    hideEditObject = false
+	     end
+	     
+	     -- upscale edited object on hold CTRL key
+	     if isKeyDown(0x11) and editResponse > 0 and not sampIsChatInputActive() 
+         and not sampIsDialogActive() and not isPauseMenuActive() 
+         and not isSampfuncsConsoleActive() then
+	        scaleEditObject = true
+	     else
+	 	    scaleEditObject = false
+	     end
          
 		 -- When switching the language Alt+Shift Shift is no longer triggered and the player does not jump
 		 if isKeyDown(0xA0) and isKeyJustPressed(0xA4) and sampIsChatInputActive() and not isPauseMenuActive() and not isCharInAnyCar(PLAYER_PED) then
@@ -958,6 +979,27 @@ end
 
 function sampev.onSendEditObject(playerObject, objectId, response, position, rotation)
    lastObjectId = objectId
+   local object = sampGetObjectHandleBySampId(objectId)
+   local modelId = getObjectModel(object)
+   
+   editResponse = response
+   
+   if response > 0 then
+      if hideEditObject then
+	     setObjectVisible(object, false)
+      else
+	     setObjectVisible(object, true)
+	  end
+	  
+	  if scaleEditObject then
+	     setObjectScale(object, 1.35)
+	  else
+	     setObjectScale(object, 1.0)
+	  end
+   else 
+      setObjectVisible(object, true)
+	  setObjectScale(object, 1.0)
+   end
 end
  
 function sampev.onRemoveBuilding(modelId, position, radius)
