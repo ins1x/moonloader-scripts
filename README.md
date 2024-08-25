@@ -17,6 +17,7 @@ It introduces the ability to load Lua scripts into the game, has all the functio
 | --- | --- |
 | [Abike](https://github.com/ins1x/moonloader-scripts/tree/main/arizona/Abike.lua) | Pressing W on the bike automatically accelerates it |
 | [AbsoluteFix](https://github.com/ins1x/moonloader-scripts/tree/main/absolutefix) | A set of fixes and additions for Absolute Play servers |
+| [AbsoluteForumChecker](https://github.com/ins1x/moonloader-scripts/tree/main/absolute-roleplay/absForumChecker) | Forum checker for Absolute Play servers |
 | [AutoForward](https://github.com/ins1x/moonloader-scripts/blob/main/AutoForward.lua) | Script for automatic movement by car (cruise control), and autoforward on foot |
 | [AbsEventHelper](https://github.com/ins1x/moonloader-scripts/tree/main/abseventhelper) | Helper for event organizers on Absolute Play servers |
 | [Clickwarp](https://github.com/ins1x/moonloader-scripts/tree/main/clickwarp/) | Fork of original clickwarp by FYP updated for Absolute Play (only for event-makers)|
