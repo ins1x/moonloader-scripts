@@ -16,11 +16,11 @@ It introduces the ability to load Lua scripts into the game, has all the functio
 | Name | Description |
 | --- | --- |
 | [Abike](https://github.com/ins1x/moonloader-scripts/tree/main/arizona/Abike.lua) | Pressing W on the bike automatically accelerates it |
-| [AbsoluteFix](https://github.com/ins1x/moonloader-scripts/tree/main/absolutefix) | A set of fixes and additions for Absolute Play servers |
-| [AbsoluteForumChecker](https://github.com/ins1x/moonloader-scripts/tree/main/absolute-roleplay/absForumChecker) | Forum checker for Absolute Play servers |
+| [AbsoluteFix](https://github.com/ins1x/moonloader-scripts/tree/main/absolute-play/absolutefix) | A set of fixes and additions for Absolute Play servers |
+| [AbsoluteForumChecker](https://github.com/ins1x/moonloader-scripts/tree/main/absolute-play/absForumChecker) | Forum checker for Absolute Play servers |
+| [AbsEventHelper](https://github.com/ins1x/moonloader-scripts/tree/main/absolute-play/abseventhelper) | Helper for event organizers on Absolute Play servers |
 | [AutoForward](https://github.com/ins1x/moonloader-scripts/blob/main/AutoForward.lua) | Script for automatic movement by car (cruise control), and autoforward on foot |
-| [AbsEventHelper](https://github.com/ins1x/moonloader-scripts/tree/main/abseventhelper) | Helper for event organizers on Absolute Play servers |
-| [Clickwarp](https://github.com/ins1x/moonloader-scripts/tree/main/clickwarp/) | Fork of original clickwarp by FYP updated for Absolute Play (only for event-makers)|
+| [Clickwarp](https://github.com/ins1x/moonloader-scripts/tree/main/absolute-play/clickwarp/) | Fork of original clickwarp by FYP updated for Absolute Play (only for event-makers)|
 | [DriftСameraLock](https://github.com/ins1x/moonloader-scripts/tree/main/DriftСameraLock.lua) | Lock camera behind player on vehicle (DriftCam) |
 | [FriendsList](https://github.com/ins1x/moonloader-scripts/tree/main/friendslist/) | It notifies you when a friend comes online or quits |
 | [GangWarNotifer](https://github.com/ins1x/moonloader-scripts/tree/main/GangWarNotifier.lua) | Notifies if gangwar has started for the territory |
@@ -32,6 +32,7 @@ It introduces the ability to load Lua scripts into the game, has all the functio
 | [noGameTexts](https://github.com/ins1x/moonloader-scripts/tree/main/noGameTexts.lua) | Hides annoying gametext in the middle of the screen on the UIF server |
 | [noPostFX.lua](https://github.com/ins1x/moonloader-scripts/tree/main/noEmptyMessages.lua) | Disables post-processing (Post-FX) and fix dark timecycle |
 | [separate-messages](https://github.com/ins1x/moonloader-scripts/tree/main/arizona/separate-messages) |  separate long chat messages at Arizona-Roleplay |
+| [SkipCarRent](https://github.com/ins1x/moonloader-scripts/tree/main/arizona/SkipCarRent) |  Skip car rent dialog on Arizona-Roleplay server |
 | [STO-helper](https://github.com/ins1x/moonloader-scripts/tree/main/arizona/sto-helper) |  Assistant for service station mechanics at Arizona-Roleplay |
 
 > Disclaimer: All rights to modified scripts belong to their respective owners (specified in the description).
