@@ -21,6 +21,7 @@ It introduces the ability to load Lua scripts into the game, has all the functio
 | [AbsEventHelper](https://github.com/ins1x/moonloader-scripts/tree/main/absolute-play/abseventhelper) | Helper for event organizers on Absolute Play servers |
 | [absTXDNames](https://github.com/ins1x/moonloader-scripts/tree/main/absolute-play/absTXDNames) | Adds names for objects and textures in the map editor on Absolute Play |
 | [AutoForward](https://github.com/ins1x/moonloader-scripts/blob/main/AutoForward.lua) | Script for automatic movement by car (cruise control), and autoforward on foot |
+| [AutoLock](https://github.com/ins1x/moonloader-scripts/blob/main/arizona/AutoLock.lua) | Simple vehicle auto lock |
 | [Clickwarp](https://github.com/ins1x/moonloader-scripts/tree/main/absolute-play/clickwarp/) | Fork of original clickwarp by FYP updated for Absolute Play (only for event-makers)|
 | [DriftСameraLock](https://github.com/ins1x/moonloader-scripts/tree/main/DriftСameraLock.lua) | Lock camera behind player on vehicle (DriftCam) |
 | [FriendsList](https://github.com/ins1x/moonloader-scripts/tree/main/friendslist/) | It notifies you when a friend comes online or quits |
