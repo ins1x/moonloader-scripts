@@ -2,7 +2,7 @@ script_name("AutoLock")
 script_description("Auto lock vehicle")
 script_url("https://github.com/ins1x/moonloader-scripts")
 script_dependencies('lib.samp.events')
-script_version("0.1")
+script_version("0.2")
 script_author("1NS")
 -- encoding.default = 'CP1251'
 -- script_moonloader(16) moonloader v.0.26
@@ -23,6 +23,7 @@ function main()
                local doorStatus = getCarDoorLockStatus(car)
                local engineState = isCarEngineOn(car)
                if doorStatus > 0 then -- if doors locked unlock them
+                  wait(500)
                   sampSendChat("/lock")
                end
             end
@@ -36,14 +37,10 @@ function main()
    end
 end
 
--- function sampev.onSendEnterVehicle(vehicleId, passenger)
-   -- if not passenger then
-      -- local carhandle = storeCarCharIsInNoSave(PLAYER_PED)
-      -- local state = isCarEngineOn(carhandle)
-   -- end
--- end
-
 function sampev.onSendExitVehicle(vehicleId)
    lastVehicleId = vehicleId
-   sampSendChat("/lock")
+   lua_thread.create(function()
+      wait(500)
+      sampSendChat("/lock")
+   end)
 end
