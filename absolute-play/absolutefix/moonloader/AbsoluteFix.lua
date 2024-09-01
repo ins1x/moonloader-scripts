@@ -3,7 +3,7 @@ script_name("AbsoluteFix")
 script_description("Set of fixes for Absolute Play servers")
 script_properties("work-in-pause")
 script_url("https://github.com/ins1x/useful-samp-stuff/tree/main/luascripts/absolutefix")
-script_version("3.1.0")
+script_version("3.2.0")
 -- script_moonloader(16) moonloader v.0.26
 
 -- If your don't play on Absolute Play servers
@@ -69,6 +69,7 @@ local removed_objects = {647, 1410, 1412, 1413}
 local restored_objects = {3337, 3244, 3276, 1290, 1540} 
 local attached_objects = {}
 local isPlayerSpectating = false
+local isWorldHoster = false
 local dialogs = {}
 local dialogRestoreText = false
 local dialogIncoming = 0
@@ -78,6 +79,9 @@ local lastObjectId = nil
 local hideEditObject = false
 local scaleEditObject = false
 local editResponse = 0 
+local editMode = 0
+local lastWorldNumber = nil
+local lastWorldName = nil
 
 function main()
    if not isSampLoaded() or not isSampfuncsLoaded() then return end
@@ -706,6 +710,46 @@ function sampev.onServerMessage(color, text)
          end
       end
       
+      if text:find("Последнего созданного объекта не существует") then
+         lua_thread.create(function()
+            wait(500)
+            if LastObject.modelid then
+               sampAddChatMessage("Последний использованный объект: {696969}"..LastObject.modelid, -1)
+	        end
+            local closestObjectId = getClosestObjectId()
+            if closestObjectId then
+               sampAddChatMessage("Ближайший объект: {696969}"..getObjectModel(closestObjectId).." ("..tostring(sampObjectModelNames[getObjectModel(closestObjectId)])..") ", -1)
+            else
+               sampAddChatMessage("Можете попробовать объект: {696969}3374{FFFFFF} - Большие стаки сена", -1)
+            end
+         end)
+      end
+      
+      if text:find("Управляющим мира смертельный урон не наносится") then
+         sampAddChatMessage("N - Оружие - Отключить сужающуюся зону урона", -1)
+      end
+      
+      if text:find("Установи 0.3DL чтобы включать полёт в этом месте") then
+         sampAddChatMessage("Необходимо уходить в полет с другой точки, где мало объектов рядом (выйти из зоны стрима)", 0x00FF00)
+      end
+      
+      if text:find("Ты уже находишься в редакторе миров") then
+         sampSendChat("/exit")
+      end
+      
+      if text:find("В этой области создано слишком много объектов") then
+         sampAddChatMessage("Вы создали много объектов в одной области.", 0x00FF00)
+         sampAddChatMessage("В радиусе 150 метров нельзя создавать больше 200 объектов.", 0x00FF00)
+         return false
+      end
+      
+      if text:find("Это не твой мир, редактировать его ты не можешь") then
+         return false
+      end
+      
+      if text:find("использовал телепорт") and isWorldHoster then
+         return false
+      end
    end
    
    if ini.settings.disablerecordnotifications then
@@ -819,6 +863,134 @@ function sampev.onSendDialogResponse(dialogId, button, listboxId, input)
          sampSendDialogResponse(1431, 1, 1, 1000)
       end
    end
+   
+   --dialoghook.textureslist = false
+      
+   -- if player wxit from world without command drop lastWorldNumber var 
+   if dialogId == 1405 and listboxId == 5 and button == 1 then
+      if input:find("Войти в свой мир") then
+         isWorldHoster = true
+         worldspawnpos.x, worldspawnpos.y, worldspawnpos.z = getCharCoordinates(playerPed)
+      else
+         lastWorldNumber = 0
+         lastWorldName = ""
+         isWorldHoster = false
+      end
+   end
+    
+   -- Get current world number from server dialogs
+   if dialogId == 1426 and listboxId == 65535 and button == 1 then
+      if tonumber(input) > 0 and tonumber(input) < 500 then
+         lastWorldNumber = tonumber(input)
+         worldspawnpos.x, worldspawnpos.y, worldspawnpos.z = getCharCoordinates(playerPed)
+      end
+   end
+   
+   if dialogId == 1406 and button == 1 then
+      local world = tonumber(string.sub(input, 0, 3))
+      if world then
+         lastWorldNumber = world
+         local rawworldname = string.match(input, "- (.+) ")
+         lastWorldName = string.gsub(rawworldname, "-", " ")
+         worldspawnpos.x, worldspawnpos.y, worldspawnpos.z = getCharCoordinates(playerPed)
+      end
+   end
+   
+   -- if dialogId == 1403 and listboxId == 2 and button == 1 then
+      -- if LastObject.txdname ~= nil then
+         -- for k, txdname in pairs(absTxdNames) do
+            -- if txdname == LastObject.txdname then
+               -- sampAddChatMessage("Последняя использованная текстура: " .. k-1, 0xFF00FF00)
+               -- break
+            -- end
+         -- end
+      -- end
+   -- end
+   
+   -- if dialogId == 1400 and listboxId == 4 and button == 1 and not input:find("Игрок") then
+      -- if LastObject.txdname ~= nil then
+         -- for k, txdname in pairs(absTxdNames) do
+            -- if txdname == LastObject.txdname then
+               -- sampAddChatMessage("Последняя использованная текстура: " .. k-1, 0xFF00FF00)
+               -- break
+            -- end
+         -- end
+      -- end
+   -- end
+   
+   -- if dialogId == 1400 and listboxId == 4 and button == 1 then
+      -- dialoghook.textureslist = true
+   -- end
+   -- if dialogId == 1403 and listboxId == 2 and button == 1 then
+      -- dialoghook.textureslist = true
+   -- end
+   
+   -- if dialogId == 1409 and listboxId == 2 and button == 1 and input:find("MP объекты") then
+      -- dialoghook.sampobjectslist = true
+   -- end
+   
+   if dialogId == 1412 and listboxId == 2 and button == 1 then
+      sampAddChatMessage("Вы изменили разрешение на редактирование мира для всех игроков!", 0xFF0000)
+   end
+   
+   if dialogId == 1419 and button == 1 then
+      worldspawnpos.x, worldspawnpos.y, worldspawnpos.z = getCharCoordinates(playerPed)
+   end
+   
+   if dialogId == 1429 and button == 1 then
+      local startpos = input:find("№")
+      local endpos = startpos + 3
+      local world = tonumber(string.sub(input, startpos+1, endpos))
+      local rawname = string.sub(input, startpos+4, string.len(input))
+      if world then
+         lastWorldNumber = world
+         lastWorldName = rawname
+         worldspawnpos.x, worldspawnpos.y, worldspawnpos.z = getCharCoordinates(playerPed)
+      end
+   end
+   
+   -- hook editmodes
+   if dialogId == 1400 and button == 1 then
+      if listboxId == 0 and input:find("Редактировать") then editMode = 1 end
+      if listboxId == 2 and input:find("Переместить") then editMode = 1 end
+      if listboxId == 4 and input:find("Перекрасить") then editMode = 4 end
+      if listboxId == 5 and input:find("Копировать") then editMode = 2 end
+      if listboxId == 17 and input:find("Информация") then editMode = 1 end
+   end 
+   
+   if dialogId == 1422 and listboxId == 0 and button == 1 then
+      editMode = 1
+   end
+   
+   if dialogId == 1403 and button == 1 then
+      if listboxId == 0 then editMode = 1 end
+      if listboxId == 1 then 
+         editMode = 3
+         if LastObject.modelid then
+            LastRemovedObject.modelid = LastObject.modelid
+         end
+      end
+      if listboxId == 2 then editMode = 4 end
+      if listboxId == 4 then editMode = 2 end
+   end
+   if dialogId == 1411 and button == 1 then
+      if listboxId == 0 or listboxId == 2 then
+         editMode = 3
+         if LastObject.modelid then
+            LastRemovedObject.modelid = LastObject.modelid
+         end
+      end
+   end
+   if dialogId == 1409 and button == 1 then
+      editMode = 1
+   end
+   -- if dialogId == 1401 and button == 1 then
+      -- if undoMode then
+         -- if LastObject.handle and doesObjectExist(LastObject.handle) then
+            -- setObjectCoordinates(LastObject.handle, lastRemovedObjectCoords.x, lastRemovedObjectCoords.y, lastRemovedObjectCoords.z)
+         -- end
+      -- end
+   -- end
 end
 
 function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
@@ -909,6 +1081,90 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
       return {dialogId, style, title, button1, button2, newtext}
    end
    
+   if dialogId == 1400 and title:find("Управление мира") then
+      isWorldHoster = true
+   end
+   
+   if dialogId == 1407 then
+      local newtext = 
+      "{FFFFFF}Внутриигровой редактор карт позволяет любому игроку создать уникальный мир.\n"..
+      "Каждый игрок от 20 уровня может создать свой мир, или редактировать открытый мир.\n"..
+      "По умолчанию в мире можно строить только 50 объектов, и расширить до 300 объектов.\n"..
+      "Любого игрока можно пригласить в открытый мир, или позволить ему редактировать ваш мир.\n"..
+      "В радиусе 150 метров нельзя создавать более 200 объектов.\n"..
+      "\nВозможности редактора карт:\n"..
+      "- Удобное меню редактора на диалогах. Вам не нужно запоминать десятки команд для управления, все доступно через единое меню.\n"..
+      "- Визуальный выбор объектов в меню. Вы видите объекты через предпросмотр, вам не нужно искать номера объектов на сторонних ресурсах.\n".. 
+      "- Создание пикапов. Создавайте пикапы оружия, здоровья, брони и другие предметы. Включая выпадение пикапов после убийства противника.\n"..
+      "- Оружие и здоровье по умолчанию. Настройка изначальных характеристик, с которыми игрок войдёт в редактор карт.\n"..
+      "- Создание транспорта. Создавайте любой транспорт в мире, включая уникальный и военную технику.\n"..
+      "- Создание гонок. Использование разных машин, мотоциклов, лодок и воздушной техники для проведения соревнований с возможностью выбора маршрутов.\n"..
+      "- Возможность совместного редактирования. Приглашайте друзей на помощь.\n"..
+      "- Организаторские опции управления. Возможность гибкой настройки параметров мира для проведения различного рода мероприятий.\n"..
+      "- Управление камерой. Вы можете работать в режиме полета свободной камерой, либо зафиксировать камеру над собой.\n"..
+      "- Смена текстур. Применяйте ретекстур к различным объектам чтобы преобразить их до неузнаваемости.\n"..
+      "- Настройка доступа. Ваш мир может быть открыт для всех игроков 24/7. Либо же вы можете задать пароль на вход, или вовсе сделать мир персональным.\n"..
+      "\n{FFD700}VIP игроки{FFFFFF} могут:\n"..
+      "- телепортироваться по метке на карте в ESC\n"..
+      "- расширять мир до 2000 объектов\n"..
+      "- выбирать шрифт и цвет текста\n"..
+      "- выбирать точку появления в мире\n"
+     
+      sampAddChatMessage("Подробнее на https://forum.sa-mp.ru/index.php?/topic/1016832-миры-описание-работы-редактора-карт", -1)
+      return {dialogId, style, title, button1, button2, newtext}
+   end
+   
+   if dialogId == 1498 then
+      return {dialogId, style, title, button1, button2,
+      "Введи размер шрифта от 1 до 255"}
+   end
+   
+   if dialogId == 1401 then
+      local closestObjectId = getClosestObjectId()
+      
+      local newtext = 
+      "{FFD700}615-18300       {FFFFFF}GTA-SA \n{FFD700}18632-19521{FFFFFF}   SA-MP\n"..
+      (LastObject.modelid and "\n{FFFFFF}Последний {FFFF00}использованный объект: "..LastObject.modelid.." ("..tostring(sampObjectModelNames[LastObject.modelid])..") " or " ")..
+      (LastRemovedObject.modelid and "\n{FFFFFF}Последний {FF0000}удаленный объект: "..LastRemovedObject.modelid.." ("..tostring(sampObjectModelNames[LastRemovedObject.modelid])..") " or " ")..
+      (closestObjectId and "\n{FFFFFF}Ближайший {696969}объект: "..getObjectModel(closestObjectId).." ("..tostring(sampObjectModelNames[getObjectModel(closestObjectId)])..") \n" or " ")..
+      "\n{FFFFFF}Введи номер объекта: \n"
+      return {dialogId, style, title, button1, button2, newtext}
+   end
+   
+   if dialogId == 1410 then
+      return {dialogId, style, title, button1, button2, 
+      "Выбери радиус в котором необходимо удалить объекты (Рекомендуется не больше 50)"}
+   end
+   
+   if dialogId == 1413 then
+      local newtext = 
+      "Для создания мира необходимо:\n"..
+      "20 LvL, $1.000.000, 100 ОА\n\n"..
+      "Ты уверен что хочешь создать мир для строительства?\n"
+      return {dialogId, style, title, button1, button2, newtext}
+   end
+   
+   if dialogId == 1414 then
+      return {dialogId, style, title, button1, button2, 
+      "{FF0000}Это действие необратимо!!!\nТы уверен что хочешь удалить мир?"}
+   end
+   
+   if dialogId == 1426 then
+      if lastWorldNumber > 0 then
+         local newtext = 
+         "Если вы хотите попробовать редактор карт\n"..
+         "Посетите мир 10, он всегда открыт для редактирования\n\n"..
+         "Последний мир в котором вы были: "..lastWorldNumber.."\n"..
+         "Введите номер мира в который хотите войти:\n"
+         return {dialogId, style, title, button1, button2, newtext}
+      else
+         local newtext = 
+         "Если вы хотите попробовать редактор карт\n"..
+         "Посетите мир 10, он всегда открыт для редактирования\n\n"..
+         "Введите номер мира в который хотите войти:\n"
+         return {dialogId, style, title, button1, button2, newtext}
+      end
+   end
 end
 
 function sampev.onSendClickPlayer(playerId, source)
@@ -974,6 +1230,58 @@ function sampev.onCreateObject(objectId, data)
          -- local distance = string.format("%.0f", getDistanceBetweenCoords3d(data.position.x, data.position.y, data.position.z, px, py, pz))
          -- print(distance, data.position.x, round(data.position.x, 4))
       -- end
+   end
+end
+
+function sampev.onSendCommand(command)
+   -- tips for those who are used to using Texture Studio syntax
+   -- if isAbsolutePlay then
+      -- if command:find("texture") then
+         -- sampAddChatMessage("Для ретекстура используйте:", 0x000FF00)
+         -- sampAddChatMessage("N - Редактировать объект - Выделить объект - Перекарсить объект", 0x000FF00)
+         -- return false
+      -- end
+      -- if command:find("showtext3d") then
+         -- sampAddChatMessage("Информация о объектах показана", 0x000FF00)
+         -- checkbox.showobjectsmodel.v = true 
+         -- return false
+      -- end
+      -- if command:find("hidetext3d") then
+         -- sampAddChatMessage("Информация о объектах скрыта", 0x000FF00)
+         -- checkbox.showobjectsmodel.v = false
+         -- return false
+      -- end
+      -- if command:find("flymode") then
+         -- sampSendChat("/полет")
+         -- return false
+      -- end
+      -- if command:find("team") or command:find("setteam") then
+         -- sampSendChat("Нельзя менять тимы. Если вы хотели изменить спавн используйте:",0x000FF00)
+         -- sampSendChat("Y - Редактор карт - Управление миром - Выбрать точку появления",0x000FF00)
+         -- return false
+      -- end
+      -- if command:find("jetpack")then
+         -- sampAddChatMessage("Джетпак можно взять в меню: N - Оружие - Выдать себе оружие", 0x000FF00)
+         -- return false
+      -- end
+   -- end  
+   
+   if command:find("/exit") or command:find("/выход") then
+      isWorldHoster = false
+   end
+   
+   if isAbsolutePlay and command:find("/spec") then
+	  if not isPlayerSpectating then 
+	     -- if chosenplayer and sampIsPlayerConnected(chosenplayer) then
+	        -- sampSendChat("/набл "..chosenplayer)
+	     -- else
+	        if getClosestPlayerId() ~= -1 then
+	           sampSendChat("/набл "..getClosestPlayerId())
+	        else
+	  	       sampSendChat("/полет")
+	        end
+	     --end
+      end
    end
 end
 
