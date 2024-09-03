@@ -3,7 +3,7 @@ script_name("AbsoluteFix")
 script_description("Set of fixes for Absolute Play servers")
 script_properties("work-in-pause")
 script_url("https://github.com/ins1x/useful-samp-stuff/tree/main/luascripts/absolutefix")
-script_version("3.2.0")
+script_version("3.2.1")
 -- script_moonloader(16) moonloader v.0.26
 
 -- If your don't play on Absolute Play servers
@@ -67,6 +67,7 @@ local hostip = "193.84.90.23"
 local isAbsoluteRoleplay = false
 local removed_objects = {647, 1410, 1412, 1413} 
 local restored_objects = {3337, 3244, 3276, 1290, 1540} 
+local worldspawnpos = {x = 0.0, y = 0.0, z = 0.0}
 local attached_objects = {}
 local isPlayerSpectating = false
 local isWorldHoster = false
