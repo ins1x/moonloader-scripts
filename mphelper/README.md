@@ -7,7 +7,7 @@
 
 ###### The following description is in Russian, because it is the main language of the user base.
 
-![logo](https://github.com/ins1x/mphelper/raw/main/moonloader/resource/mphelper/demo.gif)
+![logo](https://github.com/ins1x/moonloader-scripts/raw/main/mphelper/moonloader/resource/mphelper/demo.gif)
 
 ### Краткое описание скрипта
 Хелпер предназначен для организаторов мероприятий. Содержит множество функций для подготовки и проведения мероприятий в SA:MP.
