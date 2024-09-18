@@ -47,6 +47,9 @@
 
 Скачайте актуальную версию и скопируйте содержимое в папку **moonloader** в корне игры. Важно перенести все файлы, включая папки /config и /resource ! 
 
+<!-- [![GitHub](https://img.shields.io/badge/DOWNLOAD%20-696969?style=for-the-badge&logo=github&logoColor=white)](https://github.com/ins1x/moonloader-scripts/blob/main/mphelper/mphelper.lua) -->
+[![Google Drive](https://img.shields.io/badge/Google%20Drive-4285F4?style=for-the-badge&logo=googledrive&logoColor=white)](https://drive.google.com/drive/folders/1dfDp-OkhLMfO8O8Mkll7VLgCtgzaTlqW?usp=drive_link)
+
 > Если у вас нет папки **moonloader** в корне игры, следует установить вышеописанные в  требованиях компоненты.
 
 После установки запустите игру и подключитесь к серверу  
@@ -103,7 +106,6 @@ y=400                       Позиция по оси Y
 ### О поддержке SAMP ADDON (для игроков Absolute Play)
 Скрипт не работает с включенным античитом Samp Addon (ничего не мешает Вам поставить хелпер в свою сборку без аддона или отключить античит).
 Чтобы компенсировать недостающие от SAMP ADDON функции воспользуйтесь [AbsoluteFix](https://github.com/ins1x/useful-samp-stuff/tree/main/luascripts/absolutefix) - это набор исправлений и дополнений для серверов Absolute Play.
-Скрипт не содержит запрещенных функций, и вы можете его использовать не опасаясь попадания в читмир.  
-Все вышеописанное относится только к серверам Absolute Play.  
+Скрипт не содержит запрещенных функций, и вы можете его использовать не опасаясь попадания в читмир. Все вышеописанное относится только к серверам Absolute Play.  
 
 > Если скрипт не запустился, в папке moonloader есть файл moonloader.log с информацией о проблеме 
