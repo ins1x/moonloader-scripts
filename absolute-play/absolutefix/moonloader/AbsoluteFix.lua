@@ -881,9 +881,11 @@ function sampev.onSendDialogResponse(dialogId, button, listboxId, input)
     
    -- Get current world number from server dialogs
    if dialogId == 1426 and listboxId == 65535 and button == 1 then
-      if tonumber(input) > 0 and tonumber(input) < 500 then
-         lastWorldNumber = tonumber(input)
-         worldspawnpos.x, worldspawnpos.y, worldspawnpos.z = getCharCoordinates(playerPed)
+      if tonumber(input) then
+         if tonumber(input) > 0 and tonumber(input) < 500 then
+            lastWorldNumber = tonumber(input)
+            worldspawnpos.x, worldspawnpos.y, worldspawnpos.z = getCharCoordinates(playerPed)
+         end
       end
    end
    
@@ -1151,7 +1153,7 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
    end
    
    if dialogId == 1426 then
-      if lastWorldNumber > 0 then
+      if lastWorldNumber and lastWorldNumber > 0 then
          local newtext = 
          "Если вы хотите попробовать редактор карт\n"..
          "Посетите мир 10, он всегда открыт для редактирования\n\n"..
@@ -1282,6 +1284,19 @@ function sampev.onSendCommand(command)
 	  	       sampSendChat("/полет")
 	        end
 	     --end
+      end
+   end
+   
+   if command:find("/vbh") or command:find("/мир") then
+      if command:find('(.+) (.+)') then
+         local cmd, arg = command:match('(.+) (.+)')
+         local id = tonumber(arg)
+         if id then 
+            if id > 0 and id <= 500 then 
+               LastData.lastWorldNumber = id
+               worldspawnpos.x, worldspawnpos.y, worldspawnpos.z = getCharCoordinates(playerPed)
+            end
+         end
       end
    end
 end
