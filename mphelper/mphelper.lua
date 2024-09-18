@@ -92,7 +92,7 @@ local textbuffer = {
    mpanswer = imgui.ImBuffer(64),
    mpquestion = imgui.ImBuffer(128),
    vehiclename = imgui.ImBuffer(64),
-   vid = imgui.ImBuffer(4),
+   vid = imgui.ImBuffer(5),
    pid = imgui.ImBuffer(4),
    sethp = imgui.ImBuffer(6),
    setarm = imgui.ImBuffer(6),
@@ -740,6 +740,7 @@ function imgui.OnDrawFrame()
                   dialog.main.v = false
                elseif isAbsolutePlay then
                   sampAddChatMessage("[SCRIPT]: {FFFFFF} Y - Редактор карт - Управление миром - Выбрать точку появления", 0x0FF6600)
+                  sampSendChat("/tplist")
                end
             end
             
@@ -1335,10 +1336,14 @@ function imgui.OnDrawFrame()
             
             if imgui.Button(u8"Создать транспорт", imgui.ImVec2(150, 25)) then
                if string.len(textbuffer.vehiclename.v) >= 3 then
-                  if checkbox.copcar.v then
-                     sampSendChat("/veh "..textbuffer.vehiclename.v)
-                  else
-                     sampSendChat("/veh "..textbuffer.vehiclename.v)
+                  if isTraining then
+                     if checkbox.copcar.v then
+                        sampSendChat("/veh "..textbuffer.vehiclename.v)
+                     else
+                        sampSendChat("/veh "..textbuffer.vehiclename.v)
+                     end
+                  elseif isAbsolutePlay then
+                     sampSendChat("/машину2 "..textbuffer.vehiclename.v)
                   end
                else
                   sampAddChatMessage("Вы не указали ID транспорта", -1)
@@ -1366,7 +1371,11 @@ function imgui.OnDrawFrame()
             imgui.SameLine()
             if imgui.Button(u8"ТП к транспорту", imgui.ImVec2(125, 25)) then
                if vid then
-                  sampSendChat("/tpveh "..vid)
+                  if isTraining then
+                     sampSendChat("/tpveh "..vid)
+                  elseif isAbsolutePlay then
+                     sampSendChat("/gotocar "..vid)
+                  end
                else
                   sampAddChatMessage("Вы не указали ID транспорта", -1)
                end
@@ -1399,14 +1408,41 @@ function imgui.OnDrawFrame()
                   sampSendChat("/armall 100")
                end
             end
-            --imgui.SameLine()
-            if imgui.Button(u8"Ресснуть игроков", imgui.ImVec2(250, 25)) then
+            if imgui.Button(u8"Ресснуть игроков", imgui.ImVec2(150, 25)) then
                if isTraining then
                   sampSendChat("/ressall")
                else
                   sampSendChat("/refillall")
                end
             end
+            imgui.SameLine()
+            if imgui.Button(u8"Заморозить игроков", imgui.ImVec2(150, 25)) then
+               if isTraining then
+                  sampAddChatMessage("Недоступно для вашего сервера.", -1)
+               elseif isAbsolutePlay then
+                  sampSendChat("/tazerall")
+               else
+                  sampSendChat("/freezeall")
+               end
+            end
+            
+            imgui.Text(u8"Транспорт:")
+            if imgui.Button(u8"Починить весь транспорт рядом", imgui.ImVec2(250, 25)) then
+               if isAbsolutePlay then
+                  sampSendChat("/fixvehs")
+               else
+                  sampAddChatMessage("Недоступно для вашего сервера.", -1)
+               end
+            end
+            if imgui.Button(u8"Зареспавить весь транспорт рядом", imgui.ImVec2(250, 25)) then
+               if isAbsolutePlay then
+                  sampSendChat("/spcars")
+               else
+                  sampAddChatMessage("Недоступно для вашего сервера.", -1)
+               end
+            end
+            
+            
          elseif tabmenu.manage == 4 then
             resetIO()
             imgui.Text(u8"Разрешенное оружие: ")
@@ -2533,6 +2569,14 @@ function imgui.OnDrawFrame()
          
          imgui.Text(string.format(u8"Покраска: %i/%i", paintjob, availablePaintjobs))
           
+         if imgui.Button(u8"Открыть меню управления", imgui.ImVec2(250, 25)) then
+            if id then
+               sampSendChat("/vmenu "..id)
+            else
+               sampAddChatMessage("Вы не указали ID транспорта", -1)
+            end
+            --toggleMainWindow()
+         end
          if imgui.Button(u8"Информация о модели (онлайн)", imgui.ImVec2(250, 25)) then
             if vehinfomodelid then
                if vehinfomodelid > 400 and vehinfomodelid < 611 then 
@@ -2542,7 +2586,7 @@ function imgui.OnDrawFrame()
                end
             end
          end
-                  
+
          if imgui.Button(u8"Предпросмотр 3D модели (онлайн)", imgui.ImVec2(250, 25)) then
             if vehinfomodelid then
                if vehinfomodelid > 400 and vehinfomodelid < 611 then 
@@ -3568,7 +3612,8 @@ function applyCustomStyle()
    colors[clr.FrameBg] = ImVec4(0.10, 0.09, 0.12, 1.00)
    colors[clr.FrameBgHovered] = ImVec4(0.56, 0.42, 0.01, 1.00)
    colors[clr.FrameBgActive] = ImVec4(0.56, 0.56, 0.58, 1.00)
-   colors[clr.TitleBg] = ImVec4(0.76, 0.31, 0.00, 1.00)
+   --colors[clr.TitleBg] = ImVec4(0.76, 0.31, 0.00, 1.00)
+   colors[clr.TitleBg] = ImVec4(0.10, 0.09, 0.12, 1.00)
    colors[clr.TitleBgCollapsed] = ImVec4(1.00, 0.98, 0.95, 0.75)
    colors[clr.TitleBgActive] = ImVec4(0.56, 0.42, 0.01, 1.00)
    colors[clr.MenuBarBg] = ImVec4(0.10, 0.09, 0.12, 1.00)
