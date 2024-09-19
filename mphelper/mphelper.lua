@@ -4,7 +4,7 @@ script_description("Assistant for event makers")
 script_dependencies('imgui', 'lib.samp.events')
 script_properties("work-in-pause")
 script_url("https://github.com/ins1x/moonloader-scripts/mphelper")
-script_version("1.2")
+script_version("1.2.1")
 -- fork of MappingToolkit project
 -- script_moonloader(16) moonloader v.0.26
 -- tested on sa-mp client version: 0.3.7 R1
@@ -1146,7 +1146,10 @@ function imgui.OnDrawFrame()
                   textbuffer.pid.v = tostring(getClosestPlayerId())
                end
             end
-          
+            
+            if isAbsolutePlay then
+               imgui.TextColoredRGB("{FF0000}Для Absolute Play данный раздел без админки не работает")
+            end
             imgui.PushItemWidth(50)
             if imgui.InputText("##PlayerIdHp", textbuffer.sethp, imgui.InputTextFlags.CharsDecimal) then
             end
@@ -1222,21 +1225,23 @@ function imgui.OnDrawFrame()
                   sampSendChat("/givegun "..pid.." "..combobox.weaponselect.v.." "..input.ammo.v)
                end
             end
-            local moderitems = {
-                u8"Обнулить",
-                u8"1-го уровня", 
-                u8"2-го уровня", 
-                u8"3-го уровня", 
-                u8"4-го уровня", 
-                u8"5-го уровня"
-            }
-            imgui.PushItemWidth(200)
-            imgui.Combo(u8'##ComboBoxSetModer', combobox.setmoder, moderitems, #moderitems)
-            imgui.SameLine()
-            imgui.TextQuestion("( ? )", u8"Выдать права модератора в мире")
-            imgui.SameLine()
-            if imgui.Button(u8"Выдать модера", imgui.ImVec2(150, 25)) then
-               sampSendChat("/setmoder "..pid.." "..combobox.setmoder.v)
+            if isTraining then
+               local moderitems = {
+                   u8"Обнулить",
+                   u8"1-го уровня", 
+                   u8"2-го уровня", 
+                   u8"3-го уровня", 
+                   u8"4-го уровня", 
+                   u8"5-го уровня"
+               }
+               imgui.PushItemWidth(200)
+               imgui.Combo(u8'##ComboBoxSetModer', combobox.setmoder, moderitems, #moderitems)
+               imgui.SameLine()
+               imgui.TextQuestion("( ? )", u8"Выдать права модератора в мире")
+               imgui.SameLine()
+               if imgui.Button(u8"Выдать модера", imgui.ImVec2(150, 25)) then
+                  sampSendChat("/setmoder "..pid.." "..combobox.setmoder.v)
+               end
             end
             
             imgui.Text(u8"Выдать наказание: ")
@@ -1254,7 +1259,11 @@ function imgui.OnDrawFrame()
             
             if imgui.Button(u8"Кикнуть игрока", imgui.ImVec2(150, 25)) then
                if string.len(textbuffer.setreason.v) >= 3 then
-                  sampSendChat("/vkick "..pid.." "..textbuffer.setreason.v)
+                  if isTraining then
+                     sampSendChat("/vkick "..pid.." "..textbuffer.setreason.v)
+                  else
+                     sampSendChat("/kick "..pid.." "..textbuffer.setreason.v)
+                  end
                else
                   sampAddChatMessage("Вы не указали причину", -1)
                end
@@ -1262,7 +1271,11 @@ function imgui.OnDrawFrame()
             imgui.SameLine()
             if imgui.Button(u8"Заглушить игрока", imgui.ImVec2(150, 25)) then
                if string.len(textbuffer.setptime.v) >= 1 then
-                  sampSendChat("/vmute "..pid.." "..tonumber(textbuffer.settime.v).." "..textbuffer.setreason.v)
+                  if isTraining then
+                     sampSendChat("/vmute "..pid.." "..tonumber(textbuffer.settime.v).." "..textbuffer.setreason.v)
+                  else
+                     sampSendChat("/mute "..pid.." "..tonumber(textbuffer.settime.v).." "..textbuffer.setreason.v)
+                  end
                else
                   sampAddChatMessage("Вы не указали на какое время выдать наказание", -1)
                end
@@ -1270,7 +1283,11 @@ function imgui.OnDrawFrame()
             imgui.SameLine()
             if imgui.Button(u8"Забанить игрока", imgui.ImVec2(150, 25)) then
                if string.len(textbuffer.setptime.v) >= 1 then
-                  sampSendChat("/vban "..pid.." "..tonumber(textbuffer.settime.v).." "..textbuffer.setreason.v)
+                  if isTraining then
+                     sampSendChat("/vban "..pid.." "..tonumber(textbuffer.settime.v).." "..textbuffer.setreason.v)
+                  else
+                     sampSendChat("/ban "..pid.." "..tonumber(textbuffer.settime.v).." "..textbuffer.setreason.v)
+                  end
                else
                   sampAddChatMessage("Вы не указали на какое время выдать наказание", -1)
                end
@@ -1363,7 +1380,11 @@ function imgui.OnDrawFrame()
             end
             if imgui.Button(u8"ТП к себе", imgui.ImVec2(125, 25)) then
                if vid then
-                  sampSendChat("/vgethere "..vid)
+                  if isAbsolutePlay then
+                     sampAddChatMessage("[SCRIPT]: {FFFFFF}Недоступно для вашего сервера", 0x0FF6600) 
+                  else
+                     sampSendChat("/vgethere "..vid)
+                  end
                else
                   sampAddChatMessage("Вы не указали ID транспорта", -1)
                end
@@ -2443,7 +2464,13 @@ function imgui.OnDrawFrame()
       end
       
       if imgui.TooltipButton(u8"Статистика", imgui.ImVec2(220, 25), u8"Открыть серверную статистику игрока") then
-         sampSendChat("/stats " .. chosenplayer)
+         if isTraining then
+            sampSendChat("/stats " .. chosenplayer)
+         elseif isAbsolutePlay then
+            sampSendChat("/и " .. chosenplayer)
+         else
+            sampSendChat("/stat " .. chosenplayer)
+         end
          dialog.main.v = false
       end
       
@@ -2459,6 +2486,8 @@ function imgui.OnDrawFrame()
       if imgui.TooltipButton(u8"Меню игрока", imgui.ImVec2(220, 25), u8"Открыть серверное меню взаимодействия с игроком") then
          if isTraining then
             sampSendChat("/data " .. chosenplayer)
+         elseif isAbsolutePlay then
+            sampSendChat("/и " .. chosenplayer)
          end
          dialog.main.v = false
       end
