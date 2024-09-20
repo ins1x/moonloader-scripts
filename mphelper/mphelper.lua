@@ -4,7 +4,7 @@ script_description("Assistant for event makers")
 script_dependencies('imgui', 'lib.samp.events')
 script_properties("work-in-pause")
 script_url("https://github.com/ins1x/moonloader-scripts/mphelper")
-script_version("1.2.1")
+script_version("1.2.2")
 -- fork of MappingToolkit project
 -- script_moonloader(16) moonloader v.0.26
 -- tested on sa-mp client version: 0.3.7 R1
@@ -63,7 +63,7 @@ local v = nil
 
 local isAbsolutePlay = false
 local isTraining = false
-local readonly = false
+local isWorldHoster = false
 local chosenplayer = nil
 
 local dialog = {
@@ -79,11 +79,12 @@ local tabmenu = {
    header = 1,
    manage = 1,
    presets = 1,
+   rules = 1,
 }
 
 local textbuffer = {
    findplayer = imgui.ImBuffer(32),
-   mpname = imgui.ImBuffer(32),
+   mpname = imgui.ImBuffer(48),
    mpadd = imgui.ImBuffer(128),
    mpprize = imgui.ImBuffer(32),
    mpdonators = imgui.ImBuffer(128),
@@ -149,6 +150,7 @@ local checkbox = {
    trackanswer = imgui.ImBool(false),
    trygame = imgui.ImBool(false),
    copcar = imgui.ImBool(false),
+   testrules = imgui.ImBool(false),
 }
 
 local MP = {
@@ -172,8 +174,10 @@ local legalweapons = {0, 1}
 playersTotal = 0
 
 local mpNames = {
-   'Custom', 'Race', 'Derby', 'Survival', 'PvP', 'Death-Roof', 'TDM',
-   'Hide-n-Seek', 'Quiz', 'King', 'Hunt', 'Rodeo', 'Road Rash'
+   u8'Не указано', u8'Гонки', u8'Дерби', u8'Выживание', u8'PvP',
+   u8'Смертельная крыша', u8'TDM', u8'Прятки', u8'Викторина',
+   u8'Король', u8'Охота', u8'Родео', u8'Road Rash', u8'Рыбалка',
+   u8'Копчейз', u8'Защита груза', u8'Поиск предмета'
 }
 
 local textGames = {
@@ -293,13 +297,13 @@ function main()
    end
    
    if doesFileExist(getGameDirectory()..'\\moonloader\\resource\\mphelper\\fastanswers.txt') then
-      file = io.open("moonloader/resource/mphelper/fastanswers.txt", "r")
+      local file = io.open("moonloader/resource/mphelper/fastanswers.txt", "r")
       for line in file:lines() do
          table.insert(fastAnswers, line:lower())
       end
       file:close()
    else
-      file = io.open("moonloader/resource/mphelper/fastanswers.txt", "w")
+      local file = io.open("moonloader/resource/mphelper/fastanswers.txt", "w")
       file:write(u8"Мероприятие уже начато - вход на МП был закрыт\n")
       file:write(u8"Вынужден был удалить вас с МП из-за ваших лагов\n")
       file:write(u8"Не мешайте игрокам - кикну\n")
@@ -317,7 +321,7 @@ function main()
    else
       local file = io.open("moonloader/resource/mphelper/rules.txt", "w")
       file:write(u8"Файл поврежден либо не найден")
-      file:write(u8"Скачать стандартный можно c https://github.com/ins1x/moonloader-scripts/mphelper:")
+      file:write(u8"Скачать стандартный можно c https://github.com/ins1x/moonloader-scripts/mphelper")
       file:close()
    end
    
@@ -540,15 +544,22 @@ function imgui.OnDrawFrame()
          
          if tabmenu.mp == 1 then
          
-            imgui.TextColoredRGB("Сервер: {007DFF}" .. servername)
+            imgui.TextColoredRGB("Сервер: {F0AD00}" .. servername)
+            if MP.Started then
+               if string.len(textbuffer.mpname.v) > 1 
+               and textbuffer.mpname.v ~= u8"Введите название" then
+                  imgui.SameLine()
+                  imgui.TextColoredRGB("МП: {F0AD00}" .. tostring(u8:decode(textbuffer.mpname.v)))
+               end
+            end
+            
             if isTraining then
                if string.len(LastData.lastWorldName) > 1 then
                   imgui.SameLine()
                   imgui.TextColoredRGB("Мир: "..LastData.lastWorldName)
                end
             end
-            --imgui.SameLine()
-            --imgui.TextColoredRGB("IP:  {686868}" .. tostring(ip) ..":".. tostring(port))
+            
             imgui.TextColoredRGB("Дата: {686868}" .. os.date('%d.%m.%Y %X'))
             if MP.StartedDTime ~= nil then
                imgui.SameLine()
@@ -561,7 +572,7 @@ function imgui.OnDrawFrame()
             end
             imgui.PopItemWidth()
             imgui.SameLine()
-	        imgui.PushItemWidth(100)
+	        imgui.PushItemWidth(170)
             if imgui.Combo(u8'##ComboBoxMpNames', combobox.mpnames, mpNames, #mpNames) then
                textbuffer.mpname.v = tostring(mpNames[combobox.mpnames.v + 1])
             end
@@ -695,7 +706,7 @@ function imgui.OnDrawFrame()
             local positionX, positionY, positionZ = getCharCoordinates(playerPed)
             local zone = getZoneName(positionX, positionY, positionZ)
             if zone then 
-               imgui.TextColoredRGB(string.format("Вы находитесь в районе: {696969}%s", zone))
+               imgui.TextColoredRGB(string.format("Вы находитесь в районе: {F0AD00}%s", zone))
             end
             
             local positionX, positionY, positionZ = getCharCoordinates(playerPed)
@@ -779,7 +790,7 @@ function imgui.OnDrawFrame()
             if imgui.Button(u8"Желает кто быть", imgui.ImVec2(220, 25)) then
                sampSetChatInputEnabled(true)
                if combobox.roles.v ~= 0 then
-                  sampSetChatInputText('Желает кто быть '..u8:decode(roles[combobox.roles.v+1])..' на МП')
+                  sampSetChatInputText('Желает кто быть '..u8:decode(roles[combobox.roles.v+1])..' на МП?')
                else
                   sampSetChatInputText('Желает кто быть ')
                end
@@ -863,37 +874,31 @@ function imgui.OnDrawFrame()
                end
             end
             imgui.Spacing()
-            if isAbsolutePlay then
-               if imgui.TooltipButton(u8"Объявить МП", imgui.ImVec2(220, 25), u8"Аннонсировать МП в объявление (/об)") then
-                  if string.len(textbuffer.mpadd.v) > 0 then 
-                     sampSetChatInputEnabled(true)
-                     if checkbox.mpprize.v then
+            if imgui.TooltipButton(u8"Подать объявление", imgui.ImVec2(220, 25), u8"Аннонсировать в объявление") then
+               if string.len(textbuffer.mpadd.v) > 0 then 
+                  sampSetChatInputEnabled(true)
+                  if checkbox.mpprize.v then
+                     if isAbsolutePlay then
                         sampSetChatInputText(string.format("/об %s, приз %s", u8:decode(textbuffer.mpadd.v), u8:decode(textbuffer.mpprize.v)))
-                     else
-                        sampSetChatInputText(string.format("/об %s, приз %s", u8:decode(textbuffer.mpadd.v)))
-                     end
-                  else
-                     sampAddChatMessage("Сперва укажите текст объявления!", -1)
-                  end
-               end
-            elseif isTraining then
-               if imgui.TooltipButton(u8"Объявить МП", imgui.ImVec2(220, 25), u8"Аннонсировать МП в объявление (/ads)") then
-                  if string.len(textbuffer.mpadd.v) > 0 then 
-                     sampSetChatInputEnabled(true)
-                     if checkbox.mpprize.v then
+                     elseif isTraining then 
                         sampSetChatInputText(string.format("/ads %s, приз %s", u8:decode(textbuffer.mpadd.v), u8:decode(textbuffer.mpprize.v)))
                      else
-                        sampSetChatInputText(string.format("/ads %s", u8:decode(textbuffer.mpadd.v)))
+                        sampSetChatInputText(string.format("/ad %s, приз %s", u8:decode(textbuffer.mpadd.v), u8:decode(textbuffer.mpprize.v)))
                      end
                   else
-                     sampAddChatMessage("Сперва укажите текст объявления!", -1)
+                     if isAbsolutePlay then
+                        sampSetChatInputText(string.format("/об %s", u8:decode(textbuffer.mpadd.v)))
+                     elseif isTraining then 
+                        sampSetChatInputText(string.format("/ads %s", u8:decode(textbuffer.mpadd.v)))
+                     else
+                        sampSetChatInputText(string.format("/ad %s", u8:decode(textbuffer.mpadd.v)))
+                     end
                   end
-               end
-            else
-               if imgui.TooltipButton(u8"Объявить МП", imgui.ImVec2(220, 25), u8"Аннонсировать МП в объявление (/ads)") then
-                  sampAddChatMessage("Не поддерживается для вашего сервера", -1)
+               else
+                  sampAddChatMessage("Сперва укажите текст объявления!", -1)
                end
             end
+ 
             imgui.SameLine()
             if imgui.TooltipButton(u8"Протестировать", imgui.ImVec2(220, 25), u8:encode("Выведет сообщение только вам для теста")) then
                if checkbox.mpprize.v then
@@ -963,11 +968,11 @@ function imgui.OnDrawFrame()
                local path = getFolderPath(5)..'\\GTA San Andreas User Files\\SAMP\\chatlog.txt'
                os.execute('explorer '.. path)
             end
-            imgui.SameLine()
-            if imgui.TooltipButton(u8"video", imgui.ImVec2(60, 25), u8"Открыть каталог видеозаписей") then
-               local path = getFolderPath(5)..'\\Bandicam\\'
-               os.execute('explorer '.. path)
-            end
+            -- imgui.SameLine()
+            -- if imgui.TooltipButton(u8"video", imgui.ImVec2(60, 25), u8"Открыть каталог видеозаписей") then
+               -- local path = getFolderPath(5)..'\\Bandicam\\'
+               -- os.execute('explorer '.. path)
+            -- end
             
             if imgui.Button(u8"Выдать приз всем оставшимся", imgui.ImVec2(220, 25)) then
                if string.len(textbuffer.mpprize.v) >= 1 
@@ -1097,10 +1102,10 @@ function imgui.OnDrawFrame()
          imgui.SameLine()
          if tabmenu.manage == 3 then
             imgui.PushStyleColor(imgui.Col.Button, imgui.GetStyle().Colors[imgui.Col.ButtonHovered])
-            if imgui.Button(u8"Все", imgui.ImVec2(80, 30)) then tabmenu.manage = 3 end
+            if imgui.Button(u8"Для всех", imgui.ImVec2(80, 30)) then tabmenu.manage = 3 end
             imgui.PopStyleColor()
          else
-            if imgui.Button(u8"Все", imgui.ImVec2(80, 30)) then tabmenu.manage = 3 end
+            if imgui.Button(u8"Для всех", imgui.ImVec2(80, 30)) then tabmenu.manage = 3 end
          end
          imgui.SameLine()
          if tabmenu.manage == 4 then
@@ -1691,8 +1696,8 @@ function imgui.OnDrawFrame()
             end
          elseif tabmenu.manage == 5 then   
             
-            imgui.Text(u8"Выберите сущность:")
-            imgui.SameLine()
+            --imgui.Text(u8"Выберите сущность:")
+            --imgui.SameLine()
             imgui.PushItemWidth(120)
             local selecttableitems = {u8'Игроки', u8'Транспорт'}
             imgui.Combo(u8'##ComboBoxSelecttable', combobox.selecttable, 
@@ -1952,6 +1957,8 @@ function imgui.OnDrawFrame()
          
          local prefix = ""
          imgui.SameLine()
+         imgui.Text(u8"     Чат: ")
+         imgui.SameLine()
          if isAbsolutePlay then             
             imgui.PushItemWidth(120)
             prefixlist = {u8'мчат', u8'глобальный', u8"без префикса"}
@@ -1967,18 +1974,16 @@ function imgui.OnDrawFrame()
             end
          elseif isTraining then  
             imgui.PushItemWidth(120)
-            imgui.Text(u8"  Чат: ")
-            imgui.SameLine()
-            prefixlist = {u8'игрового мира', u8'модераторов', u8'глобальный', u8'ООС', u8"без префикса"}
+            prefixlist = {u8'игрового мира', u8'глобальный', u8'модераторов', u8'ООС', u8"без префикса"}
             imgui.Combo('##ComboChatSelect', combobox.chatselect, prefixlist, #prefixlist)
             imgui.PopItemWidth()
             
             if combobox.chatselect.v == 0 then
                prefix = "@ "
             elseif combobox.chatselect.v == 1 then
-               prefix = "$ "
-            elseif combobox.chatselect.v == 2 then
                prefix = "! "
+            elseif combobox.chatselect.v == 2 then
+               prefix = "$ "
             elseif combobox.chatselect.v == 2 then
                prefix = "/b "
             elseif combobox.chatselect.v == 2 then
@@ -2312,16 +2317,154 @@ function imgui.OnDrawFrame()
                sampSendChat(prefix.."Переигровка! Попробуем еще раз!")
             end
             
-         elseif tabmenu.presets == 3 then           
+         elseif tabmenu.presets == 3 then    
+            
+            if tabmenu.rules == 1 then
+               if combobox.mpnames.v == 0 then
+                  imgui.TextColoredRGB("{696969}Профиль мп не был выбран")
+                  if imgui.IsItemClicked() then
+                     tabmenu.header = 1
+                     tabmenu.mp = 1
+                  end
+                  textbuffer.rules.v = ""
+                  imgui.SameLine()
+               else
+                  imgui.TextColoredRGB("Профиль: "..tostring(u8:decode(mpNames[combobox.mpnames.v + 1])))
+                  imgui.SameLine()
+                  textbuffer.rules.v = ""
+               end
+            end
+            
+            imgui.PushStyleVar(imgui.StyleVar.ItemSpacing, imgui.ImVec2(2, 0))
+            
+            imgui.SetCursorPosX((imgui.GetWindowWidth() - imgui.CalcTextSize(u8"Правила МП").x) / 1.95)
+            if tabmenu.rules == 1 then
+               imgui.PushStyleColor(imgui.Col.Button, imgui.GetStyle().Colors[imgui.Col.ButtonHovered])
+               if imgui.Button(u8"Правила МП", imgui.ImVec2(100, 25)) then tabmenu.rules = 1 end
+               imgui.PopStyleColor()
+            else
+               if imgui.Button(u8"Правила МП", imgui.ImVec2(100, 25)) then tabmenu.rules = 1 end
+            end
+            imgui.SameLine()
+            if tabmenu.rules == 2 then
+               imgui.PushStyleColor(imgui.Col.Button, imgui.GetStyle().Colors[imgui.Col.ButtonHovered])
+               if imgui.Button(u8"Глобальные", imgui.ImVec2(100, 25)) then tabmenu.rules = 2 end
+               imgui.PopStyleColor()
+            else
+               if imgui.Button(u8"Глобальные", imgui.ImVec2(100, 25)) then tabmenu.rules = 2 end
+            end
+            imgui.SameLine()
+            if tabmenu.rules == 3 then
+               imgui.PushStyleColor(imgui.Col.Button, imgui.GetStyle().Colors[imgui.Col.ButtonHovered])
+               if imgui.Button(u8"Все", imgui.ImVec2(50, 25)) then tabmenu.rules = 3 end
+               imgui.PopStyleColor()
+            else
+               if imgui.Button(u8"Все", imgui.ImVec2(50, 25)) then tabmenu.rules = 3 end
+            end
+
+            imgui.PopStyleVar()
+            
             imgui.PushFont(multilinetextfont)
-            if readonly then
-               imgui.InputTextMultiline('##rules', textbuffer.rules, imgui.ImVec2(460, 280),
-               imgui.InputTextFlags.EnterReturnsTrue + imgui.InputTextFlags.AllowTabInput + imgui.InputTextFlags.ReadOnly)
-            else 
-               imgui.InputTextMultiline('##rules', textbuffer.rules, imgui.ImVec2(460, 280),
-               imgui.InputTextFlags.EnterReturnsTrue + imgui.InputTextFlags.AllowTabInput)
+            
+            local filepath = getGameDirectory().."//moonloader//resource//mphelper//rules.txt"
+            
+            if tabmenu.rules == 1 then
+               local finded = false
+               local mpname = tostring(mpNames[combobox.mpnames.v + 1])
+
+               for line in io.lines(filepath) do
+                  if finded then
+                     textbuffer.rules.v = tostring(textbuffer.rules.v).."\n"..tostring(line)
+                     if line:len() <= 1 then
+                        finded = false
+                        break
+                     end
+                  end
+                  if line:find(mpname) then
+                     finded = true
+                  end
+               end
+            
+            elseif tabmenu.rules == 2 then
+               local finded = false
+               textbuffer.rules.v = ""
+               for line in io.lines(filepath) do
+                  if finded then
+                     textbuffer.rules.v = tostring(textbuffer.rules.v).."\n"..tostring(line)
+                     if line:len() <= 1 then
+                        finded = false
+                        break
+                     end
+                  end
+                  if line:find(u8"Глобальные") then
+                     finded = true
+                  end
+               end
+               
+            elseif tabmenu.rules == 3 then
+               local file = io.open(filepath, "r")
+               textbuffer.rules.v = file:read('*a')
+               file:close() 
             end
             imgui.PopFont()
+            
+            if tabmenu.rules ~= 3 then
+               imgui.InputTextMultiline('##rules', textbuffer.rules, imgui.ImVec2(460, 160),
+               imgui.InputTextFlags.EnterReturnsTrue + imgui.InputTextFlags.AllowTabInput + imgui.InputTextFlags.ReadOnly)
+            else
+               imgui.InputTextMultiline('##rules', textbuffer.rules, imgui.ImVec2(460, 260),
+               imgui.InputTextFlags.EnterReturnsTrue + imgui.InputTextFlags.AllowTabInput + imgui.InputTextFlags.ReadOnly)
+            end
+            
+            -- TODO: refactoring this code
+            if tabmenu.rules ~= 3 and combobox.chatselect.v ~= 1 then -- ignore global chat and all rules tab
+               if imgui.TooltipButton(u8"Анонсировать правила", imgui.ImVec2(150, 25), u8:encode("Анонсировать правила в чат")) then
+                 
+                  local filepath = getGameDirectory().."//moonloader//resource//mphelper//rules.txt"
+                  if tabmenu.rules == 1 then
+                     local finded = false
+                     local mpname = tostring(mpNames[combobox.mpnames.v + 1])
+                  
+                     for line in io.lines(filepath) do
+                        if finded then
+                           if checkbox.testrules.v then
+                              sampAddChatMessage(tostring(u8:decode(line)), -1)
+                           end
+                           if line:len() <= 1 then
+                              finded = false
+                              break
+                           end
+                        end
+                        if line:find(mpname) then
+                           finded = true
+                        end
+                     end
+                  
+                  elseif tabmenu.rules == 2 then
+                     local finded = false
+                     textbuffer.rules.v = ""
+                     for line in io.lines(filepath) do
+                        if finded then
+                           if checkbox.testrules.v then
+                              sampAddChatMessage(tostring(u8:decode(line)), -1)
+                           end
+                           if line:len() <= 1 then
+                              finded = false
+                              break
+                           end
+                        end
+                        if line:find(u8"Глобальные") then
+                           finded = true
+                        end
+                     end
+                  end
+               end
+            end
+            imgui.SameLine()
+            
+            imgui.Checkbox(u8"##testrules", checkbox.testrules)
+            imgui.SameLine()
+            imgui.TextQuestion("( ? )", u8"Протестировать перед отправкой в чат (Выведет сообщения только для вас)")
             
             if imgui.Button("  v  ", imgui.ImVec2(460, 15)) then
                dialog.searchbar.v = not dialog.searchbar.v
@@ -2329,7 +2472,7 @@ function imgui.OnDrawFrame()
          end -- tabmenu.presets
          
       elseif tabmenu.header == 4 then
-         imgui.Text(u8"MP Helper v".. thisScript().version)
+         imgui.TextColoredRGB("{F0AD00}MP Helper v".. thisScript().version)
          imgui.Spacing()
          imgui.TextColoredRGB("Хелпер для организаторов мероприятий.")
          imgui.Text(u8"Содержит множество функций для проведения мероприятий")
@@ -2467,7 +2610,7 @@ function imgui.OnDrawFrame()
          if isTraining then
             sampSendChat("/stats " .. chosenplayer)
          elseif isAbsolutePlay then
-            sampSendChat("/и " .. chosenplayer)
+            sampSendChat("/стат " .. chosenplayer)
          else
             sampSendChat("/stat " .. chosenplayer)
          end
@@ -2698,8 +2841,9 @@ function imgui.OnDrawFrame()
    end
    
    if dialog.searchbar.v then
-      imgui.SetNextWindowPos(imgui.ImVec2(sizeX / 3, sizeY-150),
+      imgui.SetNextWindowPos(imgui.ImVec2(sizeX / 2, sizeY-150),
       imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
+      imgui.SetNextWindowSize(imgui.ImVec2(485, 70))
       imgui.Begin(u8"search", dialog.searchbar)
       
       local symbols = 0
@@ -2711,28 +2855,34 @@ function imgui.OnDrawFrame()
          lines = lines + 1
       end
          
-      if imgui.TooltipButton(u8"Обновить", imgui.ImVec2(80, 25), u8:encode("Загрузить правила с файла rules.txt")) then
-         local file = io.open(filepath, "r")
-         textbuffer.rules.v = file:read('*a')
-         file:close()
-      end
-      imgui.SameLine()
-      if imgui.TooltipButton(u8"Сохранить", imgui.ImVec2(80, 25), u8:encode("Сохранить правила с файла rules.txt")) then
-         if not readonly then
-            local file = io.open(filepath, "w")
-            file:write(textbuffer.rules.v)
-            file:close()
-            sampAddChatMessage("Сохранено в файл: /moonloader/resource/mphelper/rules.txt", -1)
-         else
-            sampAddChatMessage("Недоступно в режмие для чтения. Снимите режим RO (Readonly)", -1)
-         end
-      end
-      -- if imgui.TooltipButton(u8"Анонсировать правила", imgui.ImVec2(150, 25), u8:encode("Анонсировать правила в чат")) then
-         -- for line in io.lines(filepath) do
-            -- sampAddChatMessage(u8:decode(line), -1)
+      -- if imgui.TooltipButton(u8"Обновить", imgui.ImVec2(80, 25), u8:encode("Загрузить правила с файла rules.txt")) then
+         -- local file = io.open(filepath, "r")
+         -- textbuffer.rules.v = file:read('*a')
+         -- file:close()
+      -- end
+      -- imgui.SameLine()
+      -- if imgui.TooltipButton(u8"Сохранить", imgui.ImVec2(80, 25), u8:encode("Сохранить правила с файла rules.txt")) then
+         -- if not readonly then
+            -- local file = io.open(filepath, "w")
+            -- file:write(textbuffer.rules.v)
+            -- file:close()
+            -- sampAddChatMessage("Сохранено в файл: /moonloader/resource/mphelper/rules.txt", -1)
+         -- else
+            -- sampAddChatMessage("Недоступно в режмие для чтения. Снимите режим RO (Readonly)", -1)
          -- end
       -- end
+      
+      imgui.Text("lines: "..lines.." symbols: "..symbols)
+      -- imgui.SameLine()
+      -- imgui.Text("              ")
+      -- imgui.SameLine()
+      -- if imgui.Selectable("Unlock IO", false, 0, imgui.ImVec2(50, 15)) then
+         -- resetIO()
+      -- end
+      -- imgui.SameLine()
+      -- imgui.TextQuestion("( ? )", u8"RO - Включить режим ReadOnly, Unlock IO - разблокировать инпут если курсор забагался")
       imgui.SameLine()
+      
       imgui.PushItemWidth(190)
       imgui.InputText("##search", textbuffer.searchbar)
       imgui.PopItemWidth()
@@ -2755,21 +2905,7 @@ function imgui.OnDrawFrame()
       end
       imgui.SameLine()
       imgui.TextQuestion("( ? )", u8"Поиск по тексту регистрозависим!")
-      imgui.Spacing()
-               imgui.Text("lines: "..lines.." symbols: "..symbols)
-      imgui.SameLine()
-      imgui.Text("                                      ")
-      imgui.SameLine()
-      if imgui.Selectable(readonly and "RO" or "W", false, 0, imgui.ImVec2(50, 15)) then
-         readonly = not readonly
-      end
-      imgui.SameLine()
-      if imgui.Selectable("Unlock IO", false, 0, imgui.ImVec2(50, 15)) then
-         resetIO()
-      end
-      imgui.SameLine()
-      imgui.TextQuestion("( ? )", u8"RO - Включить режим ReadOnly, Unlock IO - разблокировать инпут если курсор забагался")
-         
+      
       imgui.End()
    end
 end
@@ -2791,6 +2927,11 @@ function sampev.onSendCommand(command)
       dialog.fastanswer.v = true
       dialog.main.v = true
       return false
+   end
+   
+   if command:find("/exit") or command:find("/выход") then
+      isWorldHoster = false
+      LastData.lastWorldName = ""
    end
 end  
 
@@ -2826,6 +2967,12 @@ function sampev.onServerMessage(color, text)
          end
       end
       LastData.lastPmMessage = text
+   end
+   
+   if isTraining then
+      if text:find('Вы присоеденились к миру') then
+         LastData.lastWorldName = string.match(text, "Вы присоеденились к миру: (.+)")
+      end
    end
 end
 
@@ -3639,9 +3786,8 @@ function applyCustomStyle()
    colors[clr.Border] = ImVec4(0.80, 0.80, 0.83, 0.88)
    colors[clr.BorderShadow] = ImVec4(0.92, 0.91, 0.88, 0.00)
    colors[clr.FrameBg] = ImVec4(0.10, 0.09, 0.12, 1.00)
-   colors[clr.FrameBgHovered] = ImVec4(0.56, 0.42, 0.01, 1.00)
+   colors[clr.FrameBgHovered] = ImVec4(0.56, 0.56, 0.58, 1.0)
    colors[clr.FrameBgActive] = ImVec4(0.56, 0.56, 0.58, 1.00)
-   --colors[clr.TitleBg] = ImVec4(0.76, 0.31, 0.00, 1.00)
    colors[clr.TitleBg] = ImVec4(0.10, 0.09, 0.12, 1.00)
    colors[clr.TitleBgCollapsed] = ImVec4(1.00, 0.98, 0.95, 0.75)
    colors[clr.TitleBgActive] = ImVec4(0.56, 0.42, 0.01, 1.00)
@@ -3663,7 +3809,7 @@ function applyCustomStyle()
    colors[clr.ResizeGrip] = ImVec4(0.00, 0.00, 0.00, 0.00)
    colors[clr.ResizeGripHovered] = ImVec4(0.56, 0.56, 0.58, 1.00)
    colors[clr.ResizeGripActive] = ImVec4(0.06, 0.05, 0.07, 1.00)
-   colors[clr.CloseButton] = ImVec4(0.40, 0.39, 0.38, 0.16)
+   colors[clr.CloseButton] = ImVec4(0.06, 0.05, 0.07, 0.25)
    colors[clr.CloseButtonHovered] = ImVec4(0.40, 0.39, 0.38, 0.39)
    colors[clr.CloseButtonActive] = ImVec4(0.40, 0.39, 0.38, 1.00)
    colors[clr.PlotLines] = ImVec4(0.40, 0.39, 0.38, 0.63)
