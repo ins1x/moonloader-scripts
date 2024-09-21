@@ -1,5 +1,5 @@
 script_name('AutoForward')
-script_author('Morj')
+script_author('Morj')--modified by 1NS. 
 script_description("Script for automatic movement by car (cruise control), and autoforward on foot.")
 script_version_number(2)
 script_version("2.1")
@@ -7,7 +7,7 @@ require 'lib.moonloader'
 local mem = require 'memory'
 local font_flag = require('moonloader').font_flag
 
--- script modified by 1NS. Original script (https://www.blast.hk/threads/22082/)
+-- Original script (https://www.blast.hk/threads/22082/)
 -- Changes:
 -- fixed traffic when the auto cruise is turned off and the chat is open
 -- fixed a bug with maintaining the speed limit when the cruise is disabled
