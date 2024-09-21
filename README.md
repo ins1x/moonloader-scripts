@@ -21,8 +21,9 @@ It introduces the ability to load Lua scripts into the game, has all the functio
 | [absTXDNames](https://github.com/ins1x/moonloader-scripts/tree/main/absolute-play/absTXDNames) | Adds names for objects and textures in the map editor on Absolute Play |
 | [AutoForward](https://github.com/ins1x/moonloader-scripts/blob/main/AutoForward.lua) | Script for automatic movement by car (cruise control), and autoforward on foot |
 | [AutoLock](https://github.com/ins1x/moonloader-scripts/blob/main/arizona/AutoLock.lua) | Simple vehicle auto lock |
+| [Bye-bye](https://github.com/ins1x/moonloader-scripts/blob/main/training/bb.lua) | Crash yourself by /bb cmd |
 | [Clickwarp](https://github.com/ins1x/moonloader-scripts/tree/main/absolute-play/clickwarp/) | Fork of original clickwarp by FYP updated for Absolute Play (only for event-makers)|
-| [DriftСameraLock](https://github.com/ins1x/moonloader-scripts/tree/main/DriftСameraLock.lua) | Lock camera behind player on vehicle (DriftCam) |
+| [DriftСameraLock](https://github.com/ins1x/moonloader-scripts/tree/main/training/DriftСameraLock.lua) | Lock camera behind player on vehicle (DriftCam) |
 | [FriendsList](https://github.com/ins1x/moonloader-scripts/tree/main/friendslist/) | It notifies you when a friend comes online or quits |
 | [GangWarNotifer](https://github.com/ins1x/moonloader-scripts/tree/main/uif-fixes/GangWarNotifier.lua) | Notifies if gangwar has started for the territory |
 | [GPSoff](https://github.com/ins1x/moonloader-scripts/tree/main/arizona/gpsoff.lua) | Add cmd /gpsoff to disable /gps checkpoints |
@@ -30,11 +31,11 @@ It introduces the ability to load Lua scripts into the game, has all the functio
 | [MappingToolkit](https://github.com/ins1x/MappingToolkit) | In-game assistant for mappers and event makers |
 | [ModCompatibilityChecker](https://github.com/ins1x/moonloader-scripts/tree/main/modchecker/ModCompatibilityChecker.lua) | Checks the mods that can cause crashes |
 | [mphelper](https://github.com/ins1x/moonloader-scripts/tree/main/mphelper) | Helper for event makers |
-| [noEmptyMessages](https://github.com/ins1x/moonloader-scripts/tree/main/noEmptyMessages.lua) | Ignores sending and receiving empty chat messages |
+| [noEmptyMessages](https://github.com/ins1x/moonloader-scripts/tree/main/training/noEmptyMessages.lua) | Ignores sending and receiving empty chat messages |
 | [noGameTexts](https://github.com/ins1x/moonloader-scripts/tree/main/uif-fixes/noGameTexts.lua) | Hides annoying gametext in the middle of the screen on the UIF server |
 | [noPostFX.lua](https://github.com/ins1x/moonloader-scripts/tree/main/uif-fixes/noPostFX.lua) | Disables post-processing (Post-FX) and fix dark timecycle |
 | [separate-messages](https://github.com/ins1x/moonloader-scripts/tree/main/arizona/separate-messages) |  separate long chat messages at Arizona-Roleplay |
 | [SkipCarRent](https://github.com/ins1x/moonloader-scripts/tree/main/arizona/SkipCarRent) |  Skip car rent dialog on Arizona-Roleplay server |
-| [STO-helper](https://github.com/ins1x/moonloader-scripts/tree/main/arizona/sto-helper) |  Assistant for service station mechanics at Arizona-Roleplay |
+| [STO-helper](https://github.com/ins1x/moonloader-scripts/tree/main/arizona/sto-helper) |  Unreleased Assistant for service station mechanics at Arizona-Roleplay |
 
 > Disclaimer: All rights to modified scripts belong to their respective owners (specified in the description).
