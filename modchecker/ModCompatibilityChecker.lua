@@ -2,9 +2,12 @@ script_author("1NS")
 script_name("ModCompatibilityChecker")
 script_description("Checks the mods that can cause crashes")
 script_url("https://github.com/ins1x/moonloader-scripts")
-script_version("1.3")
+script_version("1.4")
 -- Activation: script run once and unloading
 -- encoding.default = 'CP1251'
+
+-- GTA SA/VC/III .asi plugin for crash/error information
+-- https://github.com/JuniorDjjr/CrashInfo/tree/main
 
 -- Do not change booleans here
 local ENBSeries = false
@@ -13,6 +16,7 @@ local SAMPFUNCS = false
 local Modloader = false
 local ModTimecyc = false
 local SampAddonInstalled = false
+local AZLauncher = false
 
 function main()
    if not isSampLoaded() or not isSampfuncsLoaded() then return end
@@ -60,6 +64,11 @@ function main()
       Modloader = true
    end
    
+   if doesFileExist(getGameDirectory() .. "\\core.asi") or 
+   doesFileExist(getGameDirectory() .. "\\_CoreGame.asi") then
+      AZLauncher = true
+   end
+   
    if getFileSize(getGameDirectory() .. "\\data\\timecyc.dat") ~= 40037 or 
    doesFileExist(getGameDirectory() .. "\\timecycle24.asi") or
    doesFileExist(getGameDirectory() .. "\\data\\timecyc_24h.dat") then
@@ -85,15 +94,30 @@ function main()
    end
    
    -- streammemfix checker
-   if doesFileExist(getGameDirectory() .. "\\streammemfix.asi") then
-      print("ModChecker warning: streammemfix incompatible with windows 10+")
+   if doesFileExist(getGameDirectory() .. "\\StreamMemFix.asi") and 
+   getFileSize(getGameDirectory() .. "\\StreamMemFix.asi") ~= 50600 then
+      sampAddChatMessage("У вас устаревшая версия streammemfix которая может вызывать краши", 0xFF00000)
+      print("ModChecker warning: this version streammemfix incompatible with windows 10+")
    end  
    
    if doesFileExist(getGameDirectory() .. "\\StreamMemFix.asi") and 
    getFileSize(getGameDirectory() .. "\\StreamMemFix.asi") == 27648 then
-      print("ModChecker warning: streammemfix incompatible with windows 10+")
+      print("ModChecker warning: this version streammemfix incompatible with windows 10+")
    end
    
+   if doesFileExist(getGameDirectory() .. "\\FramerateVigilante.SA.asi") and
+   doesFileExist(getGameDirectory() .. "\\Swim FPS Fix.asi") then
+      sampAddChatMessage("FramerateVigilante и Swim FPS Fix несовместимы (удалите Swim FPS Fix)", 0xFF00000)
+      print("ModChecker warning: FramerateVigilante and Swim FPS Fix are incompatible (remove Swim FPS Fix)")
+   end
+   
+   if doesFileExist(getGameDirectory() .. "\\SAMP-GPS.asi") and 
+   doesFileExist(getGameDirectory() .. "\\FramerateVigilante.SA.asi") then
+      if getFileSize(getGameDirectory() .. "\\SAMP-GPS.asi") ~= 155136 then
+         sampAddChatMessage("Ваша версия SAMP-GPS несовместима с FramerateVigilante (обновите SAMP-GPS)", 0xFF00000)
+         print("ModChecker warning: Your SAMP-GPS version is not compatible with FramerateVigilante (update SAMP-GPS)")
+      end
+   end
    -- exdisp
    if doesFileExist(getGameDirectory() .. "\\exdisp.asi") then
       sampAddChatMessage("exdisp.asi может вызывать краши при снятом ограничителе фпс", 0xFF00000)
@@ -109,8 +133,32 @@ function main()
    
    -- III.VC.SA.LimitAdjuster
    if doesFileExist(getGameDirectory() .. "\\III.VC.SA.LimitAdjuster.asi") then
-      sampAddChatMessage("SA.LimitAdjuster плагин вызывает проблемы со стабильность и производительностью", 0xFF00000)
+      sampAddChatMessage("SA.LimitAdjuster плагин может вызывать проблемы со стабильностью и производительностью", 0xFF00000)
       print("ModChecker warning: SA.LimitAdjuster plugin causes stability and performance issues")
+   end
+   
+   if doesFileExist(getGameDirectory() .. "\\III.VC.SA.LimitAdjuster.asi") and 
+   doesFileExist(getGameDirectory() .. "\\modloader\\LOD Vegetation\\LODvegetation.ide") then 
+      sampAddChatMessage("LOD Vegetation установлен вместе с Project2DFX, возможны проблемы с запуском игры", 0xFF00000)
+      print("ModChecker warning: LOD Vegetation installed with Project2DFX, possible problems with game launch")
+   end
+   
+   -- SAsearchlightlimitadjuster.asi
+   if doesFileExist(getGameDirectory() .. "\\SAsearchlightlimitadjuster.asi") then
+      sampAddChatMessage("SAsearchlightlimitadjuster этот мод устарел и вызывает краши", 0xFF00000)
+      print("ModChecker warning: SAsearchlightlimitadjuster this mod is outdated and causes crashes")
+   end
+   
+   -- IndieVehicles.asi
+   if doesFileExist(getGameDirectory() .. "\\IndieVehicles.asi") then
+      sampAddChatMessage("IndieVehicles.asi этот мод устарел и несовместим с некоторыми модами! Теперь он интегрирован в VehFuncs", 0xFF00000)
+      print("ModChecker warning: IndieVehicles.asi this mod is outdated and incompatible with some mods! Now it is integrated into VehFuncs")
+   end
+   
+   -- Ryosuke's Bullet mod
+   if doesFileExist(getGameDirectory() .. "\\bullet.asi") then
+      sampAddChatMessage("bullet.asi вызывает краш при стрельбе в особняке  Madd Dogg's mansion", 0xFF00000)
+      print("ModChecker warning: bullet.asi causes crash when shooting in Madd Dogg's mansion")
    end
    
    -- newCoronaLimit
@@ -179,8 +227,15 @@ function main()
    -- RealSkybox.SA and skygrad
    if doesFileExist(getGameDirectory() .. "\\RealSkybox.SA.asi") and 
    doesFileExist(getGameDirectory() .. "\\skygrad.asi") then
-      sampAddChatMessage("Одновременное использование модов skygrad.asi и RealSkybox.SA.asi вызывает глитчи", 0xFF00000)
+      sampAddChatMessage("Одновременное использование модов skygrad и RealSkybox.SA вызывает глитчи", 0xFF00000)
       print("ModChecker warning: using mods skygrad.asi and RealSkybox.SA.asi simultaneously causes glitches")
+   end
+   
+    -- RealSkybox.SA and BetterSkybox
+   if doesFileExist(getGameDirectory() .. "\\RealSkybox.SA.asi") and 
+   doesFileExist(getGameDirectory() .. "\\moonloader\\BetterSkybox.lua") then
+      sampAddChatMessage("Одновременное использование модов BetterSkybox и RealSkybox.SA вызывает глитчи", 0xFF00000)
+      print("ModChecker warning: using mods BetterSkybox and RealSkybox.SA.asi simultaneously causes glitches")
    end
    
    -- timecycle24 and Real Linear Graphics
@@ -201,6 +256,11 @@ function main()
    and doesFileExist(getGameDirectory() .. "\\LightMap.asi") then
       sampAddChatMessage("fixtimecyc.cs несовместим с LightMap.asi", 0xFF00000)
       print("ModChecker warning: fixtimecyc.cs is incompatible with LightMap.asi")
+   end
+   
+   if doesFileExist(getGameDirectory() .. "\\cleo\\binaryipl.cs") then
+      sampAddChatMessage("binaryipl.cs вызывает множество крашей (не используйте данный мод)", 0xFF00000)
+      print("ModChecker warning: binaryipl.cs a causes many crashes (do not use this mod)")
    end
    
    -- FixDIST.cs
@@ -258,6 +318,24 @@ function main()
       sampAddChatMessage("Установлен moonloader без библиотеки lib.samp.events", 0xFF00000)
       print("ModChecker warning: Moonloader installed without lib.samp.events library")
    end
+   
+   if not AZLauncher then
+      -- Check game resources
+      -- The main.scm and script.img files are responsible for the story mode and other scenarios, this depends on the version of the game.
+      if doesFileExist(getGameDirectory() .. "\\data\\script\\main.scm") and 
+      getFileSize(getGameDirectory() .. "\\data\\script\\main.scm") ~= 3079599 then
+         sampAddChatMessage("У вас установлен изменненый файл сценариев main.scm", 0xFF00000)
+         sampAddChatMessage("Он может быть несовместим с определенной сохраненной игрой или каким-либо модом", 0xFF00000)
+         print("ModChecker warning: You have a modified main.scm script file installed.")
+      end
+      
+      if doesFileExist(getGameDirectory() .. "\\data\\script\\script.img") and 
+      getFileSize(getGameDirectory() .. "\\data\\script\\script.img") ~= 581632 then
+         sampAddChatMessage("У вас установлен изменненый файл сценариев script.img", 0xFF00000)
+         sampAddChatMessage("Он может быть несовместим с определенной сохраненной игрой или каким-либо модом", 0xFF00000)
+         print("ModChecker warning: You have a modified script.img script file installed.")
+      end
+   end 
    -- END MAIN
 end
 
