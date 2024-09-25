@@ -2,7 +2,7 @@ script_author("1NS")
 script_name("ModCompatibilityChecker")
 script_description("Checks the mods that can cause crashes")
 script_url("https://github.com/ins1x/moonloader-scripts")
-script_version("1.4")
+script_version("1.5")
 -- Activation: script run once and unloading
 -- encoding.default = 'CP1251'
 
@@ -224,13 +224,6 @@ function main()
       print("ModChecker warning: incorrect skygrad.asi incompatible with ENB")
    end
    
-   -- RealSkybox.SA and skygrad
-   if doesFileExist(getGameDirectory() .. "\\RealSkybox.SA.asi") and 
-   doesFileExist(getGameDirectory() .. "\\skygrad.asi") then
-      sampAddChatMessage("Одновременное использование модов skygrad и RealSkybox.SA вызывает глитчи", 0xFF00000)
-      print("ModChecker warning: using mods skygrad.asi and RealSkybox.SA.asi simultaneously causes glitches")
-   end
-   
     -- RealSkybox.SA and BetterSkybox
    if doesFileExist(getGameDirectory() .. "\\RealSkybox.SA.asi") and 
    doesFileExist(getGameDirectory() .. "\\moonloader\\BetterSkybox.lua") then
@@ -239,10 +232,11 @@ function main()
    end
    
    -- timecycle24 and Real Linear Graphics
-   if doesFileExist(getGameDirectory() .. "\\timecycle24.asi") and 
+   if doesFileExist(getGameDirectory() .. "\\timecycle24.asi") and
+   getFileSize(getGameDirectory() .. "\\timecycle24.asi") ~= 86016 and 
    doesFileExist(getGameDirectory() .. "\\data\\timecyc_24h.dat") then 
-      sampAddChatMessage("Мод 24H Timecycle устанавливается без файла timecyc_24h.dat", 0xFF00000)
-      print("ModChecker warning: The 24H Timecycle mod shoud be installed without the timecyc_24h.dat file")
+      sampAddChatMessage("Устаревший мод на Timecycle. Мод 24H Timecycle устанавливается без файла timecyc_24h.dat", 0xFF00000)
+      print("ModChecker warning: Outdated timecycle mod. The 24H Timecycle mod shoud be installed without the timecyc_24h.dat file")
    end
    
    -- SAMPFUNCS and skygfx
