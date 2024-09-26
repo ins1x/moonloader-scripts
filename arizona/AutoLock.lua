@@ -3,7 +3,7 @@ script_description("Auto lock vehicle")
 -- Automatically locks your vehicle, and automatically 
 -- opens locked vehicles when you press F or ENTER
 script_url("https://github.com/ins1x/moonloader-scripts")
-script_version("0.4")
+script_version("0.5")
 script_author("1NS")
 -- encoding.default = 'CP1251'
 -- script_moonloader(16) moonloader v.0.26
@@ -14,7 +14,7 @@ function main()
    while not isSampAvailable() do wait(100) end
    while true do
       wait(0)
-      if isKeyDown(0x0D) or isKeyDown(0x46) then -- Enter/F
+      if isKeyJustPressed(0x0D) or isKeyJustPressed(0x46) then -- Enter/F
          if not sampIsChatInputActive() and not sampIsDialogActive() then
             if isCharInAnyCar(playerPed) then
                local currentcarhandle = storeCarCharIsInNoSave(playerPed)
@@ -27,7 +27,7 @@ function main()
                -- Will work on vehicles within a radius of 3 meters
                local closestcarhandle, closestcarid = getClosestCar(3)
                if closestcarhandle then
-                  wait(1000) 
+                  wait(500) 
                   sampSendChat("/lock")   
                end
             end
