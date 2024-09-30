@@ -1236,38 +1236,7 @@ function sampev.onCreateObject(objectId, data)
    end
 end
 
-function sampev.onSendCommand(command)
-   -- tips for those who are used to using Texture Studio syntax
-   -- if isAbsolutePlay then
-      -- if command:find("texture") then
-         -- sampAddChatMessage("Для ретекстура используйте:", 0x000FF00)
-         -- sampAddChatMessage("N - Редактировать объект - Выделить объект - Перекарсить объект", 0x000FF00)
-         -- return false
-      -- end
-      -- if command:find("showtext3d") then
-         -- sampAddChatMessage("Информация о объектах показана", 0x000FF00)
-         -- checkbox.showobjectsmodel.v = true 
-         -- return false
-      -- end
-      -- if command:find("hidetext3d") then
-         -- sampAddChatMessage("Информация о объектах скрыта", 0x000FF00)
-         -- checkbox.showobjectsmodel.v = false
-         -- return false
-      -- end
-      -- if command:find("flymode") then
-         -- sampSendChat("/полет")
-         -- return false
-      -- end
-      -- if command:find("team") or command:find("setteam") then
-         -- sampSendChat("Нельзя менять тимы. Если вы хотели изменить спавн используйте:",0x000FF00)
-         -- sampSendChat("Y - Редактор карт - Управление миром - Выбрать точку появления",0x000FF00)
-         -- return false
-      -- end
-      -- if command:find("jetpack")then
-         -- sampAddChatMessage("Джетпак можно взять в меню: N - Оружие - Выдать себе оружие", 0x000FF00)
-         -- return false
-      -- end
-   -- end  
+function sampev.onSendCommand(command) 
    
    if command:find("/exit") or command:find("/выход") then
       isWorldHoster = false
