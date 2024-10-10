@@ -4,7 +4,7 @@ script_description("Assistant for event makers")
 script_dependencies('imgui', 'lib.samp.events')
 script_properties("work-in-pause")
 script_url("https://github.com/ins1x/moonloader-scripts/mphelper")
-script_version("1.2.3")
+script_version("1.2.4")
 -- fork of MappingToolkit project
 -- script_moonloader(16) moonloader v.0.26
 -- tested on sa-mp client version: 0.3.7 R1
@@ -84,6 +84,7 @@ local tabmenu = {
    presets = 1,
    rules = 1,
    checker = 1,
+   actions = 1,
 }
 
 local textbuffer = {
@@ -458,7 +459,7 @@ function imgui.OnDrawFrame()
    if dialog.main.v then
       imgui.SetNextWindowPos(imgui.ImVec2(sizeX / 2, sizeY / 2),
       imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
-      imgui.SetNextWindowSize(imgui.ImVec2(485, 440))
+      imgui.SetNextWindowSize(imgui.ImVec2(435, 440))
       imgui.Begin(".::  MP Helper  ::.", dialog.main)
       
       local ip, port = sampGetCurrentServerAddress()
@@ -616,7 +617,7 @@ function imgui.OnDrawFrame()
             
             
             imgui.Text(u8"Список игроков:")
-            if imgui.Button(u8"Обновить список игроков МП", imgui.ImVec2(220, 25)) then
+            if imgui.Button(u8"Обновить список игроков МП", imgui.ImVec2(200, 25)) then
                playersTable = {}       
                playersTotal = 0
                playersfile = io.open("moonloader/resource/mphelper/players.txt", "w")
@@ -634,7 +635,7 @@ function imgui.OnDrawFrame()
                sampAddChatMessage("Список игроков на МП обновлен. Всего игроков "..playersTotal, -1)
             end
             imgui.SameLine()
-            if imgui.Button(u8"Вывести список игроков", imgui.ImVec2(220, 25)) then
+            if imgui.Button(u8"Вывести список игроков", imgui.ImVec2(200, 25)) then
                sampAddChatMessage("Список игроков:", 0xFFFFFF)
                playersList = {}
                playersfile = io.open("moonloader/resource/mphelper/players.txt", "r")
@@ -816,7 +817,7 @@ function imgui.OnDrawFrame()
             imgui.TextQuestion("( ? )", u8"Выдать права модератора в мире")
             
             imgui.Text(u8"Выбор капитана:")
-	        if imgui.Button(u8"Игрок с наибольшим уровнем", imgui.ImVec2(220, 25)) then
+	        if imgui.Button(u8"Игрок с наибольшим уровнем", imgui.ImVec2(200, 25)) then
 	         local maxscore = {score = 0, id = 0}
 	         local playerid = getLocalPlayerId()
 	         for k, v in ipairs(getAllChars()) do
@@ -837,7 +838,7 @@ function imgui.OnDrawFrame()
 	        end
 	        end
 	        imgui.SameLine()
-	        if imgui.Button(u8"Выбрать случайного игрока", imgui.ImVec2(220, 25)) then
+	        if imgui.Button(u8"Выбрать случайного игрока", imgui.ImVec2(200, 25)) then
 	           if next(playersTable) == nil then -- if playersTable is empty
 	            sampAddChatMessage("Сперва обнови список игроков!", -1) 
 	         else
@@ -886,7 +887,7 @@ function imgui.OnDrawFrame()
                end
             end
             imgui.Spacing()
-            if imgui.TooltipButton(u8"Подать объявление", imgui.ImVec2(220, 25), u8"Аннонсировать в объявление") then
+            if imgui.TooltipButton(u8"Подать объявление", imgui.ImVec2(200, 25), u8"Аннонсировать в объявление") then
                if string.len(textbuffer.mpadd.v) > 0 then 
                   sampSetChatInputEnabled(true)
                   if checkbox.mpprize.v then
@@ -912,7 +913,7 @@ function imgui.OnDrawFrame()
             end
  
             imgui.SameLine()
-            if imgui.TooltipButton(u8"Протестировать", imgui.ImVec2(220, 25), u8:encode("Выведет сообщение только вам для теста")) then
+            if imgui.TooltipButton(u8"Протестировать", imgui.ImVec2(200, 25), u8:encode("Выведет сообщение только вам для теста")) then
                if checkbox.mpprize.v then
                   sampAddChatMessage("В объявление будет подано: "..u8:decode(textbuffer.mpadd.v)..", приз "..u8:decode(textbuffer.mpprize.v), -1)
                else
@@ -1036,11 +1037,11 @@ function imgui.OnDrawFrame()
 		       end
 	 	    end
             imgui.Spacing()
-	        if imgui.Button(u8"Получить id и ники игроков рядом", imgui.ImVec2(220, 25)) then
+	        if imgui.Button(u8"Id и ники игроков рядом", imgui.ImVec2(200, 25)) then
                copyNearestPlayersToClipboard()
 	        end
             imgui.SameLine()
-            if imgui.Button(u8"Всем спасибо!", imgui.ImVec2(220, 25)) then
+            if imgui.Button(u8"Всем спасибо!", imgui.ImVec2(200, 25)) then
                sampSetChatInputEnabled(true)
                if isAbsolutePlay then
                   sampSetChatInputText('* Спасибо за участие в МП! ')
@@ -1052,7 +1053,7 @@ function imgui.OnDrawFrame()
                sampAddChatMessage("Текст скопирован в строку чата", -1)
                dialog.main.v = not dialog.main.v 
 	        end
-            if imgui.Button(u8"Объявить победителей МП", imgui.ImVec2(220, 25)) then
+            if imgui.Button(u8"Объявить победителей МП", imgui.ImVec2(200, 25)) then
 	 	       local pidtable = {}
 	 	       local resulstring
 	 	       for k, v in ipairs(getAllChars()) do
@@ -1070,7 +1071,7 @@ function imgui.OnDrawFrame()
 	 	       end
 	        end
             imgui.SameLine()
-            if imgui.Button(u8"Победители не выходите", imgui.ImVec2(220, 25)) then
+            if imgui.Button(u8"Победители не выходите", imgui.ImVec2(200, 25)) then
                sampSetChatInputEnabled(true)
                sampSetChatInputText('* Победители не выходите! Дождитесь выдачи приза.')
                dialog.main.v = not dialog.main.v 
@@ -1080,13 +1081,13 @@ function imgui.OnDrawFrame()
          
       elseif tabmenu.header == 2 then
          resetIO()
-         local pid 
+         local pid -- selected player id
          local playerId = getLocalPlayerId()
          if string.len(textbuffer.pid.v) < 1 then
             textbuffer.pid.v = tostring(playerId)
          end
          
-         if string.len(textbuffer.pid.v) > 1 
+         if string.len(textbuffer.pid.v) >= 1 
          and sampIsPlayerConnected(tonumber(textbuffer.pid.v))then
             pid = tonumber(textbuffer.pid.v)
          else
@@ -1096,392 +1097,380 @@ function imgui.OnDrawFrame()
          local vid = 0
          
          imgui.PushStyleVar(imgui.StyleVar.ItemSpacing, imgui.ImVec2(2, 2))
+
          if tabmenu.manage == 1 then
             imgui.PushStyleColor(imgui.Col.Button, imgui.GetStyle().Colors[imgui.Col.ButtonHovered])
-            if imgui.Button(u8"Игрок", imgui.ImVec2(80, 30)) then tabmenu.manage = 1 end
+            if imgui.Button(u8"Действия", imgui.ImVec2(95, 30)) then tabmenu.manage = 1 end
             imgui.PopStyleColor()
          else
-            if imgui.Button(u8"Игрок", imgui.ImVec2(80, 30)) then tabmenu.manage = 1 end
+            if imgui.Button(u8"Действия", imgui.ImVec2(95, 30)) then tabmenu.manage = 1 end
          end
          imgui.SameLine()
          if tabmenu.manage == 2 then
             imgui.PushStyleColor(imgui.Col.Button, imgui.GetStyle().Colors[imgui.Col.ButtonHovered])
-            if imgui.Button(u8"Транспорт", imgui.ImVec2(80, 30)) then tabmenu.manage = 2 end
+            if imgui.Button(u8"Проверка", imgui.ImVec2(95, 30)) then tabmenu.manage = 2 end
             imgui.PopStyleColor()
          else
-            if imgui.Button(u8"Транспорт", imgui.ImVec2(80, 30)) then tabmenu.manage = 2 end
+            if imgui.Button(u8"Проверка", imgui.ImVec2(95, 30)) then tabmenu.manage = 2 end
          end
          imgui.SameLine()
          if tabmenu.manage == 3 then
             imgui.PushStyleColor(imgui.Col.Button, imgui.GetStyle().Colors[imgui.Col.ButtonHovered])
-            if imgui.Button(u8"Для всех", imgui.ImVec2(80, 30)) then tabmenu.manage = 3 end
+            if imgui.Button(u8"Наказания", imgui.ImVec2(95, 30)) then tabmenu.manage = 3 end
             imgui.PopStyleColor()
          else
-            if imgui.Button(u8"Для всех", imgui.ImVec2(80, 30)) then tabmenu.manage = 3 end
+            if imgui.Button(u8"Наказания", imgui.ImVec2(95, 30)) then tabmenu.manage = 3 end
          end
          imgui.SameLine()
          if tabmenu.manage == 4 then
             imgui.PushStyleColor(imgui.Col.Button, imgui.GetStyle().Colors[imgui.Col.ButtonHovered])
-            if imgui.Button(u8"Проверка", imgui.ImVec2(80, 30)) then tabmenu.manage = 4 end
+            if imgui.Button(u8"Зона стрима", imgui.ImVec2(95, 30)) then tabmenu.manage = 4 end
             imgui.PopStyleColor()
          else
-            if imgui.Button(u8"Проверка", imgui.ImVec2(80, 30)) then tabmenu.manage = 4 end
-         end
-         imgui.SameLine()
-         if tabmenu.manage == 5 then
-            imgui.PushStyleColor(imgui.Col.Button, imgui.GetStyle().Colors[imgui.Col.ButtonHovered])
-            if imgui.Button(u8"Зона стрима", imgui.ImVec2(80, 30)) then tabmenu.manage = 5 end
-            imgui.PopStyleColor()
-         else
-            if imgui.Button(u8"Зона стрима", imgui.ImVec2(80, 30)) then tabmenu.manage = 5 end
+            if imgui.Button(u8"Зона стрима", imgui.ImVec2(95, 30)) then tabmenu.manage = 4 end
          end
          imgui.PopStyleVar()
          imgui.Spacing()
          
          if tabmenu.manage == 1 then
-            imgui.Text(u8"Введите ID:")
+         
+            imgui.PushStyleVar(imgui.StyleVar.ItemSpacing, imgui.ImVec2(2, 2))
+            imgui.SetCursorPosX((imgui.GetWindowWidth() - imgui.CalcTextSize(u8"Игрок").x) / 2.8)
+            if tabmenu.actions == 1 then
+               imgui.PushStyleColor(imgui.Col.Button, imgui.GetStyle().Colors[imgui.Col.ButtonHovered])
+               if imgui.Button(u8"Игрок", imgui.ImVec2(80, 25)) then tabmenu.actions = 1 end
+               imgui.PopStyleColor()
+            else
+               if imgui.Button(u8"Игрок", imgui.ImVec2(80, 25)) then tabmenu.actions = 1 end
+            end
             imgui.SameLine()
-            imgui.PushItemWidth(50)
-            if imgui.InputText("##PlayerIDBuffer", textbuffer.pid, imgui.InputTextFlags.CharsDecimal) then
+            if tabmenu.actions == 2 then
+               imgui.PushStyleColor(imgui.Col.Button, imgui.GetStyle().Colors[imgui.Col.ButtonHovered])
+               if imgui.Button(u8"Транспорт", imgui.ImVec2(80, 25)) then tabmenu.actions = 2 end
+               imgui.PopStyleColor()
+            else
+               if imgui.Button(u8"Транспорт", imgui.ImVec2(80, 25)) then tabmenu.actions = 2 end
             end
-            imgui.PopItemWidth()
-            
-            if pid then
-               imgui.SameLine()
-               imgui.Text(u8""..sampGetPlayerNickname(pid))
+            imgui.SameLine()
+            if tabmenu.actions == 3 then
+               imgui.PushStyleColor(imgui.Col.Button, imgui.GetStyle().Colors[imgui.Col.ButtonHovered])
+               if imgui.Button(u8"Для всех", imgui.ImVec2(80, 25)) then tabmenu.actions = 3 end
+               imgui.PopStyleColor()
+            else
+               if imgui.Button(u8"Для всех", imgui.ImVec2(80, 25)) then tabmenu.actions = 3 end
             end
+            imgui.PopStyleVar()
+            imgui.Spacing()
             
-            if getClosestPlayerId() ~= -1 then
-               imgui.SameLine()
-               imgui.Text(u8"       ")
-               imgui.SameLine()
-               imgui.Text(u8"Ближайший: ")
-               imgui.SameLine()
-               imgui.Text(tostring(sampGetPlayerNickname(getClosestPlayerId())).."["..getClosestPlayerId().."]")
-               if imgui.IsItemClicked() then
-                  setClipboardText(getClosestPlayerId())
-                  textbuffer.pid.v = tostring(getClosestPlayerId())
+            
+            if tabmenu.actions == 1 then 
+               if imgui.TooltipButton(u8"spec", imgui.ImVec2(50, 25), u8"Уйти в наблюдение за игроком") then
+                  if isTraining then
+                     sampSendChat("/sp "..pid)
+                  else
+                     sampSendChat("/spec "..pid)
+                  end
                end
-            end
-            
-            if isAbsolutePlay then
-               imgui.TextColoredRGB("{FF0000}Для Absolute Play данный раздел без админки не работает")
-            end
-            imgui.PushItemWidth(50)
-            if imgui.InputText("##PlayerIdHp", textbuffer.sethp, imgui.InputTextFlags.CharsDecimal) then
-            end
-            imgui.PopItemWidth()
-            imgui.SameLine()
-            if imgui.Button(u8"Установить HP", imgui.ImVec2(150, 25)) then
-               sampSendChat("/sethp "..pid.." "..textbuffer.sethp.v)
-               sampAddChatMessage("[SCRIPT]: {FFFFFF}Вы пополнили хп игроку "..pid.." до "..textbuffer.sethp.v, 0x0FF6600)
-            end
-            imgui.SameLine()
-            imgui.Text("    ")
-            imgui.SameLine()
-            if imgui.Button(u8"Воскресить", imgui.ImVec2(150, 25)) then
-               sampSendChat("/ress "..pid)
-            end
-            
-            imgui.PushItemWidth(50)
-            if imgui.InputText("##PlayerIdArmour", textbuffer.setarm, imgui.InputTextFlags.CharsDecimal) then
-            end
-            imgui.PopItemWidth()
-            imgui.SameLine()
-            if imgui.Button(u8"Установить броню", imgui.ImVec2(150, 25)) then
-               sampSendChat("/setarm "..pid.." "..textbuffer.setarm.v)
-               sampAddChatMessage("[SCRIPT]: {FFFFFF}Вы пополнили броню игроку "..pid.." до "..textbuffer.sethp.v, 0x0FF6600)
-            end
-            
-            imgui.PushItemWidth(50)
-            if imgui.InputText("##PlayerIdTeamId", textbuffer.setteam, imgui.InputTextFlags.CharsDecimal) then
-            end
-            imgui.PopItemWidth()
-            imgui.SameLine()
-            if imgui.Button(u8"Установить команду", imgui.ImVec2(150, 25)) then
-               sampSendChat("/setteam "..pid.." "..textbuffer.setteam.v)
-               sampAddChatMessage("[SCRIPT]: {FFFFFF}Вы установили тиму "..textbuffer.setteam.v.."{FFFFFF} игроку {696969}"..pid, 0x0FF6600)
-            end
-            imgui.SameLine()
-            imgui.Text("    ")
-            imgui.SameLine()
-            if imgui.Button(u8"Обнулить команду", imgui.ImVec2(150, 25)) then
-               sampSendChat("/unteam "..pid)
-            end
-            
-            imgui.PushItemWidth(200)
-            if imgui.InputText("##PlayerIdVehicle", textbuffer.vehiclename) then
-            end
-            imgui.PopItemWidth()
-            imgui.SameLine()
-            imgui.TextQuestion("( ? )", u8"Укажите ID либо имя транспорта")
-            imgui.SameLine()
-            if imgui.Button(u8"Выдать транспорт", imgui.ImVec2(150, 25)) then
-               if string.len(textbuffer.vehiclename.v) >= 3 then
-                  sampSendChat("/giveveh "..pid.." "..textbuffer.vehiclename.v)
-               else
-                  sampAddChatMessage("Вы не указали ID транспорта", -1)
+               imgui.SameLine()
+               imgui.Text(u8"Введите ID:")
+               imgui.SameLine()
+               imgui.PushItemWidth(50)
+               if imgui.InputText("##PlayerIDBuffer", textbuffer.pid, imgui.InputTextFlags.CharsDecimal) then
                end
-            end
-            
-            imgui.PushItemWidth(140)
-            imgui.Combo('##ComboWeaponSelect', combobox.weaponselect, weaponNames)
-            imgui.PopItemWidth()
-            imgui.SameLine()
-            imgui.PushItemWidth(54)
-            imgui.InputInt("##inputAmmo", input.ammo, 0)
-            imgui.PopItemWidth()
-            imgui.SameLine()
-            imgui.TextQuestion("( ? )", u8"Укажите количество патронов")
-            imgui.SameLine()
-            if imgui.Button(u8"Выдать оружие", imgui.ImVec2(150, 25)) then
-               if combobox.weaponselect.v == 19 or combobox.weaponselect.v == 20
-               or combobox.weaponselect.v == 1 or combobox.weaponselect.v == 21 then
-                  sampAddChatMessage("Некорректный выбор оружия", -1)
-               else
-                  sampSendChat("/givegun "..pid.." "..combobox.weaponselect.v.." "..input.ammo.v)
+               imgui.PopItemWidth()
+               
+               if pid then
+                  imgui.SameLine()
+                  imgui.Text(u8""..sampGetPlayerNickname(pid))
                end
-            end
-            if isTraining then
-               local moderitems = {
-                   u8"Обнулить",
-                   u8"1-го уровня", 
-                   u8"2-го уровня", 
-                   u8"3-го уровня", 
-                   u8"4-го уровня", 
-                   u8"5-го уровня"
-               }
+               
+               if getClosestPlayerId() ~= -1 then
+                  imgui.SameLine()
+                  imgui.Text(u8"  ")
+                  imgui.SameLine()
+                  imgui.TextColoredRGB("{424242}[s]")
+                  if imgui.IsItemHovered() then
+                     imgui.BeginTooltip()
+                     imgui.PushTextWrapPos(350)
+                     imgui.TextUnformatted(tostring(u8"Ближайший игрок: "..sampGetPlayerNickname(getClosestPlayerId())).."["..getClosestPlayerId().."]")
+                     imgui.PopTextWrapPos()
+                     imgui.EndTooltip()
+                  end
+                  if imgui.IsItemClicked() then
+                     setClipboardText(getClosestPlayerId())
+                     textbuffer.pid.v = tostring(getClosestPlayerId())
+                  end
+               end
+               
+               if isAbsolutePlay then
+                  imgui.TextColoredRGB("{FF0000}Для Absolute Play данный раздел без админки не работает")
+               end
+               imgui.PushItemWidth(50)
+               if imgui.InputText("##PlayerIdHp", textbuffer.sethp, imgui.InputTextFlags.CharsDecimal) then
+               end
+               imgui.PopItemWidth()
+               imgui.SameLine()
+               if imgui.Button(u8"Установить HP", imgui.ImVec2(150, 25)) then
+                  sampSendChat("/sethp "..pid.." "..textbuffer.sethp.v)
+                  sampAddChatMessage("[SCRIPT]: {FFFFFF}Вы пополнили хп игроку "..pid.." до "..textbuffer.sethp.v, 0x0FF6600)
+               end
+               imgui.SameLine()
+               imgui.Text("    ")
+               imgui.SameLine()
+               if imgui.Button(u8"Воскресить", imgui.ImVec2(150, 25)) then
+                  sampSendChat("/ress "..pid)
+               end
+               
+               imgui.PushItemWidth(50)
+               if imgui.InputText("##PlayerIdArmour", textbuffer.setarm, imgui.InputTextFlags.CharsDecimal) then
+               end
+               imgui.PopItemWidth()
+               imgui.SameLine()
+               if imgui.Button(u8"Установить броню", imgui.ImVec2(150, 25)) then
+                  sampSendChat("/setarm "..pid.." "..textbuffer.setarm.v)
+                  sampAddChatMessage("[SCRIPT]: {FFFFFF}Вы пополнили броню игроку "..pid.." до "..textbuffer.sethp.v, 0x0FF6600)
+               end
+               
+               imgui.PushItemWidth(50)
+               if imgui.InputText("##PlayerIdTeamId", textbuffer.setteam, imgui.InputTextFlags.CharsDecimal) then
+               end
+               imgui.PopItemWidth()
+               imgui.SameLine()
+               if imgui.Button(u8"Установить команду", imgui.ImVec2(150, 25)) then
+                  sampSendChat("/setteam "..pid.." "..textbuffer.setteam.v)
+                  sampAddChatMessage("[SCRIPT]: {FFFFFF}Вы установили тиму "..textbuffer.setteam.v.."{FFFFFF} игроку {696969}"..pid, 0x0FF6600)
+               end
+               imgui.SameLine()
+               imgui.Text("    ")
+               imgui.SameLine()
+               if imgui.Button(u8"Обнулить команду", imgui.ImVec2(150, 25)) then
+                  sampSendChat("/unteam "..pid)
+               end
+               
                imgui.PushItemWidth(200)
-               imgui.Combo(u8'##ComboBoxSetModer', combobox.setmoder, moderitems, #moderitems)
+               if imgui.InputText("##PlayerIdVehicle", textbuffer.vehiclename) then
+               end
+               imgui.PopItemWidth()
                imgui.SameLine()
-               imgui.TextQuestion("( ? )", u8"Выдать права модератора в мире")
+               imgui.TextQuestion("( ? )", u8"Укажите ID либо имя транспорта")
                imgui.SameLine()
-               if imgui.Button(u8"Выдать модера", imgui.ImVec2(150, 25)) then
-                  sampSendChat("/setmoder "..pid.." "..combobox.setmoder.v)
+               if imgui.Button(u8"Выдать транспорт", imgui.ImVec2(150, 25)) then
+                  if string.len(textbuffer.vehiclename.v) >= 3 then
+                     sampSendChat("/giveveh "..pid.." "..textbuffer.vehiclename.v)
+                  else
+                     sampAddChatMessage("Вы не указали ID транспорта", -1)
+                  end
                end
-            end
+               
+               imgui.PushItemWidth(140)
+               imgui.Combo('##ComboWeaponSelect', combobox.weaponselect, weaponNames)
+               imgui.PopItemWidth()
+               imgui.SameLine()
+               imgui.PushItemWidth(54)
+               imgui.InputInt("##inputAmmo", input.ammo, 0)
+               imgui.PopItemWidth()
+               imgui.SameLine()
+               imgui.TextQuestion("( ? )", u8"Укажите количество патронов")
+               imgui.SameLine()
+               if imgui.Button(u8"Выдать оружие", imgui.ImVec2(150, 25)) then
+                  if combobox.weaponselect.v == 19 or combobox.weaponselect.v == 20
+                  or combobox.weaponselect.v == 1 or combobox.weaponselect.v == 21 then
+                     sampAddChatMessage("Некорректный выбор оружия", -1)
+                  else
+                     sampSendChat("/givegun "..pid.." "..combobox.weaponselect.v.." "..input.ammo.v)
+                  end
+               end
+               if isTraining then
+                  local moderitems = {
+                      u8"Обнулить",
+                      u8"1-го уровня", 
+                      u8"2-го уровня", 
+                      u8"3-го уровня", 
+                      u8"4-го уровня", 
+                      u8"5-го уровня"
+                  }
+                  imgui.PushItemWidth(200)
+                  imgui.Combo(u8'##ComboBoxSetModer', combobox.setmoder, moderitems, #moderitems)
+                  imgui.SameLine()
+                  imgui.TextQuestion("( ? )", u8"Выдать права модератора в мире")
+                  imgui.SameLine()
+                  if imgui.Button(u8"Выдать модера", imgui.ImVec2(150, 25)) then
+                     sampSendChat("/setmoder "..pid.." "..combobox.setmoder.v)
+                  end
+               end
+               
+            elseif tabmenu.actions == 2 then
             
-            imgui.Text(u8"Выдать наказание: ")
-            imgui.PushItemWidth(200)
-            if imgui.InputText(u8"причина", textbuffer.setreason) then
-            end
-            imgui.PopItemWidth()
-            imgui.SameLine()
-            imgui.PushItemWidth(50)
-            if imgui.InputText(u8"минут", textbuffer.setptime, imgui.InputTextFlags.CharsDecimal) then
-            end
-            imgui.PopItemWidth()
-            imgui.SameLine()
-            imgui.TextQuestion("( ? )", u8"Чтобы забанить навсегда укажите 0 в графу с минутами")
+               local closestcarhandle, closestcarid = getClosestCar()
+               if closestcarhandle then
+                  local closestcarmodel = getCarModel(closestcarhandle)
+                  imgui.Text(string.format(u8"Ближайший т/с: %s [model: %i] (id:%i)",
+                  VehicleNames[closestcarmodel-399], closestcarmodel, closestcarid))
+                  if imgui.IsItemClicked() then
+                     setClipboardText(closestcarid)
+                     textbuffer.vid.v = tostring(closestcarid)
+                  end
+                  imgui.SameLine()
+                  imgui.TextQuestion("( ? )", u8"В скобках указан внутренний ID (/dl)")
+               end
+                  
+               if isCharInAnyCar(playerPed) then 
+                  local carhandle = storeCarCharIsInNoSave(playerPed)
+                  local carmodel = getCarModel(carhandle)
+                  imgui.Text(string.format(u8"Вы в транспорте: %s [model: %i]",
+                  VehicleNames[carmodel-399], carmodel))
+                  if imgui.IsItemClicked() then
+                     local result, id = sampGetVehicleIdByCarHandle(carhandle)
+                     if result then
+                        setClipboardText(id)
+                        textbuffer.vid.v = tostring(id)
+                     end
+                  end
+               end
+               
+               imgui.Spacing()
+               imgui.Text(u8"Введите ID:")
+               imgui.SameLine()
+               imgui.PushItemWidth(50)
+               if imgui.InputText("##VehicleIDBuffer", textbuffer.vid, imgui.InputTextFlags.CharsDecimal) then
+               end
+               imgui.PopItemWidth()
+               
+               if textbuffer.vid.v then
+                  --imgui.Text(u8""..sampGetPlayerNickname(pid))
+                  vid = tonumber(textbuffer.vid.v)
+                  if vid then
+                     local result, car = sampGetCarHandleBySampVehicleId(id)
+                     if result then
+                        local carmodel = getCarModel(car)
+                        imgui.SameLine()
+                        imgui.Text(string.format(u8"Вы в транспорте: %s(%i)",
+                        VehicleNames[carmodel-399], carmodel))
+                     end
+                  end
+               end
+               
+               imgui.PushItemWidth(200)
+               if imgui.InputText("##PlayerIdVehicle", textbuffer.vehiclename) then
+               end
+               imgui.PopItemWidth()
+               imgui.SameLine()
+               imgui.TextQuestion("( ? )", u8"Укажите ID либо имя транспорта")
+               
+               if imgui.Button(u8"Создать транспорт", imgui.ImVec2(150, 25)) then
+                  if string.len(textbuffer.vehiclename.v) >= 3 then
+                     if isTraining then
+                        if checkbox.copcar.v then
+                           sampSendChat("/veh "..textbuffer.vehiclename.v)
+                        else
+                           sampSendChat("/veh "..textbuffer.vehiclename.v)
+                        end
+                     elseif isAbsolutePlay then
+                        sampSendChat("/машину2 "..textbuffer.vehiclename.v)
+                     end
+                  else
+                     sampAddChatMessage("Вы не указали ID транспорта", -1)
+                  end
+               end
+               imgui.SameLine()
+               imgui.Checkbox(u8"Мигалка", checkbox.copcar)
+               
+               imgui.Spacing()
+               if imgui.Button(u8"Открыть меню управления", imgui.ImVec2(250, 25)) then
+                  if vid then
+                     sampSendChat("/vmenu "..vid)
+                  else
+                     sampAddChatMessage("Вы не указали ID транспорта", -1)
+                  end
+                  toggleMainWindow()
+               end
+               if imgui.Button(u8"ТП к себе", imgui.ImVec2(125, 25)) then
+                  if vid then
+                     if isAbsolutePlay then
+                        sampAddChatMessage("[SCRIPT]: {FFFFFF}Недоступно для вашего сервера", 0x0FF6600) 
+                     else
+                        sampSendChat("/vgethere "..vid)
+                     end
+                  else
+                     sampAddChatMessage("Вы не указали ID транспорта", -1)
+                  end
+               end
+               imgui.SameLine()
+               if imgui.Button(u8"ТП к транспорту", imgui.ImVec2(125, 25)) then
+                  if vid then
+                     if isTraining then
+                        sampSendChat("/tpveh "..vid)
+                     elseif isAbsolutePlay then
+                        sampSendChat("/gotocar "..vid)
+                     end
+                  else
+                     sampAddChatMessage("Вы не указали ID транспорта", -1)
+                  end
+               end
+               imgui.Spacing()
+               if imgui.Button(u8"Удалить", imgui.ImVec2(120, 25)) then
+                  if vid then
+                     sampSendChat("/delveh "..vid)
+                  else
+                     sampAddChatMessage("Вы не указали ID транспорта", -1)
+                  end
+               end
             
-            if imgui.Button(u8"Кикнуть игрока", imgui.ImVec2(150, 25)) then
-               if string.len(textbuffer.setreason.v) >= 3 then
+            elseif tabmenu.actions == 3 then
+               imgui.Text(u8"Для всех игроков в мире:")
+               if imgui.Button(u8"Пополнить хп", imgui.ImVec2(150, 25)) then
                   if isTraining then
-                     sampSendChat("/vkick "..pid.." "..textbuffer.setreason.v)
+                     sampSendChat("/health 100")
+                     sampAddChatMessage("[SCRIPT]: {FFFFFF}Вы пополнили хп до 100 всем игрокам в мире", 0x0FF6600)
                   else
-                     sampSendChat("/kick "..pid.." "..textbuffer.setreason.v)
+                     sampSendChat("/hpall 100")
                   end
-               else
-                  sampAddChatMessage("Вы не указали причину", -1)
                end
-            end
-            imgui.SameLine()
-            if imgui.Button(u8"Заглушить игрока", imgui.ImVec2(150, 25)) then
-               if string.len(textbuffer.setptime.v) >= 1 then
+               imgui.SameLine()
+               if imgui.Button(u8"Пополнить броню", imgui.ImVec2(150, 25)) then
                   if isTraining then
-                     sampSendChat("/vmute "..pid.." "..tonumber(textbuffer.settime.v).." "..textbuffer.setreason.v)
+                     sampSendChat("/armour 100")
+                     sampAddChatMessage("[SCRIPT]: {FFFFFF}Вы пополнили броню до 100 всем игрокам в мире", 0x0FF6600)
                   else
-                     sampSendChat("/mute "..pid.." "..tonumber(textbuffer.settime.v).." "..textbuffer.setreason.v)
+                     sampSendChat("/armall 100")
                   end
-               else
-                  sampAddChatMessage("Вы не указали на какое время выдать наказание", -1)
                end
-            end
-            imgui.SameLine()
-            if imgui.Button(u8"Забанить игрока", imgui.ImVec2(150, 25)) then
-               if string.len(textbuffer.setptime.v) >= 1 then
+               if imgui.Button(u8"Ресснуть игроков", imgui.ImVec2(150, 25)) then
                   if isTraining then
-                     sampSendChat("/vban "..pid.." "..tonumber(textbuffer.settime.v).." "..textbuffer.setreason.v)
+                     sampSendChat("/ressall")
                   else
-                     sampSendChat("/ban "..pid.." "..tonumber(textbuffer.settime.v).." "..textbuffer.setreason.v)
+                     sampSendChat("/refillall")
                   end
-               else
-                  sampAddChatMessage("Вы не указали на какое время выдать наказание", -1)
+               end
+               imgui.SameLine()
+               if imgui.Button(u8"Заморозить игроков", imgui.ImVec2(150, 25)) then
+                  if isTraining then
+                     sampAddChatMessage("Недоступно для вашего сервера.", -1)
+                  elseif isAbsolutePlay then
+                     sampSendChat("/tazerall")
+                  else
+                     sampSendChat("/freezeall")
+                  end
+               end
+               
+               imgui.Text(u8"Транспорт:")
+               if imgui.Button(u8"Починить весь транспорт рядом", imgui.ImVec2(250, 25)) then
+                  if isAbsolutePlay then
+                     sampSendChat("/fixvehs")
+                  else
+                     sampAddChatMessage("Недоступно для вашего сервера.", -1)
+                  end
+               end
+               if imgui.Button(u8"Зареспавить весь транспорт рядом", imgui.ImVec2(250, 25)) then
+                  if isAbsolutePlay then
+                     sampSendChat("/spcars")
+                  else
+                     sampAddChatMessage("Недоступно для вашего сервера.", -1)
+                  end
                end
             end
             
          elseif tabmenu.manage == 2 then
-            
-            local closestcarhandle, closestcarid = getClosestCar()
-            if closestcarhandle then
-               local closestcarmodel = getCarModel(closestcarhandle)
-               imgui.Text(string.format(u8"Ближайший т/с: %s [model: %i] (id:%i)",
-               VehicleNames[closestcarmodel-399], closestcarmodel, closestcarid))
-               if imgui.IsItemClicked() then
-                  setClipboardText(closestcarid)
-                  textbuffer.vid.v = tostring(closestcarid)
-               end
-               imgui.SameLine()
-               imgui.TextQuestion("( ? )", u8"В скобках указан внутренний ID (/dl)")
-            end
-               
-            if isCharInAnyCar(playerPed) then 
-               local carhandle = storeCarCharIsInNoSave(playerPed)
-               local carmodel = getCarModel(carhandle)
-               imgui.Text(string.format(u8"Вы в транспорте: %s [model: %i]",
-               VehicleNames[carmodel-399], carmodel))
-               if imgui.IsItemClicked() then
-                  local result, id = sampGetVehicleIdByCarHandle(carhandle)
-                  if result then
-                     setClipboardText(id)
-                     textbuffer.vid.v = tostring(id)
-                  end
-               end
-            end
-            
-            imgui.Spacing()
-            imgui.Text(u8"Введите ID:")
-            imgui.SameLine()
-            imgui.PushItemWidth(50)
-            if imgui.InputText("##VehicleIDBuffer", textbuffer.vid, imgui.InputTextFlags.CharsDecimal) then
-            end
-            imgui.PopItemWidth()
-            
-            if textbuffer.vid.v then
-               --imgui.Text(u8""..sampGetPlayerNickname(pid))
-               vid = tonumber(textbuffer.vid.v)
-               if vid then
-                  local result, car = sampGetCarHandleBySampVehicleId(id)
-                  if result then
-                     local carmodel = getCarModel(car)
-                     imgui.SameLine()
-                     imgui.Text(string.format(u8"Вы в транспорте: %s(%i)",
-                     VehicleNames[carmodel-399], carmodel))
-                  end
-               end
-            end
-            
-            imgui.PushItemWidth(200)
-            if imgui.InputText("##PlayerIdVehicle", textbuffer.vehiclename) then
-            end
-            imgui.PopItemWidth()
-            imgui.SameLine()
-            imgui.TextQuestion("( ? )", u8"Укажите ID либо имя транспорта")
-            
-            if imgui.Button(u8"Создать транспорт", imgui.ImVec2(150, 25)) then
-               if string.len(textbuffer.vehiclename.v) >= 3 then
-                  if isTraining then
-                     if checkbox.copcar.v then
-                        sampSendChat("/veh "..textbuffer.vehiclename.v)
-                     else
-                        sampSendChat("/veh "..textbuffer.vehiclename.v)
-                     end
-                  elseif isAbsolutePlay then
-                     sampSendChat("/машину2 "..textbuffer.vehiclename.v)
-                  end
-               else
-                  sampAddChatMessage("Вы не указали ID транспорта", -1)
-               end
-            end
-            imgui.SameLine()
-            imgui.Checkbox(u8"Мигалка", checkbox.copcar)
-            
-            imgui.Spacing()
-            if imgui.Button(u8"Открыть меню управления", imgui.ImVec2(250, 25)) then
-               if vid then
-                  sampSendChat("/vmenu "..vid)
-               else
-                  sampAddChatMessage("Вы не указали ID транспорта", -1)
-               end
-               toggleMainWindow()
-            end
-            if imgui.Button(u8"ТП к себе", imgui.ImVec2(125, 25)) then
-               if vid then
-                  if isAbsolutePlay then
-                     sampAddChatMessage("[SCRIPT]: {FFFFFF}Недоступно для вашего сервера", 0x0FF6600) 
-                  else
-                     sampSendChat("/vgethere "..vid)
-                  end
-               else
-                  sampAddChatMessage("Вы не указали ID транспорта", -1)
-               end
-            end
-            imgui.SameLine()
-            if imgui.Button(u8"ТП к транспорту", imgui.ImVec2(125, 25)) then
-               if vid then
-                  if isTraining then
-                     sampSendChat("/tpveh "..vid)
-                  elseif isAbsolutePlay then
-                     sampSendChat("/gotocar "..vid)
-                  end
-               else
-                  sampAddChatMessage("Вы не указали ID транспорта", -1)
-               end
-            end
-            imgui.Spacing()
-            if imgui.Button(u8"Удалить", imgui.ImVec2(120, 25)) then
-               if vid then
-                  sampSendChat("/delveh "..vid)
-               else
-                  sampAddChatMessage("Вы не указали ID транспорта", -1)
-               end
-            end
-            
-         elseif tabmenu.manage == 3 then
-            imgui.Text(u8"Для всех игроков в мире:")
-            if imgui.Button(u8"Пополнить хп", imgui.ImVec2(150, 25)) then
-               if isTraining then
-                  sampSendChat("/health 100")
-                  sampAddChatMessage("[SCRIPT]: {FFFFFF}Вы пополнили хп до 100 всем игрокам в мире", 0x0FF6600)
-               else
-                  sampSendChat("/hpall 100")
-               end
-            end
-            imgui.SameLine()
-            if imgui.Button(u8"Пополнить броню", imgui.ImVec2(150, 25)) then
-               if isTraining then
-                  sampSendChat("/armour 100")
-                  sampAddChatMessage("[SCRIPT]: {FFFFFF}Вы пополнили броню до 100 всем игрокам в мире", 0x0FF6600)
-               else
-                  sampSendChat("/armall 100")
-               end
-            end
-            if imgui.Button(u8"Ресснуть игроков", imgui.ImVec2(150, 25)) then
-               if isTraining then
-                  sampSendChat("/ressall")
-               else
-                  sampSendChat("/refillall")
-               end
-            end
-            imgui.SameLine()
-            if imgui.Button(u8"Заморозить игроков", imgui.ImVec2(150, 25)) then
-               if isTraining then
-                  sampAddChatMessage("Недоступно для вашего сервера.", -1)
-               elseif isAbsolutePlay then
-                  sampSendChat("/tazerall")
-               else
-                  sampSendChat("/freezeall")
-               end
-            end
-            
-            imgui.Text(u8"Транспорт:")
-            if imgui.Button(u8"Починить весь транспорт рядом", imgui.ImVec2(250, 25)) then
-               if isAbsolutePlay then
-                  sampSendChat("/fixvehs")
-               else
-                  sampAddChatMessage("Недоступно для вашего сервера.", -1)
-               end
-            end
-            if imgui.Button(u8"Зареспавить весь транспорт рядом", imgui.ImVec2(250, 25)) then
-               if isAbsolutePlay then
-                  sampSendChat("/spcars")
-               else
-                  sampAddChatMessage("Недоступно для вашего сервера.", -1)
-               end
-            end
-            
-            
-         elseif tabmenu.manage == 4 then
             resetIO()
             
             imgui.PushStyleVar(imgui.StyleVar.ItemSpacing, imgui.ImVec2(2, 0))
@@ -1766,7 +1755,137 @@ function imgui.OnDrawFrame()
                   end
                end
             end
-         elseif tabmenu.manage == 5 then   
+         elseif tabmenu.manage == 3 then
+            
+            if isAbsolutePlay then
+               imgui.TextColoredRGB("{FF0000}Для Absolute Play данный раздел без админки не работает")
+            end
+            
+            if tonumber(pid) == tonumber(getLocalPlayerId()) then
+               imgui.TextColoredRGB("{FF0000}Измените id чтобы не выдать наказание самому себе!")
+            end
+            
+            -- if imgui.TooltipButton(u8" << ", imgui.ImVec2(50, 25), u8"Открыть статистику выбранного игрока") then
+               -- for k, v in pairs(getAllChars()) do
+                  -- --print(k, v)
+                  -- local res, id = sampGetPlayerIdByCharHandle(v)
+                  -- if res then
+                     -- if id == tonumber(pid) then 
+                        -- chosenplayer = v
+                        -- break
+                     -- end
+                  -- end
+               -- end
+               -- if not dialog.playerstat.v then dialog.playerstat.v = true end
+            -- end
+            -- imgui.SameLine()
+            if imgui.TooltipButton(u8"spec", imgui.ImVec2(50, 25), u8"Уйти в наблюдение за игроком") then
+               if isTraining then
+                  sampSendChat("/sp "..pid)
+               else
+                  sampSendChat("/spec "..pid)
+               end
+            end
+            imgui.SameLine()
+            imgui.Text(u8"Введите ID:")
+            imgui.SameLine()
+            imgui.PushItemWidth(50)
+            if imgui.InputText("##PlayerIDBuffer", textbuffer.pid, imgui.InputTextFlags.CharsDecimal) then
+            end
+            imgui.PopItemWidth()
+            
+            if pid then
+               imgui.SameLine()
+               imgui.Text(u8""..sampGetPlayerNickname(pid))
+            end
+            
+            if getClosestPlayerId() ~= -1 then
+               imgui.SameLine()
+               imgui.Text(u8"  ")
+               imgui.SameLine()
+               imgui.TextColoredRGB("{424242}[s]")
+               if imgui.IsItemHovered() then
+                  imgui.BeginTooltip()
+                  imgui.PushTextWrapPos(350)
+                  imgui.TextUnformatted(tostring(u8"Ближайший игрок: "..sampGetPlayerNickname(getClosestPlayerId())).."["..getClosestPlayerId().."]")
+                  imgui.PopTextWrapPos()
+                  imgui.EndTooltip()
+               end
+               if imgui.IsItemClicked() then
+                  setClipboardText(getClosestPlayerId())
+                  textbuffer.pid.v = tostring(getClosestPlayerId())
+               end
+            end
+               
+            imgui.Text(u8"Выдать наказание: ")
+            imgui.PushItemWidth(200)
+            if imgui.InputText(u8"причина", textbuffer.setreason) then
+            end
+            imgui.PopItemWidth()
+            imgui.SameLine()
+            imgui.PushItemWidth(50)
+            if imgui.InputText(u8"минут", textbuffer.setptime, imgui.InputTextFlags.CharsDecimal) then
+            end
+            imgui.PopItemWidth()
+            imgui.SameLine()
+            imgui.TextQuestion("( ? )", u8"Чтобы забанить навсегда укажите 0 в графу с минутами")
+            imgui.Spacing()
+            
+            if imgui.Button(u8"Кикнуть игрока", imgui.ImVec2(150, 25)) then
+               if string.len(textbuffer.setreason.v) >= 3 then
+                  if isTraining then
+                     sampSendChat("/vkick "..pid.." "..textbuffer.setreason.v)
+                  else
+                     sampSendChat("/kick "..pid.." "..textbuffer.setreason.v)
+                  end
+               else
+                  sampAddChatMessage("Вы не указали причину", -1)
+               end
+            end
+            
+            imgui.SameLine()
+            if imgui.Button(u8"Выкинуть с команды", imgui.ImVec2(150, 25)) then
+               sampSendChat("/unteam "..pid)
+            end
+            
+            if imgui.Button(u8"Забанить игрока", imgui.ImVec2(150, 25)) then
+               if string.len(textbuffer.setptime.v) >= 1 then
+                  if string.len(textbuffer.setreason.v) >= 3 then
+                     if isTraining then
+                        sampSendChat("/vban "..pid.." "..tonumber(textbuffer.setptime.v).." "..textbuffer.setreason.v)
+                     else
+                        sampSendChat("/ban "..pid.." "..tonumber(textbuffer.setptime.v).." "..textbuffer.setreason.v)
+                     end
+                  else
+                     sampAddChatMessage("Вы не указали причину", -1)
+                  end
+               else
+                  sampAddChatMessage("Вы не указали на какое время выдать наказание", -1)
+               end
+            end
+            imgui.SameLine()
+            if imgui.Button(u8"Обнулить хп", imgui.ImVec2(150, 25)) then
+               sampSendChat("/sethp "..pid.." 0")
+               sampAddChatMessage("Вы обнулили хп игроку "..sampGetPlayerNickname(pid).."("..pid..")", -1)
+            end
+            
+            if imgui.Button(u8"Заглушить игрока", imgui.ImVec2(150, 25)) then
+               if string.len(textbuffer.setptime.v) >= 1 then
+                  if string.len(textbuffer.setreason.v) >= 3 then
+                     if isTraining then
+                        sampSendChat("/vmute "..pid.." "..tonumber(textbuffer.setptime.v).." "..textbuffer.setreason.v)
+                     else
+                        sampSendChat("/mute "..pid.." "..tonumber(textbuffer.setptime.v).." "..textbuffer.setreason.v)
+                     end
+                  else
+                     sampAddChatMessage("Вы не указали причину", -1)
+                  end
+               else
+                  sampAddChatMessage("Вы не указали на какое время выдать наказание", -1)
+               end
+            end
+            
+         elseif tabmenu.manage == 4 then   
             
             --imgui.Text(u8"Выберите сущность:")
             --imgui.SameLine()
@@ -1858,7 +1977,7 @@ function imgui.OnDrawFrame()
                       setClipboardText(v)
                       sampAddChatMessage("Скопирован в буфер обмена", -1)
                    end
-                   imgui.SetColumnWidth(-1, 50)
+                   imgui.SetColumnWidth(-1, 40)
                    imgui.NextColumn()
                    if sampIsPlayerPaused(v) then
                       imgui.TextColoredRGB("{FF0000}[AFK]")
@@ -1870,12 +1989,12 @@ function imgui.OnDrawFrame()
                       chosenplayer = v
                       if not dialog.playerstat.v then dialog.playerstat.v = true end
                    end
-                   imgui.SetColumnWidth(-1, 250)
+                   imgui.SetColumnWidth(-1, 200)
                    imgui.NextColumn()
             
                    imgui.TextColoredRGB(string.format("%i", score))
             
-                   imgui.SetColumnWidth(-1, 70)
+                   imgui.SetColumnWidth(-1, 60)
                    imgui.NextColumn()
                    if health >= 5000 then
                       imgui.TextColoredRGB("{FF0000}Бессмертный")
@@ -1884,7 +2003,7 @@ function imgui.OnDrawFrame()
                    else
                       imgui.TextColoredRGB(string.format("{FF0000}%i (%i)", health, armor))
                    end
-                   imgui.SetColumnWidth(-1, 100)
+                   imgui.SetColumnWidth(-1, 80)
                    imgui.NextColumn()
                    if (ping > 90) then
                       imgui.TextColoredRGB(string.format("{FF0000}%i", ping))
@@ -2029,10 +2148,10 @@ function imgui.OnDrawFrame()
          
          local prefix = ""
          imgui.SameLine()
-         imgui.Text(u8"     Чат: ")
+         imgui.Text(u8" Чат:")
          imgui.SameLine()
          if isAbsolutePlay then             
-            imgui.PushItemWidth(120)
+            imgui.PushItemWidth(110)
             prefixlist = {u8'мчат', u8'глобальный', u8"без префикса"}
             imgui.Combo('##ComboChatSelect', combobox.chatselect, prefixlist, #prefixlist)
             imgui.PopItemWidth()
@@ -2045,7 +2164,7 @@ function imgui.OnDrawFrame()
                prefix = ""
             end
          elseif isTraining then  
-            imgui.PushItemWidth(120)
+            imgui.PushItemWidth(110)
             prefixlist = {u8'игрового мира', u8'глобальный', u8'модераторов', u8'ООС', u8"без префикса"}
             imgui.Combo('##ComboChatSelect', combobox.chatselect, prefixlist, #prefixlist)
             imgui.PopItemWidth()
@@ -2062,7 +2181,7 @@ function imgui.OnDrawFrame()
                prefix = ""
             end
          else
-            imgui.PushItemWidth(120)
+            imgui.PushItemWidth(110)
             prefixlist = {u8"без префикса"}
             imgui.Combo('##ComboChatSelect', combobox.chatselect, prefixlist, #prefixlist)
             imgui.PopItemWidth()
@@ -2120,7 +2239,7 @@ function imgui.OnDrawFrame()
             -- line 1
             imgui.Text("1.")
             imgui.SameLine()
-            imgui.PushItemWidth(400)
+            imgui.PushItemWidth(350)
             if imgui.InputText("##cmdbind1", binds.cmdbind1) then 
             end
             imgui.PopItemWidth()
@@ -2135,7 +2254,7 @@ function imgui.OnDrawFrame()
             -- line 2
             imgui.Text("2.")
             imgui.SameLine()
-            imgui.PushItemWidth(400)
+            imgui.PushItemWidth(350)
             if imgui.InputText("##cmdbind2", binds.cmdbind2) then 
             end
             imgui.PopItemWidth()
@@ -2147,7 +2266,7 @@ function imgui.OnDrawFrame()
             -- line 3 
             imgui.Text("3.")
             imgui.SameLine()
-            imgui.PushItemWidth(400)
+            imgui.PushItemWidth(350)
             if imgui.InputText("##cmdbind3", binds.cmdbind3) then 
             end
             imgui.PopItemWidth()
@@ -2159,7 +2278,7 @@ function imgui.OnDrawFrame()
             -- line 4
             imgui.Text("4.")
             imgui.SameLine()
-            imgui.PushItemWidth(400)
+            imgui.PushItemWidth(350)
             if imgui.InputText("##cmdbind4", binds.cmdbind4) then 
             end
             imgui.PopItemWidth()
@@ -2171,7 +2290,7 @@ function imgui.OnDrawFrame()
             -- line 5
             imgui.Text("5.")
             imgui.SameLine()
-            imgui.PushItemWidth(400)
+            imgui.PushItemWidth(350)
             if imgui.InputText("##cmdbind5", binds.cmdbind5) then 
             end
             imgui.PopItemWidth()
@@ -2183,7 +2302,7 @@ function imgui.OnDrawFrame()
             -- line 6
             imgui.Text("6.")
             imgui.SameLine()
-            imgui.PushItemWidth(400)
+            imgui.PushItemWidth(350)
             if imgui.InputText("##cmdbind6", binds.cmdbind6) then 
             end
             imgui.PopItemWidth()
@@ -2195,7 +2314,7 @@ function imgui.OnDrawFrame()
             -- line 7
             imgui.Text("7.")
             imgui.SameLine()
-            imgui.PushItemWidth(400)
+            imgui.PushItemWidth(350)
             if imgui.InputText("##cmdbind7", binds.cmdbind7) then 
             end
             imgui.PopItemWidth()
@@ -2207,7 +2326,7 @@ function imgui.OnDrawFrame()
             -- line 8
             imgui.Text("8.")
             imgui.SameLine()
-            imgui.PushItemWidth(400)
+            imgui.PushItemWidth(350)
             if imgui.InputText("##cmdbind8", binds.cmdbind8) then 
             end
             imgui.PopItemWidth()
@@ -2219,7 +2338,7 @@ function imgui.OnDrawFrame()
             -- line 8
             imgui.Text("9.")
             imgui.SameLine()
-            imgui.PushItemWidth(400)
+            imgui.PushItemWidth(350)
             if imgui.InputText("##cmdbind9", binds.cmdbind9) then 
             end
             imgui.PopItemWidth()
@@ -2283,7 +2402,7 @@ function imgui.OnDrawFrame()
             imgui.PopItemWidth()
             imgui.SameLine()
             imgui.Checkbox(u8("Скрыть ответ"), checkbox.hideanswer)
-            imgui.PushItemWidth(315)
+            imgui.PushItemWidth(280)
             imgui.SameLine()
             imgui.Text(" ")
             imgui.SameLine()
@@ -2320,7 +2439,7 @@ function imgui.OnDrawFrame()
             
             imgui.Checkbox(u8("Проверить игрока через /try"), checkbox.trygame)
             if checkbox.trygame.v then
-               imgui.PushItemWidth(225)
+               imgui.PushItemWidth(200)
                imgui.InputText("##trybuff", textbuffer.trytext)
                imgui.PopItemWidth()
                imgui.SameLine()
@@ -2343,7 +2462,7 @@ function imgui.OnDrawFrame()
             imgui.Spacing()
             imgui.Text(u8"Порядок проведения игры:")
             imgui.SameLine()
-            imgui.PushItemWidth(200)
+            imgui.PushItemWidth(180)
             if imgui.Combo(u8'##ComboBoxTextGames', combobox.textgames, textGames, #textGames) then
                --textbuffer.mpname.v = tostring(mpNames[combobox.textgames.v + 1])
             end
@@ -2376,16 +2495,16 @@ function imgui.OnDrawFrame()
             imgui.InputTextMultiline('##gamesrules', textbuffer.gamesrules, imgui.ImVec2(480, 75),
             imgui.InputTextFlags.EnterReturnsTrue + imgui.InputTextFlags.AllowTabInput)
             
-            if imgui.Button(u8"Есть победитель!", imgui.ImVec2(155, 25)) then
+            if imgui.Button(u8"Есть победитель!", imgui.ImVec2(140, 25)) then
                sampSetChatInputEnabled(true)
                sampSetChatInputText('Есть правильный ответ! Первым прислал игрок')
             end
             imgui.SameLine()
-            if imgui.Button(u8"Нет правильного", imgui.ImVec2(155, 25)) then
+            if imgui.Button(u8"Нет правильного", imgui.ImVec2(140, 25)) then
                sampSendChat(prefix.."Никто не дал правильный ответ!")
             end
             imgui.SameLine()
-            if imgui.Button(u8"Переигровка", imgui.ImVec2(155, 25)) then
+            if imgui.Button(u8"Переигровка", imgui.ImVec2(140, 25)) then
                sampSendChat(prefix.."Переигровка! Попробуем еще раз!")
             end
             
@@ -2393,7 +2512,7 @@ function imgui.OnDrawFrame()
             
             if tabmenu.rules == 1 then
                if combobox.mpnames.v == 0 then
-                  imgui.TextColoredRGB("{696969}Профиль мп не был выбран")
+                  imgui.TextColoredRGB("{696969}не выбран профиль")
                   if imgui.IsItemClicked() then
                      tabmenu.header = 1
                      tabmenu.mp = 1
@@ -2409,7 +2528,7 @@ function imgui.OnDrawFrame()
             
             imgui.PushStyleVar(imgui.StyleVar.ItemSpacing, imgui.ImVec2(2, 0))
             
-            imgui.SetCursorPosX((imgui.GetWindowWidth() - imgui.CalcTextSize(u8"Правила МП").x) / 1.95)
+            imgui.SetCursorPosX((imgui.GetWindowWidth() - imgui.CalcTextSize(u8"Правила МП").x) / 2.3)
             if tabmenu.rules == 1 then
                imgui.PushStyleColor(imgui.Col.Button, imgui.GetStyle().Colors[imgui.Col.ButtonHovered])
                if imgui.Button(u8"Правила МП", imgui.ImVec2(100, 25)) then tabmenu.rules = 1 end
@@ -2481,10 +2600,10 @@ function imgui.OnDrawFrame()
             imgui.PopFont()
             
             if tabmenu.rules ~= 3 then
-               imgui.InputTextMultiline('##rules', textbuffer.rules, imgui.ImVec2(460, 160),
+               imgui.InputTextMultiline('##rules', textbuffer.rules, imgui.ImVec2(400, 160),
                imgui.InputTextFlags.EnterReturnsTrue + imgui.InputTextFlags.AllowTabInput + imgui.InputTextFlags.ReadOnly)
             else
-               imgui.InputTextMultiline('##rules', textbuffer.rules, imgui.ImVec2(460, 260),
+               imgui.InputTextMultiline('##rules', textbuffer.rules, imgui.ImVec2(400, 260),
                imgui.InputTextFlags.EnterReturnsTrue + imgui.InputTextFlags.AllowTabInput + imgui.InputTextFlags.ReadOnly)
             end
             
@@ -2531,14 +2650,13 @@ function imgui.OnDrawFrame()
                      end
                   end
                end
+               imgui.SameLine()
+               imgui.Checkbox(u8"##testrules", checkbox.testrules)
+               imgui.SameLine()
+               imgui.TextQuestion("( ? )", u8"Протестировать перед отправкой в чат (Выведет сообщения только для вас)")
             end
-            imgui.SameLine()
             
-            imgui.Checkbox(u8"##testrules", checkbox.testrules)
-            imgui.SameLine()
-            imgui.TextQuestion("( ? )", u8"Протестировать перед отправкой в чат (Выведет сообщения только для вас)")
-            
-            if imgui.Button("  v  ", imgui.ImVec2(460, 15)) then
+            if imgui.Button("  v  ", imgui.ImVec2(400, 15)) then
                dialog.searchbar.v = not dialog.searchbar.v
             end
          end -- tabmenu.presets
@@ -2617,11 +2735,11 @@ function imgui.OnDrawFrame()
          local res, id = sampGetPlayerIdByCharHandle(handle)
          if res then
             if id == chosenplayer then
-                pX, pY, pZ = getCharCoordinates(handle)
-                skinid = getCharModel(handle)
-                weapon = getCurrentCharWeapon(handle)
-                ammo = getAmmoInCharWeapon(handle, weapon)
-                zone = getZoneName(pX, pY, pZ)
+               pX, pY, pZ = getCharCoordinates(handle)
+               skinid = getCharModel(handle)
+               weapon = getCurrentCharWeapon(handle)
+               ammo = getAmmoInCharWeapon(handle, weapon)
+               zone = getZoneName(pX, pY, pZ)
             end
          end
       end
@@ -2887,7 +3005,7 @@ function imgui.OnDrawFrame()
       imgui.SameLine()
       imgui.TextColoredRGB("{696969} "..string.len(u8:decode(textbuffer.sms.v)).."/128")
       
-      imgui.PushItemWidth(420)
+      imgui.PushItemWidth(400)
       if imgui.InputText("##SMSBuffer", textbuffer.sms) then
          -- if string.len(u8:decode(textbuffer.sms.v) > 128 then
          -- end
@@ -2903,7 +3021,7 @@ function imgui.OnDrawFrame()
       end
       
       imgui.Text(u8"Быстрые ответы: ")
-      imgui.PushItemWidth(420)
+      imgui.PushItemWidth(400)
       
       if imgui.Combo(u8'##ComboBoxFastAnswers', combobox.fastanswers, fastAnswers, #fastAnswers) then
         textbuffer.sms.v = fastAnswers[combobox.fastanswers.v+1]
@@ -2915,7 +3033,7 @@ function imgui.OnDrawFrame()
    if dialog.searchbar.v then
       imgui.SetNextWindowPos(imgui.ImVec2(sizeX / 2, sizeY-150),
       imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
-      imgui.SetNextWindowSize(imgui.ImVec2(485, 70))
+      imgui.SetNextWindowSize(imgui.ImVec2(435, 70))
       imgui.Begin(u8"search", dialog.searchbar)
       
       local symbols = 0
@@ -3903,7 +4021,7 @@ function applyCustomStyle()
    colors[clr.Header] = ImVec4(0.10, 0.09, 0.12, 1.00)
    colors[clr.HeaderHovered] = ImVec4(0.56, 0.42, 0.01, 1.00)
    colors[clr.HeaderActive] = ImVec4(0.06, 0.05, 0.07, 1.00)
-   colors[clr.ResizeGrip] = ImVec4(0.00, 0.00, 0.00, 0.00)
+   colors[clr.ResizeGrip] = ImVec4(0.00, 0.00, 0.00, 0.00)   
    colors[clr.ResizeGripHovered] = ImVec4(0.56, 0.56, 0.58, 1.00)
    colors[clr.ResizeGripActive] = ImVec4(0.06, 0.05, 0.07, 1.00)
    colors[clr.CloseButton] = ImVec4(0.06, 0.05, 0.07, 0.25)
@@ -3915,7 +4033,6 @@ function applyCustomStyle()
    colors[clr.PlotHistogramHovered] = ImVec4(0.25, 1.00, 0.00, 1.00)
    colors[clr.TextSelectedBg] = ImVec4(0.56, 0.42, 0.01, 1.00)
    colors[clr.ModalWindowDarkening] = ImVec4(1.00, 0.98, 0.95, 0.73)
-
 end
 
 applyCustomStyle()
