@@ -5,7 +5,6 @@ script_dependencies('imgui', 'lib.samp.events')
 script_properties("work-in-pause")
 script_url("https://github.com/ins1x/moonloader-scripts/mphelper")
 script_version("1.2.4")
--- fork of MappingToolkit project
 -- script_moonloader(16) moonloader v.0.26
 -- tested on sa-mp client version: 0.3.7 R1
 -- activaton: ALT + E (show main menu) or command /events
@@ -75,6 +74,7 @@ local dialog = {
    vehstat = imgui.ImBool(false),
    fastanswer = imgui.ImBool(false),
    searchbar = imgui.ImBool(false),
+   setteams = imgui.ImBool(false),
 }
 
 local tabmenu = {
@@ -139,6 +139,10 @@ local combobox = {
    textgames = imgui.ImInt(0),
    roles = imgui.ImInt(0),
    fastanswers = imgui.ImInt(0),
+   kickreasons = imgui.ImInt(0),
+   kicktime = imgui.ImInt(0),
+   teamA = imgui.ImInt(0),
+   teamB = imgui.ImInt(0),
 }
 
 local checkbox = {
@@ -177,6 +181,8 @@ local LastData = {
 
 local fastAnswers = {}
 local playersTable = {}
+local teamA = {}
+local teamB = {}
 local blacklist = {}
 local legalweapons = {0, 1}
 
@@ -193,6 +199,19 @@ local mpNames = {
 local textGames = {
    u8'NoRules', u8'Анаграммы', u8'Викторина', u8'Крокодил', 
    u8'Караоке', u8'Музыкальный марафон', u8'Загадки'
+}
+
+local kickreasons = {
+   u8"Чит", u8"AFK", u8"Помеха", u8"High Ping", u8"DM", u8"ДБ", u8"Сбив",
+   u8"Teamkill", u8"Spawnkill", u8"CBUG", u8"Flood", u8"PG", u8"nonRP", 
+   u8"Rapid", u8"Damager", u8"AirBreak", u8"Speed Hack", u8"Unfreeze", 
+   u8"Fakekill", u8"Lag", u8"Invis", u8"Ghost", u8"Fly", u8"Health Hack", 
+   u8"Weapon Hack", u8"GodMode", u8"NOP", u8"Crasher", u8"Bypass",
+   u8"Texture bug", u8"Engine Hack", u8"Vehicle Hack",
+}
+
+local kicktime = {
+   "10", "20", "30", "60", "120", "300", "600", "2000"
 }
 
 local VehicleNames = {
@@ -223,7 +242,7 @@ local VehicleNames = {
    "Savanna", "Bandito", "Freight", "Trailer", "Kart", "Mower", "Duneride",
    "Sweeper", "Broadway", "Tornado", "AT-400", "DFT-30", "Huntley", "Stafford","BF-400",
    "Newsvan", "Tug", "Trailer", "Emperor", "Wayfarer", "Euros", "Hotdog", "Club",
-   "Trailer", "Trailer", "Andromada", "Dodo", "RC Cam", "Launch", "Police Car (LS)",
+   "Trailer", "Trailer", "Andromada", "Dodo", "RC Cam", "Lnaunch", "Police Car (LS)",
    "Police Car (SF)", "Police Car (LV)", "Police Ranger", "Picador", "S.W.A.T. Van",
    "Alpha", "Phoenix", "Glendale", "Sadler", "Luggage Trailer", "Luggage Trailer",
    "Stair Trailer", "Boxville", "Farm Plow", "Utility Trailer"
@@ -717,6 +736,13 @@ function imgui.OnDrawFrame()
          
          elseif tabmenu.mp == 2 then   
             
+            local citiesList = {'Los-Santos', 'San-Fierro', 'Las-Venturas'}
+		    local city = getCityPlayerIsIn(PLAYER_HANDLE)
+		    if city > 0 then 
+               playerCity = citiesList[city] 
+               imgui.TextColoredRGB(string.format("Город: {F0AD00}%s", playerCity))
+            end
+        
             local positionX, positionY, positionZ = getCharCoordinates(playerPed)
             local zone = getZoneName(positionX, positionY, positionZ)
             if zone then 
@@ -840,13 +866,17 @@ function imgui.OnDrawFrame()
 	        imgui.SameLine()
 	        if imgui.Button(u8"Выбрать случайного игрока", imgui.ImVec2(200, 25)) then
 	           if next(playersTable) == nil then -- if playersTable is empty
-	            sampAddChatMessage("Сперва обнови список игроков!", -1) 
-	         else
-	            local rand = math.random(playersTotal)
-	            chosenplayer = playersTable[rand]                
-	            sampAddChatMessage("Случайный игрок: ".. sampGetPlayerNickname(playersTable[rand]), -1)
-	         end
+	              sampAddChatMessage("Сперва обнови список игроков!", -1) 
+	           else
+	              local rand = math.random(playersTotal)
+	              chosenplayer = playersTable[rand]                
+	              sampAddChatMessage("Случайный игрок: ".. sampGetPlayerNickname(playersTable[rand]), -1)
+	           end
 	        end
+            
+            if imgui.Button(u8"Настройки тимы", imgui.ImVec2(300, 25)) then
+               dialog.setteams.v = not dialog.setteams.v
+            end
             
          elseif tabmenu.mp == 4 then
          
@@ -1016,7 +1046,7 @@ function imgui.OnDrawFrame()
             for k, v in ipairs(getAllChars()) do
 		       local res, id = sampGetPlayerIdByCharHandle(v)
                local pid = getLocalPlayerId()
-               local nick = sampGetPlayerNickname(id)
+               
 		       if res and id ~= pid then
                   playerscounter = playerscounter + 1
                   if playerscounter >= 9 then
@@ -1024,6 +1054,7 @@ function imgui.OnDrawFrame()
                   end
                   imgui.Text("  ")
                   imgui.SameLine()
+                  local nick = sampGetPlayerNickname(id)
                   imgui.Selectable(string.format("%d. %s", id, nick))
                   if imgui.IsItemClicked() then
                      if isAbsolutePlay then
@@ -1817,9 +1848,23 @@ function imgui.OnDrawFrame()
                end
             end
                
-            imgui.Text(u8"Выдать наказание: ")
-            imgui.PushItemWidth(200)
-            if imgui.InputText(u8"причина", textbuffer.setreason) then
+            imgui.Text(u8"Причина: ")
+            imgui.PushItemWidth(100)
+            if imgui.Combo(u8'##ComboBoxKickreasons', combobox.kickreasons, 
+            kickreasons, #kickreasons) then
+               textbuffer.setreason.v = tostring(kickreasons[combobox.kickreasons.v+1])
+            end
+            imgui.PopItemWidth()
+            imgui.SameLine()
+            imgui.PushItemWidth(240)
+            if imgui.InputText(u8"##kickreasonbuff", textbuffer.setreason) then
+            end
+            imgui.PopItemWidth()
+            
+            imgui.PushItemWidth(70)
+            if imgui.Combo(u8'##ComboBoxKicktime', combobox.kicktime, 
+            kicktime, #kicktime) then
+               textbuffer.setptime.v = tostring(kicktime[combobox.kicktime.v+1])
             end
             imgui.PopItemWidth()
             imgui.SameLine()
@@ -1831,7 +1876,8 @@ function imgui.OnDrawFrame()
             imgui.TextQuestion("( ? )", u8"Чтобы забанить навсегда укажите 0 в графу с минутами")
             imgui.Spacing()
             
-            if imgui.Button(u8"Кикнуть игрока", imgui.ImVec2(150, 25)) then
+            imgui.Text(u8"Действие: ")
+            if imgui.Button(u8"Кикнуть", imgui.ImVec2(100, 25)) then
                if string.len(textbuffer.setreason.v) >= 3 then
                   if isTraining then
                      sampSendChat("/vkick "..pid.." "..textbuffer.setreason.v)
@@ -1842,13 +1888,8 @@ function imgui.OnDrawFrame()
                   sampAddChatMessage("Вы не указали причину", -1)
                end
             end
-            
             imgui.SameLine()
-            if imgui.Button(u8"Выкинуть с команды", imgui.ImVec2(150, 25)) then
-               sampSendChat("/unteam "..pid)
-            end
-            
-            if imgui.Button(u8"Забанить игрока", imgui.ImVec2(150, 25)) then
+            if imgui.Button(u8"Забанить", imgui.ImVec2(100, 25)) then
                if string.len(textbuffer.setptime.v) >= 1 then
                   if string.len(textbuffer.setreason.v) >= 3 then
                      if isTraining then
@@ -1864,12 +1905,7 @@ function imgui.OnDrawFrame()
                end
             end
             imgui.SameLine()
-            if imgui.Button(u8"Обнулить хп", imgui.ImVec2(150, 25)) then
-               sampSendChat("/sethp "..pid.." 0")
-               sampAddChatMessage("Вы обнулили хп игроку "..sampGetPlayerNickname(pid).."("..pid..")", -1)
-            end
-            
-            if imgui.Button(u8"Заглушить игрока", imgui.ImVec2(150, 25)) then
+            if imgui.Button(u8"Заглушить", imgui.ImVec2(100, 25)) then
                if string.len(textbuffer.setptime.v) >= 1 then
                   if string.len(textbuffer.setreason.v) >= 3 then
                      if isTraining then
@@ -1883,6 +1919,20 @@ function imgui.OnDrawFrame()
                else
                   sampAddChatMessage("Вы не указали на какое время выдать наказание", -1)
                end
+            end
+            imgui.Spacing()
+            if imgui.Button(u8"Заковать в наручники", imgui.ImVec2(150, 25)) then
+               sampSendChat("/cuff "..pid)
+               sampAddChatMessage("Вы заковали в наручники игрока "..sampGetPlayerNickname(pid).."("..pid.."). Введите /uncuff id для снятия.", -1)
+            end
+            imgui.SameLine()
+            if imgui.Button(u8"Выкинуть с команды", imgui.ImVec2(150, 25)) then
+               sampSendChat("/unteam "..pid)
+            end
+            
+            if imgui.Button(u8"Обнулить хп", imgui.ImVec2(150, 25)) then
+               sampSendChat("/sethp "..pid.." 0")
+               sampAddChatMessage("Вы обнулили хп игроку "..sampGetPlayerNickname(pid).."("..pid..")", -1)
             end
             
          elseif tabmenu.manage == 4 then   
@@ -2970,6 +3020,101 @@ function imgui.OnDrawFrame()
       imgui.End()
    end
    
+   if dialog.setteams.v then
+      imgui.SetNextWindowPos(imgui.ImVec2(sizeX / 6, sizeY / 2),
+      imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
+      imgui.SetNextWindowSize(imgui.ImVec2(300, 350))
+      imgui.Begin(u8"Выбор команды", dialog.setteams)
+      
+      local pid -- selected player id
+      local playerId = getLocalPlayerId()
+      if string.len(textbuffer.pid.v) < 1 then
+         textbuffer.pid.v = tostring(playerId)
+      end
+      
+      if string.len(textbuffer.pid.v) >= 1 
+      and sampIsPlayerConnected(tonumber(textbuffer.pid.v))then
+         pid = tonumber(textbuffer.pid.v)
+      else
+         pid = tostring(playerId)
+      end
+ 
+      imgui.Text(u8"Введите ID:")
+      imgui.SameLine()
+      imgui.PushItemWidth(50)
+      if imgui.InputText("##PlayerIDBuffer", textbuffer.pid, imgui.InputTextFlags.CharsDecimal) then
+      end
+      imgui.PopItemWidth()
+      
+      if pid then
+         imgui.SameLine()
+         imgui.Text(u8""..sampGetPlayerNickname(pid))
+      end
+      
+      if getClosestPlayerId() ~= -1 then
+         imgui.SameLine()
+         imgui.Text(u8"  ")
+         imgui.SameLine()
+         imgui.TextColoredRGB("{424242}[s]")
+         if imgui.IsItemHovered() then
+            imgui.BeginTooltip()
+            imgui.PushTextWrapPos(350)
+            imgui.TextUnformatted(tostring(u8"Ближайший игрок: "..sampGetPlayerNickname(getClosestPlayerId())).."["..getClosestPlayerId().."]")
+            imgui.PopTextWrapPos()
+            imgui.EndTooltip()
+         end
+         if imgui.IsItemClicked() then
+            setClipboardText(getClosestPlayerId())
+            textbuffer.pid.v = tostring(getClosestPlayerId())
+         end
+      end
+      
+      imgui.Columns(2)
+      if imgui.Button(u8"Добавить по ID##TeamAButton", imgui.ImVec2(95, 25)) then
+         if pid then
+            if isPlayerInAnyTeam(pid) then
+               sampAddChatMessage("Этот игрок уже в другой команде", -1)
+            else
+               table.insert(teamA, tostring(sampGetPlayerNickname(pid)))
+            end
+         end
+      end
+      imgui.NextColumn() 
+      if imgui.Button(u8"Добавить по ID##TeamBButton", imgui.ImVec2(95, 25)) then
+         if pid then
+            if isPlayerInAnyTeam(pid) then
+               sampAddChatMessage("Этот игрок уже в другой команде", -1)
+            else
+               table.insert(teamB, tostring(sampGetPlayerNickname(pid)))
+            end
+         end
+      end
+      imgui.Columns(1)
+      
+      imgui.Separator()
+      imgui.Columns(2)
+      imgui.Text(u8"TEAM A")
+      imgui.NextColumn() 
+      imgui.Text(u8"TEAM B")
+      imgui.Columns(1)
+      
+      imgui.Columns(2)
+      imgui.PushItemWidth(120)
+      if imgui.ListBox('##ListBoxTeamA', combobox.teamA, teamA, 10) then
+      end
+      imgui.PopItemWidth()
+      imgui.NextColumn()
+      imgui.PushItemWidth(120)
+      if imgui.ListBox('##ListBoxTeamB', combobox.teamB, teamB, 10) then
+      end
+      imgui.PopItemWidth()
+      imgui.Columns(1)
+      imgui.Separator()
+
+      
+      imgui.End()
+   end
+   
    if dialog.fastanswer.v then
       imgui.SetNextWindowPos(imgui.ImVec2(sizeX / 4, sizeY / 26),
       imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
@@ -3205,7 +3350,7 @@ function sampev.onSendTakeDamage(playerID, damage, weaponID, bodypart)
    if checkbox.damageinformer.v then
       if playerID ~= 65535 then
          sampAddChatMessage("Вам нанес урон "..sampGetPlayerNickname(playerID).."("..playerID..")", -1)
-         sampAddChatMessage("Оружие: "..weaponID.." кол-во: "..damage, -1)
+         sampAddChatMessage(string.format("Оружие: %d кол-во: %.1f", weaponID, damage), -1)
       end
    end
 end
@@ -3414,6 +3559,22 @@ function reloadBindsFromConfig()
    binds.cmdbind9.v = u8(ini.binds.cmdbind9)
 end
 
+function isPlayerInAnyTeam(playerid)
+   -- Check loacl teamA and 
+   -- is not same GetPlayerTeam !!
+   for key, value in ipairs(teamA) do
+      if value == sampGetPlayerNickname(playerid) then
+         return true
+      end
+   end
+   for key, value in ipairs(teamB) do
+      if value == sampGetPlayerNickname(playerid) then
+         return true
+      end
+   end
+   return false
+end
+
 function copyNearestPlayersToClipboard()
    local tmpPlayers = {}
    local resulstring
@@ -3436,7 +3597,6 @@ function copyNearestPlayersToClipboard()
       sampAddChatMessage("Не найдено игроков рядом", -1)
    end
 end
-
 
 -- FYP color utils
 function join_argb(a, r, g, b)
@@ -3625,7 +3785,7 @@ function getZoneName(x, y, z)
       {"Родео", 334.503, -1501.950, -89.084, 422.680, -1406.050, 110.916},
       {"Ричман", 225.165, -1369.620, -89.084, 334.503, -1292.070, 110.916},
       {"Деловой район", 1724.760, -1250.900, -89.084, 1812.620, -1150.870, 110.916},
-      {"Стрип", 2027.400, 1703.230, -89.084, 2137.400, 1783.230, 110.916},
+      {"Лас-Вентурас Стрип", 2027.400, 1703.230, -89.084, 2137.400, 1783.230, 110.916},
       {"Деловой район", 1378.330, -1130.850, -89.084, 1463.900, -1026.330, 110.916},
       {"Пересечение Блэкфилд", 1197.390, 1044.690, -89.084, 1277.050, 1163.390, 110.916},
       {"Конференц Центр", 1073.220, -1842.270, -89.084, 1323.900, -1804.210, 110.916},
@@ -3635,7 +3795,7 @@ function getZoneName(x, y, z)
       {"Международный аэропорт Лос-Сантос", 2051.630, -2597.260, -39.084, 2152.450, -2394.330, 60.916},
       {"Малхолланд", 1096.470, -910.170, -89.084, 1169.130, -768.027, 110.916},
       {"Поле для гольфа «Йеллоу-Белл»", 1457.460, 2723.230, -89.084, 1534.560, 2863.230, 110.916},
-      {"Стрип", 2027.400, 1783.230, -89.084, 2162.390, 1863.230, 110.916},
+      {"Лас-Вентурас Стрип", 2027.400, 1783.230, -89.084, 2162.390, 1863.230, 110.916},
       {"Джефферсон", 2056.860, -1210.740, -89.084, 2185.330, -1126.320, 110.916},
       {"Малхолланд", 952.604, -937.184, -89.084, 1096.470, -860.619, 110.916},
       {"Альдеа-Мальвада", -1372.140, 2498.520, 0.000, -1277.590, 2615.350, 200.000},
@@ -3685,7 +3845,7 @@ function getZoneName(x, y, z)
       {"Глен Парк", 1812.620, -1449.670, -89.084, 1996.910, -1350.720, 110.916},
       {"Международный аэропорт Истер-Бэй", -1242.980, -50.096, 0.000, -1213.910, 578.396, 200.000},
       {"Мост «Мартин»", -222.179, 293.324, 0.000, -122.126, 476.465, 200.000},
-      {"Стрип", 2106.700, 1863.230, -89.084, 2162.390, 2202.760, 110.916},
+      {"Лас-Вентурас Стрип", 2106.700, 1863.230, -89.084, 2162.390, 2202.760, 110.916},
       {"Уиллоуфилд", 2541.700, -2059.230, -89.084, 2703.580, -1941.400, 110.916},
       {"Марина", 807.922, -1577.590, -89.084, 926.922, -1416.250, 110.916},
       {"Аэропорт Лас-Вентурас", 1457.370, 1143.210, -89.084, 1777.400, 1203.280, 110.916},
@@ -3817,7 +3977,7 @@ function getZoneName(x, y, z)
       {"Казино «Пираты в мужских штанах»", 1817.390, 1469.230, -89.084, 2027.400, 1703.230, 110.916},
       {"Сити Холл", -2867.850, 277.411, -9.1, -2593.440, 458.411, 200.000},
       {"Загородный клуб «Ависпа»", -2646.400, -355.493, 0.000, -2270.040, -222.589, 200.000},
-      {"Стрип", 2027.400, 863.229, -89.084, 2087.390, 1703.230, 110.916},
+      {"Казино «4 Дракона»", 2027.400, 863.229, -89.084, 2087.390, 1703.230, 110.916},
       {"Хашбери", -2593.440, -222.589, -1.0, -2411.220, 54.722, 200.000},
       {"Международный аэропорт Лос-Сантос", 1852.000, -2394.330, -89.084, 2089.000, -2179.250, 110.916},
       {"Уайтвуд-Истейтс", 1098.310, 1726.220, -89.084, 1197.390, 2243.230, 110.916},
