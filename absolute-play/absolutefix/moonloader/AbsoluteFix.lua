@@ -3,7 +3,7 @@ script_name("AbsoluteFix")
 script_description("Set of fixes for Absolute Play servers")
 script_properties("work-in-pause")
 script_url("https://github.com/ins1x/useful-samp-stuff/tree/main/luascripts/absolutefix")
-script_version("3.2.1")
+script_version("3.2.2")
 -- script_moonloader(16) moonloader v.0.26
 
 -- If your don't play on Absolute Play servers
@@ -77,12 +77,14 @@ local dialogIncoming = 0
 local clickedplayerid = nil
 local randomcolor = nil
 local lastObjectId = nil
+local lastObjectModelId = nil
 local hideEditObject = false
 local scaleEditObject = false
 local editResponse = 0 
 local editMode = 0
 local lastWorldNumber = nil
 local lastWorldName = nil
+local lastRemovedObjectModel = nil
 
 function main()
    if not isSampLoaded() or not isSampfuncsLoaded() then return end
@@ -714,15 +716,9 @@ function sampev.onServerMessage(color, text)
       if text:find("Последнего созданного объекта не существует") then
          lua_thread.create(function()
             wait(500)
-            if LastObject.modelid then
-               sampAddChatMessage("Последний использованный объект: {696969}"..LastObject.modelid, -1)
+            if lastObjectModelId then
+               sampAddChatMessage("Последний использованный объект: {696969}"..lastObjectModelId, -1)
 	        end
-            local closestObjectId = getClosestObjectId()
-            if closestObjectId then
-               sampAddChatMessage("Ближайший объект: {696969}"..getObjectModel(closestObjectId).." ("..tostring(sampObjectModelNames[getObjectModel(closestObjectId)])..") ", -1)
-            else
-               sampAddChatMessage("Можете попробовать объект: {696969}3374{FFFFFF} - Большие стаки сена", -1)
-            end
          end)
       end
       
@@ -969,8 +965,8 @@ function sampev.onSendDialogResponse(dialogId, button, listboxId, input)
       if listboxId == 0 then editMode = 1 end
       if listboxId == 1 then 
          editMode = 3
-         if LastObject.modelid then
-            LastRemovedObject.modelid = LastObject.modelid
+         if lastObjectModelId then
+            lastRemovedObjectModel = lastObjectModelId
          end
       end
       if listboxId == 2 then editMode = 4 end
@@ -979,21 +975,15 @@ function sampev.onSendDialogResponse(dialogId, button, listboxId, input)
    if dialogId == 1411 and button == 1 then
       if listboxId == 0 or listboxId == 2 then
          editMode = 3
-         if LastObject.modelid then
-            LastRemovedObject.modelid = LastObject.modelid
+         if lastObjectModelId then
+            lastRemovedObjectModel = lastObjectModelId
          end
       end
    end
    if dialogId == 1409 and button == 1 then
       editMode = 1
    end
-   -- if dialogId == 1401 and button == 1 then
-      -- if undoMode then
-         -- if LastObject.handle and doesObjectExist(LastObject.handle) then
-            -- setObjectCoordinates(LastObject.handle, lastRemovedObjectCoords.x, lastRemovedObjectCoords.y, lastRemovedObjectCoords.z)
-         -- end
-      -- end
-   -- end
+   
 end
 
 function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
@@ -1123,13 +1113,12 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
    end
    
    if dialogId == 1401 then
-      local closestObjectId = getClosestObjectId()
+
       
       local newtext = 
       "{FFD700}615-18300       {FFFFFF}GTA-SA \n{FFD700}18632-19521{FFFFFF}   SA-MP\n"..
-      (LastObject.modelid and "\n{FFFFFF}Последний {FFFF00}использованный объект: "..LastObject.modelid.." ("..tostring(sampObjectModelNames[LastObject.modelid])..") " or " ")..
-      (LastRemovedObject.modelid and "\n{FFFFFF}Последний {FF0000}удаленный объект: "..LastRemovedObject.modelid.." ("..tostring(sampObjectModelNames[LastRemovedObject.modelid])..") " or " ")..
-      (closestObjectId and "\n{FFFFFF}Ближайший {696969}объект: "..getObjectModel(closestObjectId).." ("..tostring(sampObjectModelNames[getObjectModel(closestObjectId)])..") \n" or " ")..
+      (lastObjectModelId and "\n{FFFFFF}Последний {FFFF00}использованный объект: "..lastObjectModelId.." ("..tostring(sampObjectModelNames[lastObjectModelId])..") " or " ")..
+      (lastRemovedObjectModel and "\n{FFFFFF}Последний {FF0000}удаленный объект: "..lastRemovedObjectModel.." ("..tostring(sampObjectModelNames[lastRemovedObjectModel])..") " or " ")..
       "\n{FFFFFF}Введи номер объекта: \n"
       return {dialogId, style, title, button1, button2, newtext}
    end
@@ -1236,7 +1225,38 @@ function sampev.onCreateObject(objectId, data)
    end
 end
 
-function sampev.onSendCommand(command) 
+function sampev.onSendCommand(command)
+   -- tips for those who are used to using Texture Studio syntax
+   -- if isAbsolutePlay then
+      -- if command:find("texture") then
+         -- sampAddChatMessage("Для ретекстура используйте:", 0x000FF00)
+         -- sampAddChatMessage("N - Редактировать объект - Выделить объект - Перекарсить объект", 0x000FF00)
+         -- return false
+      -- end
+      -- if command:find("showtext3d") then
+         -- sampAddChatMessage("Информация о объектах показана", 0x000FF00)
+         -- checkbox.showobjectsmodel.v = true 
+         -- return false
+      -- end
+      -- if command:find("hidetext3d") then
+         -- sampAddChatMessage("Информация о объектах скрыта", 0x000FF00)
+         -- checkbox.showobjectsmodel.v = false
+         -- return false
+      -- end
+      -- if command:find("flymode") then
+         -- sampSendChat("/полет")
+         -- return false
+      -- end
+      -- if command:find("team") or command:find("setteam") then
+         -- sampSendChat("Нельзя менять тимы. Если вы хотели изменить спавн используйте:",0x000FF00)
+         -- sampSendChat("Y - Редактор карт - Управление миром - Выбрать точку появления",0x000FF00)
+         -- return false
+      -- end
+      -- if command:find("jetpack")then
+         -- sampAddChatMessage("Джетпак можно взять в меню: N - Оружие - Выдать себе оружие", 0x000FF00)
+         -- return false
+      -- end
+   -- end  
    
    if command:find("/exit") or command:find("/выход") then
       isWorldHoster = false
