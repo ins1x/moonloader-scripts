@@ -3,7 +3,7 @@ script_name("AbsoluteFix")
 script_description("Set of fixes for Absolute Play servers")
 script_properties("work-in-pause")
 script_url("https://github.com/ins1x/useful-samp-stuff/tree/main/luascripts/absolutefix")
-script_version("3.2.2")
+script_version("3.2.3")
 -- script_moonloader(16) moonloader v.0.26
 
 -- If your don't play on Absolute Play servers
@@ -1285,6 +1285,16 @@ function sampev.onSendCommand(command)
                LastData.lastWorldNumber = id
                worldspawnpos.x, worldspawnpos.y, worldspawnpos.z = getCharCoordinates(playerPed)
             end
+         end
+      end
+   end
+   
+   -- teleport fix
+   if command:find("/тпк") or command:find("/ngr") then
+      if not command:find('(.+) (.+)') then
+         local bTargetResult, bX, bY, bZ = getTargetBlipCoordinates()
+         if bTargetResult then
+            sampSendChat(string.format("/ngr %.2f %.2f %.2f", bX, bY, bZ+1.5))
          end
       end
    end
