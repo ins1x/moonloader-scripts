@@ -9,6 +9,10 @@ script_author("1NS")
 -- script_moonloader(16) moonloader v.0.26
 -- activation: auto
 
+-- Will work on vehicles within a radius of 3 meters
+local maxSearchVehRadius = 3
+local recallDelay = 1000
+
 function main()
    if not isSampLoaded() or not isSampfuncsLoaded() then return end
    while not isSampAvailable() do wait(100) end
@@ -19,15 +23,14 @@ function main()
             if isCharInAnyCar(playerPed) then
                local currentcarhandle = storeCarCharIsInNoSave(playerPed)
                local currentcarDoorStatus = getCarDoorLockStatus(currentcarhandle)
-               if currentcarDoorStatus ~= 2 then 
-                  wait(500)
+               if currentcarDoorStatus ~= 2 then  -- isNotPassenger check
+                  wait(recallDelay)
                   sampSendChat("/lock")
                end
             else
-               -- Will work on vehicles within a radius of 3 meters
-               local closestcarhandle, closestcarid = getClosestCar(3)
+               local closestcarhandle, closestcarid = getClosestCar(maxSearchVehRadius)
                if closestcarhandle then
-                  wait(500) 
+                  wait(recallDelay) 
                   sampSendChat("/lock")   
                end
             end
