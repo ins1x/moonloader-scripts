@@ -2,7 +2,8 @@ script_author("1NS")
 script_name("ModCompatibilityChecker")
 script_description("Checks the mods that can cause crashes")
 script_url("https://github.com/ins1x/moonloader-scripts")
-script_version("1.5")
+script_version("1.6")
+-- Require SAMPFUNCS and CLEO 
 -- Activation: script run once and unloading
 -- encoding.default = 'CP1251'
 
@@ -10,13 +11,16 @@ script_version("1.5")
 -- https://github.com/JuniorDjjr/CrashInfo/tree/main
 
 -- Do not change booleans here
-local ENBSeries = false
-local FastloadAsi = false
-local SAMPFUNCS = false
-local Modloader = false
-local ModTimecyc = false
-local SampAddonInstalled = false
-local AZLauncher = false
+local Mods = {
+   ENBSeries = false,
+   FastloadAsi = false,
+   SAMPFUNCS = false,
+   Modloader = false,
+   Timecyc = false,
+   SampAddon = false,
+   AZLauncher = false,
+   MixSets = false,
+}
 
 function main()
    if not isSampLoaded() or not isSampfuncsLoaded() then return end
@@ -45,34 +49,38 @@ function main()
    -- init loaders and mods check
    if doesFileExist(getGameDirectory() .. "\\enbseries.asi") or 
    doesFileExist(getGameDirectory() .. "\\d3d9.dll") then
-      ENBSeries = true
+      Mods.ENBSeries = true
    end
    
    if doesFileExist(getGameDirectory() .. "\\FastLoad.asi") then
-      FastloadAsi = true
+      Mods.FastloadAsi = true
    end
    
    if doesFileExist(getGameDirectory() .. "\\SAMPFUNCS.asi") then
-      SAMPFUNCS = true
+      Mods.SAMPFUNCS = true
    end
    
    if doesFileExist(getGameDirectory() .. "\\audio.asi") then
-      SampAddonInstalled = true
+      Mods.SampAddon = true
    end
    
    if doesFileExist(getGameDirectory() .. "\\modloader\\modloader.ini") then
-      Modloader = true
+      Mods.Modloader = true
    end
    
    if doesFileExist(getGameDirectory() .. "\\core.asi") or 
    doesFileExist(getGameDirectory() .. "\\_CoreGame.asi") then
-      AZLauncher = true
+      Mods.AZLauncher = true
    end
    
    if getFileSize(getGameDirectory() .. "\\data\\timecyc.dat") ~= 40037 or 
    doesFileExist(getGameDirectory() .. "\\timecycle24.asi") or
    doesFileExist(getGameDirectory() .. "\\data\\timecyc_24h.dat") then
-      ModTimecyc = true
+      Mods.Timecyc = true
+   end
+   
+   if doesFileExist(getGameDirectory() .. "\\MixSets.asi") then
+      Mods.MixSets = true
    end
    
    -- broken files checker work if samp addon not installed
@@ -161,6 +169,12 @@ function main()
       print("ModChecker warning: bullet.asi causes crash when shooting in Madd Dogg's mansion")
    end
    
+   -- dialogs.asi
+   if doesFileExist(getGameDirectory() .. "\\dialogs.asi") then
+      sampAddChatMessage("dialogs.asi вызывает краш при использовании кастомных диалогов", 0xFF00000)
+      print("ModChecker warning: dialogs.asi causes crash when using custom dialogs")
+   end
+   
    -- newCoronaLimit
    if doesFileExist(getGameDirectory() .. "\\newCoronaLimit.asi") then
       sampAddChatMessage("newCoronaLimit.asi приводит к сбою в отображении шейдера ENB на автомобилях.", 0xFF00000)
@@ -220,7 +234,7 @@ function main()
    end
    
    -- skygrad
-   if ENBSeries and doesFileExist(getGameDirectory() .. "\\skygrad.asi") then
+   if Mods.ENBSeries and doesFileExist(getGameDirectory() .. "\\skygrad.asi") then
       print("ModChecker warning: incorrect skygrad.asi incompatible with ENB")
    end
    
@@ -240,7 +254,7 @@ function main()
    end
    
    -- SAMPFUNCS and skygfx
-   if SAMPFUNCS and doesFileExist(getGameDirectory() .. "\\SkyGfx.asi") then
+   if Mods.SAMPFUNCS and doesFileExist(getGameDirectory() .. "\\SkyGfx.asi") then
       sampAddChatMessage("SkyGFX is incompatible with SAMPFUNCS", 0xFF00000)
       print("ModChecker warning: SkyGfx несовместим с SAMPFUNCS")
    end
@@ -258,9 +272,15 @@ function main()
    end
    
    -- FixDIST.cs
-   if ModTimecyc and doesFileExist(getGameDirectory() .. "\\cleo\\FixDIST.cs") then
+   if Mods.Timecyc and doesFileExist(getGameDirectory() .. "\\cleo\\FixDIST.cs") then
       sampAddChatMessage("FixDIST.cs может неккоректно работать на нестандартном таймцикле", 0xFF00000)
       print("ModChecker warning: FixDIST.cs may not work correctly on a non-standard timecycle")
+   end
+   
+   -- old cleo verison Mix Sets 
+   if doesFileExist(getGameDirectory() .. "\\cleo\\Mix Sets (Junior_Djjr).cs") then
+      sampAddChatMessage("Mix Sets устарел, рекомендуется обновить то последней версии", 0xFF00000)
+      print("ModChecker warning: Mix Sets is outdated, recommended update to the latest version")
    end
    
    -- language files check
@@ -298,7 +318,7 @@ function main()
    
    -- Lucky patcher
    if doesFileExist(getGameDirectory() .. "\\moonloader\\!SAPatcher.lua") then
-      if SampAddonInstalled then
+      if Mods.SampAddon then
          sampAddChatMessage("Lucky patcher несовместим с Samp Addon, аддон уже содержит фиксы из патчера", 0xFF00000)
          print("ModChecker warning: !SAPatcher.lua incompatible with Samp Addon, addon already contains fixes from patcher")
       end
@@ -313,7 +333,7 @@ function main()
       print("ModChecker warning: Moonloader installed without lib.samp.events library")
    end
    
-   if not AZLauncher then
+   if not Mods.AZLauncher then
       -- Check game resources
       -- The main.scm and script.img files are responsible for the story mode and other scenarios, this depends on the version of the game.
       if doesFileExist(getGameDirectory() .. "\\data\\script\\main.scm") and 
