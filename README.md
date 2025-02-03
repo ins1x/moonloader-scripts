@@ -5,6 +5,8 @@
     <img src="https://img.shields.io/badge/Moonloader-v0.26-blue">
 </p>
 
+[![moonloader.png](https://www.blast.hk/moonloader/images/moonloader.png)](https://www.blast.hk/threads/13305/)
+
 Various useful Moonloader [lua scripts](https://www.blast.hk/threads/22707/) for GTA [SA-MP](https://sampwiki.blast.hk/wiki/Main_Page) multiplayer.  
 The presented systems were developed or improved by me, and implemented in working projects.  
 
