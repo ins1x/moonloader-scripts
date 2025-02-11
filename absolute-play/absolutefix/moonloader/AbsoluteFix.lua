@@ -3,12 +3,13 @@ script_name("AbsoluteFix")
 script_description("Set of fixes for Absolute Play servers")
 script_properties("work-in-pause")
 script_url("https://github.com/ins1x/useful-samp-stuff/tree/main/luascripts/absolutefix")
-script_version("3.2.3")
+script_version("3.3")
 -- script_moonloader(16) moonloader v.0.26
 
 -- If your don't play on Absolute Play servers
 -- recommend use more functional script GameFixer by Gorskin
 -- https://vk.com/@gorskinscripts-gamefixer-obnovlenie-30
+-- or MixSets https://www.mixmods.com.br/2022/03/sa-mixsets/
 
 require 'lib.moonloader'
 local sampev = require 'lib.samp.events'
@@ -1336,60 +1337,23 @@ function sampev.onRemoveBuilding(modelId, position, radius)
       end   
    end
 end
-
-function sampev.onSetVehicleVelocity(turn, velocity)
-   if ini.setting.anticrash then
-      if velocity.x ~= velocity.x or velocity.y ~= velocity.y or velocity.z ~= velocity.z then
-         sampAddChatMessage("Warning: ignoring invalid SetVehicleVelocity", -1)
-         return false
-      end
-   end
-end
-
 -- END hooks
 
--- Thanks Heroku for this function on !SAPatcher
 function onSendRpc(id, bs, priority, reliability, channel, shiftTimestamp)
-   if ini.settings.anticrash then
-       -- Fix ClickMap height detection when setting a placemark on the game map
-      if id == 119 then
-         local posX, posY, posZ = raknetBitStreamReadFloat(bs), raknetBitStreamReadFloat(bs), raknetBitStreamReadFloat(bs)
-         requestCollision(posX, posY)
-         loadScene(posX, posY, posZ)
-         local res, x, y, z = getTargetBlipCoordinates()
-         if res then
-              local new_bs = raknetNewBitStream()
-              raknetBitStreamWriteFloat(new_bs, x)
-              raknetBitStreamWriteFloat(new_bs, y)
-              raknetBitStreamWriteFloat(new_bs, z + 0.5)
-           raknetSendRpcEx(119, new_bs, priority, reliability, channel, shiftTimestamp)
-           raknetDeleteBitStream(new_bs)
-         end
-         return false
+   -- Fix ClickMap height detection when setting a placemark on the game map
+   if id == 119 then
+      local posX, posY, posZ = raknetBitStreamReadFloat(bs), raknetBitStreamReadFloat(bs), raknetBitStreamReadFloat(bs)
+      requestCollision(posX, posY)
+      loadScene(posX, posY, posZ)
+      local res, x, y, z = getTargetBlipCoordinates()
+      if res then
+           local new_bs = raknetNewBitStream()
+           raknetBitStreamWriteFloat(new_bs, x)
+           raknetBitStreamWriteFloat(new_bs, y)
+           raknetBitStreamWriteFloat(new_bs, z + 0.5)
+        raknetSendRpcEx(119, new_bs, priority, reliability, channel, shiftTimestamp)
+        raknetDeleteBitStream(new_bs)
       end
-
-      if id == 153 then
-         local playerId = raknetBitStreamReadInt32(bs)
-         local modelId = raknetBitStreamReadInt32(bs)
-         
-         -- Fixes a SAMP crash related to the installation of an invalid player skin model.
-         -- works only on the R1 version of the client, Kalcor has already built this fix into R3.
-         if modelId < 0 or modelId == 65535 then
-            sampAddChatMessage("Warning: The server is trying to set invalid skin model (model: "
-            .. modelId .. ")", -1)
-            return false
-         end
-         
-         -- Fixes the crash of SA-MP (0x006E3D17) associated with the installation of the skin in the car.	  
-         local result, myId = sampGetPlayerIdByCharHandle(PLAYER_PED)
-         if result then
-            if playerId == myId then
-               if isCharInAnyCar(PLAYER_PED) then
-                  sampAddChatMessage("Warning: The server is trying to set the skin in the car.", -1)
-                  return false
-               end
-            end
-         end
-      end
+      return false
    end
 end
