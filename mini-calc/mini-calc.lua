@@ -3,6 +3,7 @@ script_author("1NS")
 script_url("https://github.com/ins1x/moonloader-scripts")
 script_dependencies('imgui')
 script_description("mini-calc")
+script_version("0.2")
 -- demo version
 
 -- script_moonloader(16) moonloader v.0.26
@@ -15,8 +16,8 @@ local mainWindow = imgui.ImBool(false)
 local v = nil
 local buffer = imgui.ImBuffer(32)
 local input = imgui.ImBuffer(16)
-local buttonSizeX = 30
-local buttonSizeY = 30
+local buttonSizeX = 35
+local buttonSizeY = 35
 -- calc variables
 local numberOne = nil
 local numberTwo = nil
@@ -41,9 +42,12 @@ function main()
       -- Hook input numbers
       if isInputAllowed() and mainWindow.v then
          -- Backspace
-         if isKeyJustPressed(0x08)then 
-            buffer.v = string.sub(buffer.v, 0, string.len(buffer.v)-1);
-            input.v = string.sub(input.v, 0, string.len(input.v)-1);
+         if isKeyJustPressed(0x08)then
+            local result = string.match(buffer.v, ".*[^%d]$")
+            if not result then
+               buffer.v = string.sub(buffer.v, 0, string.len(buffer.v)-1)
+            end
+            input.v = string.sub(input.v, 0, string.len(input.v)-1)
          end
          
          -- Hook input numbers
@@ -78,7 +82,7 @@ function main()
             addSymbolToBuffer("9")
          end
          
-         if isKeyJustPressed(0x6A) then --Multiply key
+         if isKeyJustPressed(0x6A) then -- Multiply key
             local result = string.match(buffer.v, ".*[^%d]$")
             if not result then
                operation = "*"
@@ -86,7 +90,7 @@ function main()
             end
          end
          
-         if isKeyJustPressed(0x6B) then --Add key
+         if isKeyJustPressed(0x6B) then -- Add key
             local result = string.match(buffer.v, ".*[^%d]$")
             if not result then
                operation = "+"
@@ -94,7 +98,7 @@ function main()
             end
          end
          
-         if isKeyJustPressed(0x6D) then --Substract key
+         if isKeyJustPressed(0x6D) then -- Substract key
             local result = string.match(buffer.v, ".*[^%d]$")
             if not result then
                operation = "-"
@@ -102,11 +106,11 @@ function main()
             end
          end
          
-         if isKeyJustPressed(0x6E) then --Decimal key
+         if isKeyJustPressed(0x6E) then -- Decimal key
             addSymbolToBuffer(".")
          end
          
-         if isKeyJustPressed(0x6F) then --Divide key
+         if isKeyJustPressed(0x6F) then -- Divide key
             local result = string.match(buffer.v, ".*[^%d]$")
             if not result then
                operation = "/"
@@ -115,8 +119,46 @@ function main()
          end
          
          if isKeyJustPressed(0x0D) or isKeyJustPressed(0xBB) then --Enter key
-            calc(operation)
-         end  
+            local result = string.match(buffer.v, ".*[^%d]$")
+            if not result then
+               calc(operation)
+            end
+         end
+         
+         if isKeyJustPressed(0x2E) then -- CE Delete key
+            isFloat = false
+            buffer.v = ""
+            input.v = ""
+            numberOne = nil
+            numberTwo = nil
+            operation = nil
+         end
+         
+         if isKeyJustPressed(0x43) then -- C key
+            isFloat = false
+            input.v = ""
+            numberOne = nil
+            numberTwo = nil
+            operation = nil
+         end
+         
+         if isKeyJustPressed(0x78) then -- +-
+            if numberOne then
+               if string.match(numberOne, "^-.*$") then
+                  numberOne = string.sub(numberOne, 1, string.len(numberOne));
+               else
+                  numberOne = string.format("-%s", numberOne)
+               end
+            else
+               if string.match(input.v, "^-.*$") then
+                  buffer.v = string.sub(buffer.v, 1, string.len(buffer.v));
+                  input.v = string.sub(input.v, 1, string.len(input.v));
+               else
+                  buffer.v = string.format("-%s", buffer.v)
+                  input.v = string.format("-%s", input.v)
+               end
+            end
+         end
          
       end      
       wait(0)
@@ -128,7 +170,7 @@ function imgui.OnDrawFrame()
    local sizeX, sizeY = getScreenResolution()
    
    if mainWindow.v then
-      imgui.SetNextWindowPos(imgui.ImVec2(sizeX / 2, sizeY / 2),
+      imgui.SetNextWindowPos(imgui.ImVec2(sizeX / 1.5, sizeY / 2),
       imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
       imgui.Begin('mini-calc', mainWindow, imgui.WindowFlags.NoResize + imgui.WindowFlags.NoCollapse)
       
@@ -136,7 +178,6 @@ function imgui.OnDrawFrame()
       
       imgui.PushItemWidth(buttonSizeX * 4.5)
       if imgui.InputText("##Display", input, imgui.InputTextFlags.CharsDecimal) then
-         --result = tonumber(buffer)
       end
       imgui.PopItemWidth()
       
@@ -146,7 +187,6 @@ function imgui.OnDrawFrame()
          numberOne = nil
          numberTwo = nil
          operation = nil
-         --operation = none
       end
       imgui.SameLine()
       if imgui.Button(" CE ", imgui.ImVec2(buttonSizeX, buttonSizeY)) then
@@ -159,9 +199,11 @@ function imgui.OnDrawFrame()
       end
       imgui.SameLine()
       if imgui.Button(" <X ", imgui.ImVec2(buttonSizeX, buttonSizeY)) then
-         --buffer.v = string.format("%s9", buffer.v)
-         --buffer.v = string.sub(buffer.v, 0, string.len(buffer.v)-1);
-         input.v = string.sub(input.v, 0, string.len(input.v)-1);
+         local result = string.match(buffer.v, ".*[^%d]$")
+         if not result then
+            buffer.v = string.sub(buffer.v, 0, string.len(buffer.v)-1)
+         end
+         input.v = string.sub(input.v, 0, string.len(input.v)-1)
       end
       imgui.SameLine()
       if imgui.Button(" / ", imgui.ImVec2(buttonSizeX, buttonSizeY)) then
@@ -233,12 +275,20 @@ function imgui.OnDrawFrame()
       end
       
       if imgui.Button(" +- ", imgui.ImVec2(buttonSizeX, buttonSizeY)) then
-         if string.match(buffer.v, "^-.*$") then
-            buffer.v = string.sub(buffer.v, 1, string.len(buffer.v));
-            input.v = string.sub(input.v, 1, string.len(input.v));
+         if numberOne then
+            if string.match(numberOne, "^-.*$") then
+               numberOne = string.sub(numberOne, 1, string.len(numberOne));
+            else
+               numberOne = string.format("-%s", numberOne)
+            end
          else
-            buffer.v = string.format("-%s", buffer.v)
-            input.v = string.format("-%s", input.v)
+            if string.match(input.v, "^-.*$") then
+               buffer.v = string.sub(buffer.v, 1, string.len(buffer.v));
+               input.v = string.sub(input.v, 1, string.len(input.v));
+            else
+               buffer.v = string.format("-%s", buffer.v)
+               input.v = string.format("-%s", input.v)
+            end
          end
       end
       imgui.SameLine()
@@ -248,13 +298,16 @@ function imgui.OnDrawFrame()
       imgui.SameLine()
       if imgui.Button(" , ", imgui.ImVec2(buttonSizeX, buttonSizeY)) then
         if not isFloat then
-           addSymbolToBuffer(",")
+           addSymbolToBuffer(".")
            isFloat = true
         end
       end
       imgui.SameLine()
       if imgui.Button(" = ", imgui.ImVec2(buttonSizeX, buttonSizeY)) then
-         calc(operation)
+         local result = string.match(buffer.v, ".*[^%d]$")
+         if not result then
+            calc(operation)
+         end
       end
       
       imgui.Spacing()
@@ -263,7 +316,19 @@ function imgui.OnDrawFrame()
 end
 
 function calc(operation)
-   local numbers = string.match(buffer.v, "%d")
+    --local numbers = string.match(buffer.v, "%d")
+    local numbers
+    
+    if string.find(buffer.v, ".") then
+       isFloat = true
+    end
+    
+    if isFloat then
+       numbers = string.match(buffer.v, "[%+%-%d]%d*%.?%d*[eE]?[%+%-]?%d*")
+    else
+       numbers = string.match(buffer.v, "%d")
+    end
+
    if numbers and operation then
       if numberOne then
          numberTwo = tonumber(input.v)
@@ -281,23 +346,19 @@ function calc(operation)
                input.v = tostring(numberOne * numberTwo)
             end
             buffer.v = string.format("%s"..tostring(input.v), buffer.v)
+            if string.find(buffer.v, "=") then
+               result = string.match(buffer.v, ".*=")
+               if result then
+                  buffer.v = string.sub(buffer.v, string.len(result))
+               end
+            end
          end
          numberOne = nil
          numberTwo = nil
       else
          numberOne = tonumber(input.v)
-         -- local result = string.match(input.v, ".*[^%d]$")
-         -- if not result then
          addSymbolToBuffer(operation)
       end
-   end
-end
-
-function addSymbolToInput(symbol)
-   if string.match(symbol, "%d") then
-      input.v = string.format("%s"..symbol, input.v)
-   else
-      input.v = ""
    end
 end
 
