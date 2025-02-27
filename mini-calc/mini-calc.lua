@@ -106,9 +106,9 @@ function main()
             end
          end
          
-         if isKeyJustPressed(0x6E) then -- Decimal key
-            addSymbolToBuffer(".")
-         end
+         -- if isKeyJustPressed(0x6E) then -- Decimal key
+            -- addSymbolToBuffer(".")
+         -- end
          
          if isKeyJustPressed(0x6F) then -- Divide key
             local result = string.match(buffer.v, ".*[^%d]$")
@@ -295,15 +295,15 @@ function imgui.OnDrawFrame()
       if imgui.Button(" 0 ", imgui.ImVec2(buttonSizeX, buttonSizeY)) then
          addSymbolToBuffer("0")
       end
+      -- imgui.SameLine()
+      -- if imgui.Button(" , ", imgui.ImVec2(buttonSizeX, buttonSizeY)) then
+        -- if not isFloat then
+           -- addSymbolToBuffer(".")
+           -- isFloat = true
+        -- end
+      -- end
       imgui.SameLine()
-      if imgui.Button(" , ", imgui.ImVec2(buttonSizeX, buttonSizeY)) then
-        if not isFloat then
-           addSymbolToBuffer(".")
-           isFloat = true
-        end
-      end
-      imgui.SameLine()
-      if imgui.Button(" = ", imgui.ImVec2(buttonSizeX, buttonSizeY)) then
+      if imgui.Button(" = ", imgui.ImVec2(buttonSizeX*2.1, buttonSizeY)) then
          local result = string.match(buffer.v, ".*[^%d]$")
          if not result then
             calc(operation)
