@@ -31,8 +31,9 @@ It introduces the ability to load Lua scripts into the game, has all the functio
 | [GPSoff](https://github.com/ins1x/moonloader-scripts/tree/main/arizona/gpsoff.lua) | Add cmd /gpsoff to disable /gps checkpoints |
 | [Renderobjects](https://github.com/ins1x/moonloader-scripts/tree/main/renderobjects) | A convenient tool for mappers, allows you to quickly find the desired object |
 | [MappingToolkit](https://github.com/ins1x/MappingToolkit) | In-game assistant for mappers and event makers |
+| [mini-calc](https://github.com/ins1x/moonloader-scripts/tree/main/mini-calc) | A simple calculator with a minimal set of functions |
 | [ModCompatibilityChecker](https://github.com/ins1x/moonloader-scripts/tree/main/modchecker/ModCompatibilityChecker.lua) | Checks the mods that can cause crashes |
-| [mphelper](https://github.com/ins1x/mphelper) | Helper for event makers |
+| [MP helper](https://github.com/ins1x/mphelper) | Helper for event makers |
 | [noEmptyMessages](https://github.com/ins1x/moonloader-scripts/tree/main/training-sandbox/noEmptyMessages.lua) | Ignores sending and receiving empty chat messages |
 | [noGameTexts](https://github.com/ins1x/moonloader-scripts/tree/main/uif-fixes/noGameTexts.lua) | Hides annoying gametext in the middle of the screen on the UIF server |
 | [noPostFX.lua](https://github.com/ins1x/moonloader-scripts/tree/main/uif-fixes/noPostFX.lua) | Disables post-processing (Post-FX) and fix dark timecycle |
@@ -40,5 +41,7 @@ It introduces the ability to load Lua scripts into the game, has all the functio
 | [SkipCarRent](https://github.com/ins1x/moonloader-scripts/tree/main/arizona/SkipCarRent) |  Skip car rent dialog on Arizona-Roleplay server |
 | [STO-helper](https://github.com/ins1x/moonloader-scripts/tree/main/arizona/sto-helper) |  Unreleased Assistant for service station mechanics at Arizona-Roleplay |
 | [Training-autologin](https://github.com/ins1x/moonloader-scripts/tree/main/training-sandbox/training-autologin) | Autologin for TRAINING-SANDBOX |
+| [Training-loadvw](https://github.com/ins1x/moonloader-scripts/tree/main/training-sandbox/training-loadvw.lua) | Adds arguments to the /loadvw command on TRAINING-SANDBOX |
+| [weapon-check](https://github.com/ins1x/moonloader-scripts/tree/main/training-sandbox/weapon-check.lua) | Weapon-checker for TRAINING-SANDBOX |
 
 > Disclaimer: All rights to modified scripts belong to their respective owners (specified in the description).
