@@ -33,6 +33,7 @@ It introduces the ability to load Lua scripts into the game, has all the functio
 | [MappingToolkit](https://github.com/ins1x/MappingToolkit) | In-game assistant for mappers and event makers |
 | [mini-calc](https://github.com/ins1x/moonloader-scripts/tree/main/mini-calc) | A simple calculator with a minimal set of functions |
 | [ModCompatibilityChecker](https://github.com/ins1x/moonloader-scripts/tree/main/modchecker/ModCompatibilityChecker.lua) | Checks the mods that can cause crashes |
+| [moonloader-templates](https://github.com/ins1x/moonloader-scripts/tree/main/templates) | templates and snippets for moonloader |
 | [MP helper](https://github.com/ins1x/mphelper) | Helper for event makers |
 | [noEmptyMessages](https://github.com/ins1x/moonloader-scripts/tree/main/training-sandbox/noEmptyMessages.lua) | Ignores sending and receiving empty chat messages |
 | [noGameTexts](https://github.com/ins1x/moonloader-scripts/tree/main/uif-fixes/noGameTexts.lua) | Hides annoying gametext in the middle of the screen on the UIF server |

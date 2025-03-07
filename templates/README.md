@@ -5,8 +5,8 @@
 Эти шаблоны используются мною для создания новых скриптов, и являются своего рода готовым каркасом который нужно только дополнить под свою задачу.
 
 Содержит шаблоны для библиотек:
-- imgui
-- samp.events
+- [imgui](https://github.com/ocornut/imgui/blob/master/imgui.h)
+- [samp.events](https://github.com/THE-FYP/SAMP.Lua/blob/master/samp/events.lua)
 
 Полезные ссылки:
 - [Lua Полезные сниппеты и функции](https://www.blast.hk/threads/13380/)
