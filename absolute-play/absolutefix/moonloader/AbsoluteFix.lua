@@ -3,7 +3,7 @@ script_name("AbsoluteFix")
 script_description("Set of fixes for Absolute Play servers")
 script_properties("work-in-pause")
 script_url("https://github.com/ins1x/useful-samp-stuff/tree/main/luascripts/absolutefix")
-script_version("3.3")
+script_version("3.3") --R1
 -- script_moonloader(16) moonloader v.0.26
 
 -- If your don't play on Absolute Play servers
@@ -1061,10 +1061,10 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
       return {dialogId, style, title, button1, button2, text.."\nДля того чтобы быстро отцепить транспорт войди в наблюдение (/набл 0)"}
    end
    
-   if dialogId == 1700 then
-      local newtext = "Интерфейс\nЦвет интерфейса\nЗвук\nГрафика\nInternet радио\nЧат\nАккаунт\nДругое"
-      return {dialogId, style, title, button1, button2, newtext}
-   end
+   -- if dialogId == 1700 then
+      -- local newtext = "Интерфейс\nЦвет интерфейса\nЗвук\nГрафика\nInternet радио\nЧат\nАккаунт\nДругое"
+      -- return {dialogId, style, title, button1, button2, newtext}
+   -- end
    
    if dialogId == 1770 then
       local newtext = 
