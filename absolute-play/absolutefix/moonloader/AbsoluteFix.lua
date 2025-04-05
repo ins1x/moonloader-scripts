@@ -315,16 +315,16 @@ function main()
 	  end
      
       local servername = sampGetCurrentServerName()
-      -- Unload script if not localhost server and not is Absolute
-      if not servername:find("SA-MP") then
-         local ip, port = sampGetCurrentServerAddress()
+      -- -- Unload script if not localhost server and not is Absolute
+      -- if not servername:find("SA-MP") then
+         -- local ip, port = sampGetCurrentServerAddress()
          
-         if not ip:find("127.0.0.1") and 
-         not servername:find("Absolute") and
-         not servername:find("Абсолют") then
-            thisScript():unload()
-         end
-      end
+         -- if not ip:find("127.0.0.1") or
+         -- not servername:find("Absolute") or
+         -- not servername:find("Абсолют") then
+            -- thisScript():unload()
+         -- end
+      -- end
       
       if servername:find("Абсолют") then
          isAbsoluteRoleplay = true
