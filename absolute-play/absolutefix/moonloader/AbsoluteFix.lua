@@ -3,7 +3,7 @@ script_name("AbsoluteFix")
 script_description("Set of fixes for Absolute Play servers")
 script_properties("work-in-pause")
 script_url("https://github.com/ins1x/useful-samp-stuff/tree/main/luascripts/absolutefix")
-script_version("3.3") --R1
+script_version("3.4")
 -- script_moonloader(16) moonloader v.0.26
 
 -- If your don't play on Absolute Play servers
@@ -62,9 +62,6 @@ local ini = inicfg.load({
 }, configIni)
 inicfg.save(ini, configIni)
 
--- If the server changes IP, change it here
-local hostip = "193.84.90.23"
-
 local isAbsoluteRoleplay = false
 local removed_objects = {647, 1410, 1412, 1413} 
 local restored_objects = {3337, 3244, 3276, 1290, 1540} 
@@ -90,15 +87,6 @@ local lastRemovedObjectModel = nil
 function main()
    if not isSampLoaded() or not isSampfuncsLoaded() then return end
       while not isSampAvailable() do wait(100) end
-	  -- unload script if not Absolute play server
-      local ip, port = sampGetCurrentServerAddress()
-      if not ip:find(hostip) then
-         thisScript():unload()
-	  else
-	     if port >= 7771 and port < 7777 then isAbsoluteRoleplay = true end
-	     if port == 7111 then isAbsoluteRoleplay = true end -- testhost
-	     sampAddChatMessage("{880000}Absolute Fix. {FFFFFF}Загружен", 0xFFFFFF)
-      end
 	  
       -- flickr
       if not doesFileExist(getGameDirectory() .. "\\flickr.asi") then
@@ -325,7 +313,23 @@ function main()
             sampSetGamestate(1)-- GAMESTATE_WAIT_CONNECT
          end
 	  end
-
+     
+      local servername = sampGetCurrentServerName()
+      -- Unload script if not localhost server and not is Absolute
+      if not servername:find("SA-MP") then
+         local ip, port = sampGetCurrentServerAddress()
+         
+         if not ip:find("127.0.0.1") and 
+         not servername:find("Absolute") and
+         not servername:find("Абсолют") then
+            thisScript():unload()
+         end
+      end
+      
+      if servername:find("Абсолют") then
+         isAbsoluteRoleplay = true
+      end
+      
       -- chatfix
       if isKeyJustPressed(0x54) and not sampIsDialogActive() and not sampIsScoreboardOpen() and not isSampfuncsConsoleActive() then
          sampSetChatInputEnabled(true)
