@@ -3,7 +3,7 @@ script_name("AbsoluteFix")
 script_description("Set of fixes for Absolute Play servers")
 script_properties("work-in-pause")
 script_url("https://github.com/ins1x/useful-samp-stuff/tree/main/luascripts/absolutefix")
-script_version("3.4")
+script_version("3.4") --R2
 -- script_moonloader(16) moonloader v.0.26
 
 -- If your don't play on Absolute Play servers
@@ -315,16 +315,17 @@ function main()
 	  end
      
       local servername = sampGetCurrentServerName()
-      -- -- Unload script if not localhost server and not is Absolute
-      -- if not servername:find("SA-MP") then
-         -- local ip, port = sampGetCurrentServerAddress()
+      -- Unload script if not localhost server and not is Absolute
+      if isLookingAtPlayer() then
+         local ip, port = sampGetCurrentServerAddress()
          
-         -- if not ip:find("127.0.0.1") or
-         -- not servername:find("Absolute") or
-         -- not servername:find("Абсолют") then
-            -- thisScript():unload()
-         -- end
-      -- end
+         if not ip:find("127.0.0.1") then
+            if not servername:find("Absolute") and
+            not servername:find("Абсолют") then
+               thisScript():unload()
+            end
+         end
+      end
       
       if servername:find("Абсолют") then
          isAbsoluteRoleplay = true
@@ -865,8 +866,6 @@ function sampev.onSendDialogResponse(dialogId, button, listboxId, input)
          sampSendDialogResponse(1431, 1, 1, 1000)
       end
    end
-   
-   --dialoghook.textureslist = false
       
    -- if player wxit from world without command drop lastWorldNumber var 
    if dialogId == 1405 and listboxId == 5 and button == 1 then
@@ -899,39 +898,6 @@ function sampev.onSendDialogResponse(dialogId, button, listboxId, input)
          worldspawnpos.x, worldspawnpos.y, worldspawnpos.z = getCharCoordinates(playerPed)
       end
    end
-   
-   -- if dialogId == 1403 and listboxId == 2 and button == 1 then
-      -- if LastObject.txdname ~= nil then
-         -- for k, txdname in pairs(absTxdNames) do
-            -- if txdname == LastObject.txdname then
-               -- sampAddChatMessage("Последняя использованная текстура: " .. k-1, 0xFF00FF00)
-               -- break
-            -- end
-         -- end
-      -- end
-   -- end
-   
-   -- if dialogId == 1400 and listboxId == 4 and button == 1 and not input:find("Игрок") then
-      -- if LastObject.txdname ~= nil then
-         -- for k, txdname in pairs(absTxdNames) do
-            -- if txdname == LastObject.txdname then
-               -- sampAddChatMessage("Последняя использованная текстура: " .. k-1, 0xFF00FF00)
-               -- break
-            -- end
-         -- end
-      -- end
-   -- end
-   
-   -- if dialogId == 1400 and listboxId == 4 and button == 1 then
-      -- dialoghook.textureslist = true
-   -- end
-   -- if dialogId == 1403 and listboxId == 2 and button == 1 then
-      -- dialoghook.textureslist = true
-   -- end
-   
-   -- if dialogId == 1409 and listboxId == 2 and button == 1 and input:find("MP объекты") then
-      -- dialoghook.sampobjectslist = true
-   -- end
    
    if dialogId == 1412 and listboxId == 2 and button == 1 then
       sampAddChatMessage("Вы изменили разрешение на редактирование мира для всех игроков!", 0xFF0000)
@@ -1231,37 +1197,6 @@ function sampev.onCreateObject(objectId, data)
 end
 
 function sampev.onSendCommand(command)
-   -- tips for those who are used to using Texture Studio syntax
-   -- if isAbsolutePlay then
-      -- if command:find("texture") then
-         -- sampAddChatMessage("Для ретекстура используйте:", 0x000FF00)
-         -- sampAddChatMessage("N - Редактировать объект - Выделить объект - Перекарсить объект", 0x000FF00)
-         -- return false
-      -- end
-      -- if command:find("showtext3d") then
-         -- sampAddChatMessage("Информация о объектах показана", 0x000FF00)
-         -- checkbox.showobjectsmodel.v = true 
-         -- return false
-      -- end
-      -- if command:find("hidetext3d") then
-         -- sampAddChatMessage("Информация о объектах скрыта", 0x000FF00)
-         -- checkbox.showobjectsmodel.v = false
-         -- return false
-      -- end
-      -- if command:find("flymode") then
-         -- sampSendChat("/полет")
-         -- return false
-      -- end
-      -- if command:find("team") or command:find("setteam") then
-         -- sampSendChat("Нельзя менять тимы. Если вы хотели изменить спавн используйте:",0x000FF00)
-         -- sampSendChat("Y - Редактор карт - Управление миром - Выбрать точку появления",0x000FF00)
-         -- return false
-      -- end
-      -- if command:find("jetpack")then
-         -- sampAddChatMessage("Джетпак можно взять в меню: N - Оружие - Выдать себе оружие", 0x000FF00)
-         -- return false
-      -- end
-   -- end  
    
    if command:find("/exit") or command:find("/выход") then
       isWorldHoster = false
@@ -1302,6 +1237,14 @@ function sampev.onSendCommand(command)
             sampSendChat(string.format("/ngr %.2f %.2f %.2f", bX, bY, bZ+1.5))
          end
       end
+   end
+   
+   if command:find("/nologo$") then
+      -- remove server logo
+	  sampAddChatMessage("Логотипы сервера были удалены (Чтобы появились снова потребуется релог)", 0x00FF00)
+      sampTextdrawDelete(2048)
+      sampTextdrawDelete(420)
+      return false
    end
 end
 
@@ -1360,4 +1303,8 @@ function onSendRpc(id, bs, priority, reliability, channel, shiftTimestamp)
       end
       return false
    end
+end
+
+function isLookingAtPlayer()
+   return readMemory(0xB6F028+0x2B, 1, true) == 1
 end
