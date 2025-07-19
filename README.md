@@ -5,7 +5,7 @@
     <img src="https://img.shields.io/badge/Moonloader-v0.26-blue">
 </p>
 
-[![moonloader.png](https://www.blast.hk/moonloader/images/moonloader.png)](https://www.blast.hk/threads/13305/)
+[![moonloader.png](https://github.com/ins1x/moonloader-scripts/tree/main/templates/moonloader.png)](https://www.blast.hk/threads/13305/)
 
 Various useful Moonloader [lua scripts](https://www.blast.hk/threads/22707/) for GTA [SA-MP](https://sampwiki.blast.hk/wiki/Main_Page) multiplayer.  
 The presented systems were developed or improved by me, and implemented in working projects.  
@@ -42,6 +42,7 @@ It introduces the ability to load Lua scripts into the game, has all the functio
 | [SkipCarRent](https://github.com/ins1x/moonloader-scripts/tree/main/arizona/SkipCarRent) |  Skip car rent dialog on Arizona-Roleplay server |
 | [STO-helper](https://github.com/ins1x/moonloader-scripts/tree/main/arizona/sto-helper) |  Unreleased Assistant for service station mechanics at Arizona-Roleplay |
 | [Training-autologin](https://github.com/ins1x/moonloader-scripts/tree/main/training-sandbox/training-autologin) | Autologin for TRAINING-SANDBOX |
+| [Training-attachcodes](https://github.com/ins1x/moonloader-scripts/tree/main/training-sandbox/training-attachcodes.lua) | Attach codes for old system on TRAINING-SANDBOX |
 | [Training-loadvw](https://github.com/ins1x/moonloader-scripts/tree/main/training-sandbox/training-loadvw.lua) | Adds arguments to the /loadvw command on TRAINING-SANDBOX |
 | [weapon-check](https://github.com/ins1x/moonloader-scripts/tree/main/training-sandbox/weapon-check.lua) | Weapon-checker for TRAINING-SANDBOX |
 
