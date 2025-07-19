@@ -2,8 +2,8 @@ script_author("1NS")
 script_name("AbsoluteFix")
 script_description("Set of fixes for Absolute Play servers")
 script_properties("work-in-pause")
-script_url("https://github.com/ins1x/useful-samp-stuff/tree/main/luascripts/absolutefix")
-script_version("3.4") --R2
+script_url("https://github.com/ins1x/moonloader-scripts")
+script_version("3.5") 
 -- script_moonloader(16) moonloader v.0.26
 
 -- If your don't play on Absolute Play servers
@@ -48,7 +48,6 @@ local ini = inicfg.load({
 	  noradio = false,
       nogametext = false,
 	  noweaponpickups = true,
-      mapfixes = true,
       menupatch = true,
       pmsoundfix = true,
 	  restoreremovedobjects = false,
@@ -83,6 +82,48 @@ local editMode = 0
 local lastWorldNumber = nil
 local lastWorldName = nil
 local lastRemovedObjectModel = nil
+
+-- macro
+function isLookingAtPlayer()
+   return readMemory(0xB6F028+0x2B, 1, true) == 1
+end
+
+function doesFileExist(path)
+   -- work like doesDirectoryExist(string directory)
+   -- result: ans = file_exists("sample.txt")
+   local f=io.open(path,"r")
+   if f~=nil then io.close(f) return true else return false end
+end
+
+function getClosestPlayerId()
+    local closestId = -1
+    mydist = 30
+    local x, y, z = getCharCoordinates(PLAYER_PED)
+    for i = 0, 999 do
+        local streamed, pedID = sampGetCharHandleBySampPlayerId(i)
+        if streamed and getCharHealth(pedID) > 0 and not sampIsPlayerPaused(pedID) then
+            local xi, yi, zi = getCharCoordinates(pedID)
+            local dist = getDistanceBetweenCoords3d(x, y, z, xi, yi, zi)
+            if dist <= mydist then
+                mydist = dist
+                closestId = i
+            end
+        end
+    end
+    return closestId
+end
+
+function enterEditObject()
+   local bs = raknetNewBitStream()
+   raknetEmulRpcReceiveBitStream(27, bs)
+   raknetDeleteBitStream(bs)
+end 
+
+-- function editObjectBySampId(id, playerobj) 
+   -- if isSampAvailable() then
+      -- ffi.cast("void (__thiscall*)(unsigned long, short int, unsigned long)", sampGetBase() + 0x6DE40)(readMemory(sampGetBase() + 0x21A0C4, 4), id, playerobj and 1 or 0)
+   -- end
+-- end
 
 function main()
    if not isSampLoaded() or not isSampfuncsLoaded() then return end
@@ -285,16 +326,6 @@ function main()
 	  if ini.settings.noradio then
 	     memory.copy(0x4EB9A0, memory.strptr('\xC2\x04\x00'), 3, true)
 	  end
-	  
-      -- MapFix
-      if ini.settings.mapfixes then
-         -- restore statue on spawn LS
-         local tmpobjid = createObject(2744, 423.1, -1558.3, 26.3)
-         setObjectHeading(tmpobjid, 202.8)
-         
-         -- replacing invisible roadsign by tree
-         createObject(700, 724.05, 1842.88, 4.9)
-      end
       
       --- END init
       while true do
@@ -602,45 +633,6 @@ function main()
       -- END main
    end
 end
-
--- Macro
-function doesFileExist(path)
-   -- work like doesDirectoryExist(string directory)
-   -- result: ans = file_exists("sample.txt")
-   local f=io.open(path,"r")
-   if f~=nil then io.close(f) return true else return false end
-end
-
-function getClosestPlayerId()
-    local closestId = -1
-    mydist = 30
-    local x, y, z = getCharCoordinates(PLAYER_PED)
-    for i = 0, 999 do
-        local streamed, pedID = sampGetCharHandleBySampPlayerId(i)
-        if streamed and getCharHealth(pedID) > 0 and not sampIsPlayerPaused(pedID) then
-            local xi, yi, zi = getCharCoordinates(pedID)
-            local dist = getDistanceBetweenCoords3d(x, y, z, xi, yi, zi)
-            if dist <= mydist then
-                mydist = dist
-                closestId = i
-            end
-        end
-    end
-    return closestId
-end
-
-
-function enterEditObject()
-   local bs = raknetNewBitStream()
-   raknetEmulRpcReceiveBitStream(27, bs)
-   raknetDeleteBitStream(bs)
-end 
-
--- function editObjectBySampId(id, playerobj) 
-   -- if isSampAvailable() then
-      -- ffi.cast("void (__thiscall*)(unsigned long, short int, unsigned long)", sampGetBase() + 0x6DE40)(readMemory(sampGetBase() + 0x21A0C4, 4), id, playerobj and 1 or 0)
-   -- end
--- end
 
 -- Hooks
 function sampev.onServerMessage(color, text)
@@ -1134,11 +1126,6 @@ function sampev.onSendClickPlayer(playerId, source)
    clickedplayerid = playerId
 end
 
-function round(num, idp)
-   local mult = 10^(idp or 0)
-   return math.floor(num * mult + 0.5) / mult
-end
-
 function sampev.onCreateObject(objectId, data)
    -- Fix Crash the game when creating a crane object 1382
    if data.modelId == 1382 then return false end
@@ -1148,51 +1135,6 @@ function sampev.onCreateObject(objectId, data)
       if data.modelId == 18864 or data.modelId == 18863 then
          return false
       end
-   end
-   
-   if ini.settings.mapfixes then 
-      -- Fix double created objects 
-      if data.modelId == 16563 and round(data.position.x, 3) == -222.195 then 
-         return false
-      end
-      
-      if data.modelId == 6431 and round(data.position.x, 4) == -233.8828 then 
-         return false
-      end
-       
-      if data.modelId == 6421 and round(data.position.x, 4) == 137.3984 then
-         return false
-      end
-      
-      if data.modelId == 8849 and round(data.position.x, 4) == 2764.1797 then
-         return false
-      end
-      
-      if data.modelId == 1344 and round(data.position.x, 4) == 2764.9766 then
-         return false
-      end
-      
-      if data.modelId == 6399 and round(data.position.x, 4) == 552.4297 then
-         return false
-      end
-      
-      if data.modelId == 7510 and round(data.position.x, 4) == 1370.3594 then
-         return false
-      end
-      
-      if data.modelId == 640 then
-         if round(data.position.x, 4) == 1335.8281 or
-            round(data.position.x, 4) == 1302.2266 then
-            return false
-         end
-      end
-       
-      -- Debug
-      -- if data.modelId == 7510 then
-         -- local px, py, pz = getCharCoordinates(PLAYER_PED)
-         -- local distance = string.format("%.0f", getDistanceBetweenCoords3d(data.position.x, data.position.y, data.position.z, px, py, pz))
-         -- print(distance, data.position.x, round(data.position.x, 4))
-      -- end
    end
 end
 
@@ -1303,8 +1245,4 @@ function onSendRpc(id, bs, priority, reliability, channel, shiftTimestamp)
       end
       return false
    end
-end
-
-function isLookingAtPlayer()
-   return readMemory(0xB6F028+0x2B, 1, true) == 1
 end
