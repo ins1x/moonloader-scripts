@@ -1,5 +1,5 @@
 script_name("Separate Messages")
-script_version("2.4")
+script_version("2.4") -- r2
 -- script_moonloader(16) moonloader v.0.26
 -- fork of Separate Messages v2 https://www.blast.hk/threads/69714/
 -- changed: 
@@ -8,8 +8,12 @@ script_version("2.4")
 -- made the code more readable
 
 local sampev = require 'lib.samp.events'
+
 -- МОЖНО ДОБАВИТЬ СВОЮ КОМАНДУ ДЛЯ ПЕРЕНОСА ТУТ, ИЛИ УБРАТЬ ЛИШНЮЮ
-commands = {'c', 's', 'b', 'r', 'm', 'd', 'f', 'rb', 'fb', 'rt', 'pt', 'ft', 'cs', 't', 'ct', 'fam', 'vr', 'al'}
+commands = {
+   'c', 's', 'b', 'r', 'm', 'd', 'f', 'rb', 'fb', 'rt', 
+   'pt', 'ft', 'cs', 't', 'ct', 'fam', 'vr', 'al'
+}
 isDivided = false
 
 function sampev.onSendCommand(msg)
@@ -75,22 +79,24 @@ function divide(msg, beginning, ending, doing)
    limit = 72
    
    local firstpart, secondpart = string.match(msg:sub(1, limit), "(.*) (.*)")
-   if secondpart == nil then 
+   if not secondpart then 
       secondpart = ""
    end 
-   local firstpart, secondpart = firstpart .. "...", "..." .. secondpart .. msg:sub(limit + 1, msg:len())
+   if firstpart then
+      firstpart, secondpart = firstpart .. "...", "..." .. secondpart .. msg:sub(limit + 1, msg:len())
 
-   isDivided = true
-   sampSendChat(beginning .. firstpart .. ending)
-   if doing == "ext" then
-      beginning = "/do "
-      if secondpart:sub(-1) ~= "." then secondpart = secondpart .. "." end
+      isDivided = true
+      sampSendChat(beginning .. firstpart .. ending)
+      if doing == "ext" then
+         beginning = "/do "
+         if secondpart:sub(-1) ~= "." then secondpart = secondpart .. "." end
+      end
+      isDivided = true
+      lua_thread.create(function()
+         wait(1500)
+         sampSendChat(beginning .. secondpart .. ending)
+      end)
    end
-   isDivided = true
-   lua_thread.create(function()
-      wait(1500)
-      sampSendChat(beginning .. secondpart .. ending)
-   end)
 end
 
 function main()
