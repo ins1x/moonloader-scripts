@@ -4,7 +4,7 @@ script_authors("xWivar", "1NS")
 script_dependencies('lib.samp.events')
 script_url("https://forum.training-server.com/d/17909-lua-autologin-v1")
 script_version_number(4)
-script_version("4")
+script_version("4.1")
 -- Require CLEO 4.0+, SAMPFUNCS 5.4.0+, Moonloader 0.26+ (lib SAMP.Lua)
 -- editor options: tabsize 3, Windows (CR LF), encoding Windows-1251
 
@@ -66,7 +66,7 @@ function ev.onShowDialog(dialogId, style, title, button1, button2, text)
       end
    
       if skiprulesdialog then 
-         if text:find('1. Общее положение') and style == 0 and button1 == "Принимаю" then
+         if text:find('1. Общие правила') and style == 0 and button1 == "Принимаю" then
             sampSendDialogResponse(32700, 1, nil)
             sampCloseCurrentDialogWithButton(1)
          end
