@@ -268,7 +268,7 @@ function main()
       if isKeyJustPressed(0x66) and dialoghook.textureslist and not sampIsChatInputActive() and not sampIsDialogActive()
       and not isPauseMenuActive() and not isSampfuncsConsoleActive() then 
          if lastClickedTextdrawId == 2099 then
-            sampSendClickTextdraw(37)
+            sampSendClickTextdraw(38)
             lastClickedTextdrawId = 2053
          else
             sampSendClickTextdraw(lastClickedTextdrawId)
@@ -276,22 +276,22 @@ function main()
          end
       end
       
-      if isAbsolutePlay then
-         -- Switching textdraws with arrow buttons, mouse buttons, pgup-pgdown keys
-         if isKeyJustPressed(0x25) or isKeyJustPressed(0x05) 
-         or isKeyJustPressed(0x21) and sampIsCursorActive() 
-         and not sampIsChatInputActive() and not sampIsDialogActive() 
-         and not isPauseMenuActive() and not isSampfuncsConsoleActive() then
-            sampSendClickTextdraw(36)
-         end
+      -- if isAbsolutePlay then
+         -- -- Switching textdraws with arrow buttons, mouse buttons, pgup-pgdown keys
+         -- if isKeyJustPressed(0x25) or isKeyJustPressed(0x05) 
+         -- or isKeyJustPressed(0x21) and sampIsCursorActive() 
+         -- and not sampIsChatInputActive() and not sampIsDialogActive() 
+         -- and not isPauseMenuActive() and not isSampfuncsConsoleActive() then
+            -- sampSendClickTextdraw(37)
+         -- end
          
-         if isKeyJustPressed(0x27) or isKeyJustPressed(0x06) 
-         or isKeyJustPressed(0x22) and sampIsCursorActive()
-         and not sampIsChatInputActive() and not sampIsDialogActive()
-         and not isPauseMenuActive() and not isSampfuncsConsoleActive() then 
-            sampSendClickTextdraw(37)
-         end
-      end
+         -- if isKeyJustPressed(0x27) or isKeyJustPressed(0x06) 
+         -- or isKeyJustPressed(0x22) and sampIsCursorActive()
+         -- and not sampIsChatInputActive() and not sampIsDialogActive()
+         -- and not isPauseMenuActive() and not isSampfuncsConsoleActive() then 
+            -- sampSendClickTextdraw(38)
+         -- end
+      -- end
    end
 end
 
