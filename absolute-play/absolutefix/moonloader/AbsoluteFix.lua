@@ -625,9 +625,9 @@ function main()
 		 end
 		 
 		 -- Switching textdraws with arrow buttons, mouse buttons, pgup-pgdown keys
-	     if isKeyJustPressed(0x25) or isKeyJustPressed(0x05) or isKeyJustPressed(0x21) and sampIsCursorActive() and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then sampSendClickTextdraw(36) end
+	     if isKeyJustPressed(0x25) or isKeyJustPressed(0x05) or isKeyJustPressed(0x21) and sampIsCursorActive() and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then sampSendClickTextdraw(37) end
 	  
-	     if isKeyJustPressed(0x27) or isKeyJustPressed(0x06) or isKeyJustPressed(0x22) and sampIsCursorActive() and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then sampSendClickTextdraw(37) end
+	     if isKeyJustPressed(0x27) or isKeyJustPressed(0x06) or isKeyJustPressed(0x22) and sampIsCursorActive() and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then sampSendClickTextdraw(38) end
       end 
 	  
       -- END main
