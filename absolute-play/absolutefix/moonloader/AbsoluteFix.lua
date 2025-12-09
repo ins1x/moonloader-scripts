@@ -3,7 +3,7 @@ script_name("AbsoluteFix")
 script_description("Set of fixes for Absolute Play servers")
 script_properties("work-in-pause")
 script_url("https://github.com/ins1x/moonloader-scripts")
-script_version("3.5") 
+script_version("3.6") 
 -- script_moonloader(16) moonloader v.0.26
 
 -- If your don't play on Absolute Play servers
@@ -82,6 +82,7 @@ local editMode = 0
 local lastWorldNumber = nil
 local lastWorldName = nil
 local lastRemovedObjectModel = nil
+--local lastObjectBlip = nil
 
 -- macro
 function isLookingAtPlayer()
@@ -891,7 +892,7 @@ function sampev.onSendDialogResponse(dialogId, button, listboxId, input)
       end
    end
    
-   if dialogId == 1412 and listboxId == 2 and button == 1 then
+   if dialogId == 1412 and listboxId == 1 and button == 1 then
       sampAddChatMessage("Вы изменили разрешение на редактирование мира для всех игроков!", 0xFF0000)
    end
    
@@ -934,6 +935,23 @@ function sampev.onSendDialogResponse(dialogId, button, listboxId, input)
       end
       if listboxId == 2 then editMode = 4 end
       if listboxId == 4 then editMode = 2 end
+      -- Add arrow (Blip to object) bug broke edit mode on set blip
+      -- if listboxId == 6 then
+         -- if (lastObjectId) then
+            -- sampAddChatMessage("lastObjectId:"..lastObjectId,-1)
+         -- end
+         -- if sampGetObjectHandleBySampId(lastObjectId) 
+         -- and doesObjectExist(sampGetObjectHandleBySampId(lastObjectId)) then
+            -- sampAddChatMessage("test1",-1)
+            -- if lastObjectBlip then
+               -- removeBlip(lastObjectBlip)
+               -- lastObjectBlip = nil
+            -- else
+               -- lastObjectBlip = addBlipForObject(sampGetObjectHandleBySampId(lastObjectId))
+            -- end
+         -- end                  
+         -- sampGetObjectHandleBySampId(lastObjectId)
+      -- end
    end
    if dialogId == 1411 and button == 1 then
       if listboxId == 0 or listboxId == 2 then
@@ -1075,9 +1093,7 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
       "Введи размер шрифта от 1 до 255"}
    end
    
-   if dialogId == 1401 then
-
-      
+   if dialogId == 1401 then     
       local newtext = 
       "{FFD700}615-18300       {FFFFFF}GTA-SA \n{FFD700}18632-19521{FFFFFF}   SA-MP\n"..
       (lastObjectModelId and "\n{FFFFFF}Последний {FFFF00}использованный объект: "..lastObjectModelId.." ("..tostring(sampObjectModelNames[lastObjectModelId])..") " or " ")..
@@ -1107,19 +1123,25 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
    if dialogId == 1426 then
       if lastWorldNumber and lastWorldNumber > 0 then
          local newtext = 
-         "Если вы хотите попробовать редактор карт\n"..
-         "Посетите мир 10, он всегда открыт для редактирования\n\n"..
          "Последний мир в котором вы были: "..lastWorldNumber.."\n"..
          "Введите номер мира в который хотите войти:\n"
          return {dialogId, style, title, button1, button2, newtext}
       else
          local newtext = 
-         "Если вы хотите попробовать редактор карт\n"..
-         "Посетите мир 10, он всегда открыт для редактирования\n\n"..
          "Введите номер мира в который хотите войти:\n"
          return {dialogId, style, title, button1, button2, newtext}
       end
    end
+   
+   if dialogId == 1441 then
+      sampAddChatMessage("Выберите слот для сохранения гонок. Макимальное количество гоночных чекпоинтов - 40", -1)
+   end
+   
+   -- if dialogId == 1403 then
+      -- local newtext = 
+      -- "\nМетку на объект\n"
+      -- return {dialogId, style, title, button1, button2, text..newtext}
+   -- end
 end
 
 function sampev.onSendClickPlayer(playerId, source)
