@@ -20,7 +20,7 @@ It introduces the ability to load Lua scripts into the game, has all the functio
 | [Abike](https://github.com/ins1x/moonloader-scripts/tree/main/arizona/Abike.lua) | Pressing W on the bike automatically accelerates it |
 | [AbsoluteFix](https://github.com/ins1x/moonloader-scripts/tree/main/absolute-play/absolutefix) | A set of fixes and additions for Absolute Play servers |
 | [AbsoluteForumChecker](https://github.com/ins1x/moonloader-scripts/tree/main/absolute-play/absForumChecker) | Forum checker for Absolute Play servers |
-| [absTXDNames](https://github.com/ins1x/moonloader-scripts/tree/main/absolute-play/absTXDNames) | Adds names for objects and textures in the map editor on Absolute Play |
+| [absMoreModelnames](https://github.com/ins1x/moonloader-scripts/tree/main/absolute-play/absMoreModelnames) | Adds names for objects in the map editor on Absolute Play |
 | [AutoForward](https://github.com/ins1x/moonloader-scripts/blob/main/AutoForward.lua) | Script for automatic movement by car (cruise control), and autoforward on foot |
 | [AutoLock](https://github.com/ins1x/moonloader-scripts/blob/main/arizona/AutoLock.lua) | Simple vehicle auto lock |
 | [Bye-bye](https://github.com/ins1x/moonloader-scripts/blob/main/training-sandbox/bb.lua) | Crash yourself by /bb cmd |
