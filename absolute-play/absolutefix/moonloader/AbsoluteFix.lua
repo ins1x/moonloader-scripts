@@ -3,7 +3,7 @@ script_name("AbsoluteFix")
 script_description("Set of fixes for Absolute Play servers")
 script_properties("work-in-pause")
 script_url("https://github.com/ins1x/moonloader-scripts")
-script_version("3.6") 
+script_version("3.7") 
 -- script_moonloader(16) moonloader v.0.26
 
 -- If your don't play on Absolute Play servers
@@ -73,15 +73,19 @@ local dialogRestoreText = false
 local dialogIncoming = 0
 local clickedplayerid = nil
 local randomcolor = nil
-local lastObjectId = nil
-local lastObjectModelId = nil
 local hideEditObject = false
 local scaleEditObject = false
 local editResponse = 0 
 local editMode = 0
-local lastWorldNumber = nil
-local lastWorldName = nil
-local lastRemovedObjectModel = nil
+
+local last = {
+   ObjectId = nil,
+   ObjectModelId = nil,
+   TextureName = nil,
+   WorldNumber = nil,
+   WorldName = nil,
+   RemovedObjectModel = nil,
+}
 --local lastObjectBlip = nil
 
 -- macro
@@ -112,6 +116,37 @@ function getClosestPlayerId()
         end
     end
     return closestId
+end
+
+function getClosestObjectId()
+   local closestId = nil
+   mydist = 20
+   local px, py, pz = getCharCoordinates(playerPed)
+   for _, v in ipairs(getAllObjects()) do
+      if isObjectOnScreen(v) then
+         local _, x, y, z = getObjectCoordinates(v)
+         local dist = getDistanceBetweenCoords3d(x, y, z, px, py, pz)
+         if dist <= mydist and dist >= 1.0 then -- 1.0 to ignore attached objects
+            mydist = dist
+            closestId = v
+         end
+      end
+   end
+   return closestId
+end
+
+function getNearestObjectByModel(modelid)
+   local objects = {}
+   local x, y, z = getCharCoordinates(playerPed)
+   for i, obj in ipairs(getAllObjects()) do
+      if getObjectModel(obj) == modelid then
+         local result, ox, oy, oz = getObjectCoordinates(obj)
+         table.insert(objects, {getDistanceBetweenCoords3d(ox, oy, oz, x, y, z), ox, oy, oz})
+      end
+   end
+   if #objects <= 0 then return false end
+   table.sort(objects, function(a, b) return a[1] < b[1] end)
+   return true, unpack(objects[1])
 end
 
 function enterEditObject()
@@ -601,8 +636,8 @@ function main()
 		 
          if isPlayerSpectating then
             if isKeyJustPressed(0x4E) and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then 
-               --if lastObjectId ~= nil then
-                  --editObjectBySampId(lastObjectId, false)
+               --if last.ObjectId ~= nil then
+                  --editObjectBySampId(last.ObjectId, false)
                --end
                enterEditObject()
             end
@@ -637,10 +672,6 @@ end
 
 -- Hooks
 function sampev.onServerMessage(color, text)
-   -- Some functions are prohibited on Arizona
-   if text:find('Добро пожаловать на Arizona Role Play!') then
-      thisScript():unload()
-   end
    
    if ini.settings.chatfilter then 
       if text:find("подключился к серверу") or text:find("вышел с сервера") then
@@ -654,9 +685,9 @@ function sampev.onServerMessage(color, text)
    
    if ini.settings.disablenotifications then
 	  -- ignore various server flood mesages
-	  if text:find("не засчитан") then
-         return false
-      end
+	  -- if text:find("не засчитан") then
+         -- return false
+      -- end
 	  
       if text:find("выхода из читмира") then
          return false
@@ -682,6 +713,8 @@ function sampev.onServerMessage(color, text)
          return false
       end
       
+      -- Рекомендуется прикрепить Телеграм/страницу Вконтакте/Discord для защиты аккаунта
+      -- Клавиша Y - Настройки - Аккаунт - Телеграм/Вконтакте/Discord
       if text:find("Вконтакте") then
          return false
       end
@@ -698,9 +731,9 @@ function sampev.onServerMessage(color, text)
          return false
       end
       
-      if text:find("В мире можно телепортироваться к объектам или на карте") then
-         return false
-      end
+      -- if text:find("В мире можно телепортироваться к объектам или на карте") then
+         -- return false
+      -- end
       
       if text:find("Необходим установленный SA") then
          return false
@@ -715,8 +748,8 @@ function sampev.onServerMessage(color, text)
       if text:find("Последнего созданного объекта не существует") then
          lua_thread.create(function()
             wait(500)
-            if lastObjectModelId then
-               sampAddChatMessage("Последний использованный объект: {696969}"..lastObjectModelId, -1)
+            if last.ObjectModelId then
+               sampAddChatMessage("Последний использованный объект: {696969}"..last.ObjectModelId, -1)
 	        end
          end)
       end
@@ -822,7 +855,8 @@ function sampev.onSendDialogResponse(dialogId, button, listboxId, input)
    end
    
    -- Corrects the placement of objects near the house. Sets the correct angle.
-   if dialogId == 100 and listboxId == 4 and button == 1 then
+   if dialogId == 100 and listboxId == 4 and button == 1 
+   and input == "Объекты к дому" then
       sampAddChatMessage("Примечание: Стоимость 1000$ за любой", -1)
       if ini.settings.houseobjectsrotfix then
          local angle = math.ceil(getCharHeading(PLAYER_PED))
@@ -860,23 +894,23 @@ function sampev.onSendDialogResponse(dialogId, button, listboxId, input)
       end
    end
       
-   -- if player wxit from world without command drop lastWorldNumber var 
+   -- if player wxit from world without command drop last.WorldNumber var 
    if dialogId == 1405 and listboxId == 5 and button == 1 then
       if input:find("Войти в свой мир") then
          isWorldHoster = true
          worldspawnpos.x, worldspawnpos.y, worldspawnpos.z = getCharCoordinates(playerPed)
       else
-         lastWorldNumber = 0
-         lastWorldName = ""
+         last.WorldNumber = 0
+         last.WorldName = ""
          isWorldHoster = false
       end
    end
-    
+   
    -- Get current world number from server dialogs
    if dialogId == 1426 and listboxId == 65535 and button == 1 then
       if tonumber(input) then
          if tonumber(input) > 0 and tonumber(input) < 500 then
-            lastWorldNumber = tonumber(input)
+            last.WorldNumber = tonumber(input)
             worldspawnpos.x, worldspawnpos.y, worldspawnpos.z = getCharCoordinates(playerPed)
          end
       end
@@ -885,9 +919,9 @@ function sampev.onSendDialogResponse(dialogId, button, listboxId, input)
    if dialogId == 1406 and button == 1 then
       local world = tonumber(string.sub(input, 0, 3))
       if world then
-         lastWorldNumber = world
+         last.WorldNumber = world
          local rawworldname = string.match(input, "- (.+) ")
-         lastWorldName = string.gsub(rawworldname, "-", " ")
+         last.WorldName = string.gsub(rawworldname, "-", " ")
          worldspawnpos.x, worldspawnpos.y, worldspawnpos.z = getCharCoordinates(playerPed)
       end
    end
@@ -906,8 +940,8 @@ function sampev.onSendDialogResponse(dialogId, button, listboxId, input)
       local world = tonumber(string.sub(input, startpos+1, endpos))
       local rawname = string.sub(input, startpos+4, string.len(input))
       if world then
-         lastWorldNumber = world
-         lastWorldName = rawname
+         last.WorldNumber = world
+         last.WorldName = rawname
          worldspawnpos.x, worldspawnpos.y, worldspawnpos.z = getCharCoordinates(playerPed)
       end
    end
@@ -916,8 +950,30 @@ function sampev.onSendDialogResponse(dialogId, button, listboxId, input)
    if dialogId == 1400 and button == 1 then
       if listboxId == 0 and input:find("Редактировать") then editMode = 1 end
       if listboxId == 2 and input:find("Переместить") then editMode = 1 end
-      if listboxId == 4 and input:find("Перекрасить") then editMode = 4 end
+      if listboxId == 4 and input:find("Перекрасить") then 
+         if last.TextureName then
+            local id = string.match(last.TextureName, "%d+")
+            if id then
+               sampAddChatMessage("Последняя текстура: "..id, -1)   
+            end
+         end
+         editMode = 4 
+      end
       if listboxId == 5 and input:find("Копировать") then editMode = 2 end
+      if listboxId == 16 and input:find("Телепортация к ближайшему объекту") then
+         local closestObjectId = getClosestObjectId()
+         if closestObjectId then
+            local model = getObjectModel(closestObjectId)
+            local result, distance, x, y, z = getNearestObjectByModel(model)
+            if result then
+               lua_thread.create(function()
+                  wait(1500)
+                  sampSendChat((".тпк %.2f, %.2f, %.2f"):format(x,y,z))
+                  sampAddChatMessage("Ближайший объект: "..model, -1)
+               end)
+            end
+         end
+      end
       if listboxId == 17 and input:find("Информация") then editMode = 1 end
    end 
    
@@ -929,35 +985,43 @@ function sampev.onSendDialogResponse(dialogId, button, listboxId, input)
       if listboxId == 0 then editMode = 1 end
       if listboxId == 1 then 
          editMode = 3
-         if lastObjectModelId then
-            lastRemovedObjectModel = lastObjectModelId
+         if last.ObjectModelId then
+            last.RemovedObjectModel = last.ObjectModelId
          end
       end
-      if listboxId == 2 then editMode = 4 end
+      if listboxId == 2 then 
+         if last.TextureName then
+            local id = string.match(last.TextureName, "%d+")
+            if id then
+               sampAddChatMessage("Последняя текстура: "..id, -1)   
+            end
+         end
+         editMode = 4 
+      end
       if listboxId == 4 then editMode = 2 end
       -- Add arrow (Blip to object) bug broke edit mode on set blip
       -- if listboxId == 6 then
-         -- if (lastObjectId) then
-            -- sampAddChatMessage("lastObjectId:"..lastObjectId,-1)
+         -- if (last.ObjectId) then
+            -- sampAddChatMessage("last.ObjectId:"..last.ObjectId,-1)
          -- end
-         -- if sampGetObjectHandleBySampId(lastObjectId) 
-         -- and doesObjectExist(sampGetObjectHandleBySampId(lastObjectId)) then
+         -- if sampGetObjectHandleBySampId(last.ObjectId) 
+         -- and doesObjectExist(sampGetObjectHandleBySampId(last.ObjectId)) then
             -- sampAddChatMessage("test1",-1)
             -- if lastObjectBlip then
                -- removeBlip(lastObjectBlip)
                -- lastObjectBlip = nil
             -- else
-               -- lastObjectBlip = addBlipForObject(sampGetObjectHandleBySampId(lastObjectId))
+               -- lastObjectBlip = addBlipForObject(sampGetObjectHandleBySampId(last.ObjectId))
             -- end
          -- end                  
-         -- sampGetObjectHandleBySampId(lastObjectId)
+         -- sampGetObjectHandleBySampId(last.ObjectId)
       -- end
    end
    if dialogId == 1411 and button == 1 then
       if listboxId == 0 or listboxId == 2 then
          editMode = 3
-         if lastObjectModelId then
-            lastRemovedObjectModel = lastObjectModelId
+         if last.ObjectModelId then
+            last.RemovedObjectModel = last.ObjectModelId
          end
       end
    end
@@ -1082,9 +1146,12 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
       "- телепортироваться по метке на карте в ESC\n"..
       "- расширять мир до 2000 объектов\n"..
       "- выбирать шрифт и цвет текста\n"..
-      "- выбирать точку появления в мире\n"
+      "- выбирать точку появления в мире\n"..
+      "\nУправление:\n"..text
      
-      sampAddChatMessage("Подробнее на https://forum.sa-mp.ru/index.php?/topic/1016832-миры-описание-работы-редактора-карт", -1)
+      sampAddChatMessage("Подробнее на {696969}https://forum.sa-mp.ru/index.php?/topic/1016832-миры-описание-работы-редактора-карт.", -1)
+      sampAddChatMessage("Ссылка на топик скопирована в буфер обмена", -1)
+      setClipboardText("https://forum.sa-mp.ru/index.php?/topic/1016832-миры-описание-работы-редактора-карт")
       return {dialogId, style, title, button1, button2, newtext}
    end
    
@@ -1096,8 +1163,8 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
    if dialogId == 1401 then     
       local newtext = 
       "{FFD700}615-18300       {FFFFFF}GTA-SA \n{FFD700}18632-19521{FFFFFF}   SA-MP\n"..
-      (lastObjectModelId and "\n{FFFFFF}Последний {FFFF00}использованный объект: "..lastObjectModelId.." ("..tostring(sampObjectModelNames[lastObjectModelId])..") " or " ")..
-      (lastRemovedObjectModel and "\n{FFFFFF}Последний {FF0000}удаленный объект: "..lastRemovedObjectModel.." ("..tostring(sampObjectModelNames[lastRemovedObjectModel])..") " or " ")..
+      (last.ObjectModelId and "\n{FFFFFF}Последний {FFFF00}использованный объект: "..last.ObjectModelId.." ("..tostring(sampObjectModelNames[last.ObjectModelId])..") " or " ")..
+      (last.RemovedObjectModel and "\n{FFFFFF}Последний {FF0000}удаленный объект: "..last.RemovedObjectModel.." ("..tostring(sampObjectModelNames[last.RemovedObjectModel])..") " or " ")..
       "\n{FFFFFF}Введи номер объекта: \n"
       return {dialogId, style, title, button1, button2, newtext}
    end
@@ -1121,9 +1188,9 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
    end
    
    if dialogId == 1426 then
-      if lastWorldNumber and lastWorldNumber > 0 then
+      if last.WorldNumber and last.WorldNumber > 0 then
          local newtext = 
-         "Последний мир в котором вы были: "..lastWorldNumber.."\n"..
+         "Последний мир в котором вы были: "..last.WorldNumber.."\n"..
          "Введите номер мира в который хотите войти:\n"
          return {dialogId, style, title, button1, button2, newtext}
       else
@@ -1160,6 +1227,16 @@ function sampev.onCreateObject(objectId, data)
    end
 end
 
+function sampev.onSendClickTextDraw(textdrawId)
+   if textdrawId ~= 65535 then
+      local text = sampTextdrawGetString(textdrawId+1)
+      if text then
+         text = text:gsub("~n~", " ")
+         last.TextureName = text
+      end
+   end
+end
+
 function sampev.onSendCommand(command)
    
    if command:find("/exit") or command:find("/выход") then
@@ -1186,7 +1263,7 @@ function sampev.onSendCommand(command)
          local id = tonumber(arg)
          if id then 
             if id > 0 and id <= 500 then 
-               LastData.lastWorldNumber = id
+               last.WorldNumber = id
                worldspawnpos.x, worldspawnpos.y, worldspawnpos.z = getCharCoordinates(playerPed)
             end
          end
@@ -1213,7 +1290,7 @@ function sampev.onSendCommand(command)
 end
 
 function sampev.onSendEditObject(playerObject, objectId, response, position, rotation)
-   lastObjectId = objectId
+   last.ObjectId = objectId
    local object = sampGetObjectHandleBySampId(objectId)
    local modelId = getObjectModel(object)
    
