@@ -3,7 +3,7 @@ script_name("AbsoluteFix")
 script_description("Set of fixes for Absolute Play servers")
 script_properties("work-in-pause")
 script_url("https://github.com/ins1x/moonloader-scripts")
-script_version("3.7") 
+script_version("3.8") 
 -- script_moonloader(16) moonloader v.0.26
 
 -- If your don't play on Absolute Play servers
@@ -31,9 +31,11 @@ local ini = inicfg.load({
       dialogfix = true,
       disablenotifications = true,
 	  disablerecordnotifications = true,
+      disablewipenotifications = true,
       fastload = true,
       hideattachesonaim = true,
 	  hidehousesmapicons = true,
+      hideeditobject = true,
       houseobjectsrotfix = true,
       gamefixes = true,
       grass = false,
@@ -56,6 +58,7 @@ local ini = inicfg.load({
       speedblur = false,
       sunfix = false,
       snowoff = false,
+      scaleeditobject = true,
       vehvisualdmg = false
    },
 }, configIni)
@@ -73,10 +76,13 @@ local dialogRestoreText = false
 local dialogIncoming = 0
 local clickedplayerid = nil
 local randomcolor = nil
-local hideEditObject = false
-local scaleEditObject = false
-local editResponse = 0 
-local editMode = 0
+
+local edit = {
+   mode = 0, -- (1 - edit, 2 - copy, 3 - delete, 4 - retexture)
+   response = 0,
+   hideObject = false,
+   scaleObject = false,
+}
 
 local last = {
    ObjectId = nil,
@@ -576,22 +582,25 @@ function main()
 		 end
          
          -- hide edited object on hold ALT key
-         if isKeyDown(0x12) and editResponse > 0 and not sampIsChatInputActive() 
-         and not sampIsDialogActive() and not isPauseMenuActive() 
-         and not isSampfuncsConsoleActive() then
-	        hideEditObject = true
-	     else
-	 	    hideEditObject = false
+         if ini.settings.hideeditobject then
+            if isKeyDown(0x12) and edit.response > 0 and not sampIsChatInputActive() 
+            and not sampIsDialogActive() and not isPauseMenuActive() 
+            and not isSampfuncsConsoleActive() then
+	           edit.hideObject = true
+	        else
+	 	       edit.hideObject = false
+	        end
 	     end
-	     
 	     -- upscale edited object on hold CTRL key
-	     if isKeyDown(0x11) and editResponse > 0 and not sampIsChatInputActive() 
-         and not sampIsDialogActive() and not isPauseMenuActive() 
-         and not isSampfuncsConsoleActive() then
-	        scaleEditObject = true
-	     else
-	 	    scaleEditObject = false
-	     end
+         if ini.settings.scaleeditobject then
+	        if isKeyDown(0x11) and edit.response > 0 and not sampIsChatInputActive() 
+            and not sampIsDialogActive() and not isPauseMenuActive() 
+            and not isSampfuncsConsoleActive() then
+	           edit.scaleObject = true
+	        else
+	 	       edit.scaleObject = false
+	        end
+         end
          
 		 -- When switching the language Alt+Shift Shift is no longer triggered and the player does not jump
 		 if isKeyDown(0xA0) and isKeyJustPressed(0xA4) and sampIsChatInputActive() and not isPauseMenuActive() and not isCharInAnyCar(PLAYER_PED) then
@@ -634,8 +643,20 @@ function main()
             if isKeyJustPressed(0x49) and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then sampSendChat("/inv") end
 		 end
 		 
+         -- Enter to object edit mode
          if isPlayerSpectating then
-            if isKeyJustPressed(0x4E) and not sampIsChatInputActive() and not sampIsDialogActive() and not isPauseMenuActive() and not isSampfuncsConsoleActive() then 
+            if isKeyJustPressed(0x4E) and not sampIsChatInputActive() 
+            and not sampIsDialogActive() and not isPauseMenuActive() 
+            and not isSampfuncsConsoleActive() then -- Key N
+               --if last.ObjectId ~= nil then
+                  --editObjectBySampId(last.ObjectId, false)
+               --end
+               enterEditObject()
+            end
+         else 
+            if isKeyJustPressed(0x5A) and not sampIsChatInputActive() -- Key Z
+            and not sampIsDialogActive() and not isPauseMenuActive() 
+            and not isSampfuncsConsoleActive() then 
                --if last.ObjectId ~= nil then
                   --editObjectBySampId(last.ObjectId, false)
                --end
@@ -778,6 +799,17 @@ function sampev.onServerMessage(color, text)
       
       if text:find("использовал телепорт") and isWorldHoster then
          return false
+      end
+      
+      -- Disable wipe messages
+      if ini.settings.disablewipenotifications then
+         if text:find("Запущено удаление старых данных, обработка сервером займёт несколько секунд!") then
+            return false
+         end
+         
+         if text:find("Удалено домов") then
+            return false
+         end
       end
    end
    
@@ -948,8 +980,8 @@ function sampev.onSendDialogResponse(dialogId, button, listboxId, input)
    
    -- hook editmodes
    if dialogId == 1400 and button == 1 then
-      if listboxId == 0 and input:find("Редактировать") then editMode = 1 end
-      if listboxId == 2 and input:find("Переместить") then editMode = 1 end
+      if listboxId == 0 and input:find("Редактировать") then edit.mode = 1 end
+      if listboxId == 2 and input:find("Переместить") then edit.mode = 1 end
       if listboxId == 4 and input:find("Перекрасить") then 
          if last.TextureName then
             local id = string.match(last.TextureName, "%d+")
@@ -957,9 +989,9 @@ function sampev.onSendDialogResponse(dialogId, button, listboxId, input)
                sampAddChatMessage("Последняя текстура: "..id, -1)   
             end
          end
-         editMode = 4 
+         edit.mode = 4 
       end
-      if listboxId == 5 and input:find("Копировать") then editMode = 2 end
+      if listboxId == 5 and input:find("Копировать") then edit.mode = 2 end
       if listboxId == 16 and input:find("Телепортация к ближайшему объекту") then
          local closestObjectId = getClosestObjectId()
          if closestObjectId then
@@ -974,17 +1006,17 @@ function sampev.onSendDialogResponse(dialogId, button, listboxId, input)
             end
          end
       end
-      if listboxId == 17 and input:find("Информация") then editMode = 1 end
+      if listboxId == 17 and input:find("Информация") then edit.mode = 1 end
    end 
    
    if dialogId == 1422 and listboxId == 0 and button == 1 then
-      editMode = 1
+      edit.mode = 1
    end
    
    if dialogId == 1403 and button == 1 then
-      if listboxId == 0 then editMode = 1 end
+      if listboxId == 0 then edit.mode = 1 end
       if listboxId == 1 then 
-         editMode = 3
+         edit.mode = 3
          if last.ObjectModelId then
             last.RemovedObjectModel = last.ObjectModelId
          end
@@ -996,9 +1028,9 @@ function sampev.onSendDialogResponse(dialogId, button, listboxId, input)
                sampAddChatMessage("Последняя текстура: "..id, -1)   
             end
          end
-         editMode = 4 
+         edit.mode = 4 
       end
-      if listboxId == 4 then editMode = 2 end
+      if listboxId == 4 then edit.mode = 2 end
       -- Add arrow (Blip to object) bug broke edit mode on set blip
       -- if listboxId == 6 then
          -- if (last.ObjectId) then
@@ -1019,14 +1051,14 @@ function sampev.onSendDialogResponse(dialogId, button, listboxId, input)
    end
    if dialogId == 1411 and button == 1 then
       if listboxId == 0 or listboxId == 2 then
-         editMode = 3
+         edit.mode = 3
          if last.ObjectModelId then
             last.RemovedObjectModel = last.ObjectModelId
          end
       end
    end
    if dialogId == 1409 and button == 1 then
-      editMode = 1
+      edit.mode = 1
    end
    
 end
@@ -1227,13 +1259,27 @@ function sampev.onCreateObject(objectId, data)
    end
 end
 
+function sampev.onShowTextDraw(id, data)
+   if data.text == "Transparency" then
+      edit.mode = 4
+   end
+   if id == 549 then
+      data.text = "~n~"
+      return {id, data}
+   end
+end
+
 function sampev.onSendClickTextDraw(textdrawId)
    if textdrawId ~= 65535 then
-      local text = sampTextdrawGetString(textdrawId+1)
-      if text then
-         text = text:gsub("~n~", " ")
-         last.TextureName = text
+      if edit.mode == 4 then
+         local text = sampTextdrawGetString(textdrawId+1)
+         if text then
+            text = text:gsub("~n~", " ")
+            last.TextureName = text
+         end
       end
+   else
+      edit.mode = 0
    end
 end
 
@@ -1285,6 +1331,7 @@ function sampev.onSendCommand(command)
 	  sampAddChatMessage("Логотипы сервера были удалены (Чтобы появились снова потребуется релог)", 0x00FF00)
       sampTextdrawDelete(2048)
       sampTextdrawDelete(420)
+      sampTextdrawDelete(549)
       return false
    end
 end
@@ -1294,16 +1341,16 @@ function sampev.onSendEditObject(playerObject, objectId, response, position, rot
    local object = sampGetObjectHandleBySampId(objectId)
    local modelId = getObjectModel(object)
    
-   editResponse = response
+   edit.response = response
    
    if response > 0 then
-      if hideEditObject then
+      if edit.hideObject then
 	     setObjectVisible(object, false)
       else
 	     setObjectVisible(object, true)
 	  end
 	  
-	  if scaleEditObject then
+	  if edit.scaleObject then
 	     setObjectScale(object, 1.35)
 	  else
 	     setObjectScale(object, 1.0)
