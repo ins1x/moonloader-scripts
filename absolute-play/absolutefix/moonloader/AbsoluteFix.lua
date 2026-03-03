@@ -3,7 +3,7 @@ script_name("AbsoluteFix")
 script_description("Set of fixes for Absolute Play servers")
 script_properties("work-in-pause")
 script_url("https://github.com/ins1x/moonloader-scripts")
-script_version("3.8") 
+script_version("3.8") -- r1 
 -- script_moonloader(16) moonloader v.0.26
 
 -- If your don't play on Absolute Play servers
@@ -36,6 +36,7 @@ local ini = inicfg.load({
       hideattachesonaim = true,
 	  hidehousesmapicons = true,
       hideeditobject = true,
+      hidebadconnectiontxd = true,
       houseobjectsrotfix = true,
       gamefixes = true,
       grass = false,
@@ -182,9 +183,15 @@ function main()
 	  -- remove server site textdraw
 	  sampTextdrawDelete(418)
 	  -- remove server logo
-	  if ini.settings.nologo then            
+      
+      if ini.settings.hidebadconnectiontxd then
+         sampTextdrawDelete(574)
+      end
+      
+	  if ini.settings.nologo then
          sampTextdrawDelete(2048)
          sampTextdrawDelete(420)
+         sampTextdrawDelete(549)
       end
    
 	  if ini.settings.antiafk then
@@ -706,9 +713,9 @@ function sampev.onServerMessage(color, text)
    
    if ini.settings.disablenotifications then
 	  -- ignore various server flood mesages
-	  -- if text:find("не засчитан") then
-         -- return false
-      -- end
+	  if text:find("Рекорд не засчитан") then
+         return false
+      end
 	  
       if text:find("выхода из читмира") then
          return false
@@ -1332,6 +1339,7 @@ function sampev.onSendCommand(command)
       sampTextdrawDelete(2048)
       sampTextdrawDelete(420)
       sampTextdrawDelete(549)
+      sampTextdrawDelete(574) -- bad connection txd
       return false
    end
 end
