@@ -1,5 +1,5 @@
 script_name("Separate Messages")
-script_version("2.4") -- r2
+script_version("2.5")
 -- script_moonloader(16) moonloader v.0.26
 -- fork of Separate Messages v2 https://www.blast.hk/threads/69714/
 -- changed: 
@@ -12,9 +12,12 @@ local sampev = require 'lib.samp.events'
 -- МОЖНО ДОБАВИТЬ СВОЮ КОМАНДУ ДЛЯ ПЕРЕНОСА ТУТ, ИЛИ УБРАТЬ ЛИШНЮЮ
 commands = {
    'c', 's', 'b', 'r', 'm', 'd', 'f', 'rb', 'fb', 'rt', 
-   'pt', 'ft', 'cs', 't', 'ct', 'fam', 'vr', 'al'
+   'pt', 'ft', 'cs', 't', 'ct', 'fam', 'vr', 'al',
 }
 isDivided = false
+-- Здесь можно изменить задержку отправки второй части сообщения в чат 
+-- по-умолчанию 1000 мс.
+sendDelay = 1000
 
 function sampev.onSendCommand(msg)
    if isDivided then 
@@ -78,6 +81,7 @@ end
 function divide(msg, beginning, ending, doing)
    limit = 72
    
+   local chatprefix = string.match(msg:sub(0, 1), "%p") -- Any punctuation character
    local firstpart, secondpart = string.match(msg:sub(1, limit), "(.*) (.*)")
    if not secondpart then 
       secondpart = ""
@@ -93,8 +97,12 @@ function divide(msg, beginning, ending, doing)
       end
       isDivided = true
       lua_thread.create(function()
-         wait(1500)
-         sampSendChat(beginning .. secondpart .. ending)
+         wait(sendDelay)
+         if chatprefix then
+            sampSendChat(chatprefix .. beginning .. secondpart .. ending)
+         else
+            sampSendChat(beginning .. secondpart .. ending)
+         end
       end)
    end
 end
