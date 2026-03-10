@@ -70,6 +70,10 @@ function ev.onShowDialog(dialogId, style, title, button1, button2, text)
             sampSendDialogResponse(32700, 1, nil)
             sampCloseCurrentDialogWithButton(1)
          end
+         if text:find('1. Main') and style == 0 and button1 == "Принимаю" then
+            sampSendDialogResponse(32700, 1, nil)
+            sampCloseCurrentDialogWithButton(1)
+         end
       end
    end
 end
