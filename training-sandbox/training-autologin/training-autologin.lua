@@ -4,7 +4,7 @@ script_authors("xWivar", "1NS")
 script_dependencies('lib.samp.events')
 script_url("https://forum.training-server.com/d/17909-lua-autologin-v1")
 script_version_number(4)
-script_version("4.1")
+script_version("4.2")
 -- Require CLEO 4.0+, SAMPFUNCS 5.4.0+, Moonloader 0.26+ (lib SAMP.Lua)
 -- editor options: tabsize 3, Windows (CR LF), encoding Windows-1251
 
@@ -30,7 +30,10 @@ ffi.C.GetVolumeInformationA(eax, eax, 0, ebx, eax, eax, eax, 0)
 local ecx = ebx[0]
 -- Flag to intercept the input dialog
 local hookdialogpassw = false
+-- Script options (Change them for your own needs)
 local skiprulesdialog = true
+local skiplang = true
+local defaultlangrus = false
 
 function main()
    sampRegisterChatCommand("newpass", function(arg)
@@ -50,8 +53,19 @@ end
 
 function ev.onShowDialog(dialogId, style, title, button1, button2, text)
    if dialogId == 32700 then
+      -- Auto select Language
+      if skiplang then
+         if title:find('Select Language') then
+            if defaultlangrus then
+               sampSendDialogResponse(32700, 1, 1, "Russian")
+            else
+               sampSendDialogResponse(32700, 1, 1, "English")
+            end
+            sampCloseCurrentDialogWithButton(0)
+         end
+      end
       -- Hook login dialog
-      if text:find('Вы подключились к') and button1 == 'Войти' and button2 == 'Уйти' then
+      if text:find('Вы подключились к') and button1:find('>>>') then
          local _, id = sampGetPlayerIdByCharHandle(playerPed)      
          local nickname = sampGetPlayerNickname(id)
          
@@ -60,11 +74,13 @@ function ev.onShowDialog(dialogId, style, title, button1, button2, text)
             local val = hash:gsub(tostring(ecx),"")
             sampSendDialogResponse(dialogId, 1, nil, val)
             return false
-         else
-            hookdialogpassw = true
          end
       end
-   
+      
+      if text:find('Для начала регистрации укажите') then
+         hookdialogpassw = false
+      end
+      
       if skiprulesdialog then 
          if text:find('1. Общие правила') and style == 0 and button1 == "Принимаю" then
             sampSendDialogResponse(32700, 1, nil)
@@ -80,23 +96,27 @@ end
 
 function ev.onSendDialogResponse(dialogId, button, listboxId, input)
    -- Hook login dialog
-   if dialogId == 32700 and button == 1 and hookdialogpassw then
-      local _, id = sampGetPlayerIdByCharHandle(playerPed)
-      local nickname = sampGetPlayerNickname(id)
-      hookdialogpassw = false
-      cfg.Hashtable[nickname] = toHash(("%s%s"):format(input, ecx))
-      ini.save(cfg, "training-autologin")      
+   if dialogId == 32700 then
+      if hookdialogpassw and button == 1 then
+         local _, id = sampGetPlayerIdByCharHandle(playerPed)
+         local nickname = sampGetPlayerNickname(id)
+         hookdialogpassw = false
+         cfg.Hashtable[nickname] = toHash(("%s%s"):format(input, ecx))
+         ini.save(cfg, "training-autologin")      
+      end
    end
 end
 
 
 function ev.onServerMessage(color, text)
-   -- If the password is entered incorrectly, the auto-complete field will be reset
-   if text:find("Неверно введен пароль! .+1/3") and color == -872414977 then
-      local _, id = sampGetPlayerIdByCharHandle(playerPed)
-      local nickname = sampGetPlayerNickname(id)
-      hookdialogpassw = true
-      cfg.Hashtable[nickname] = nil
+   if text:find("Данный аккаунт зарегистрирован") then
+      -- If the password is entered incorrectly, the auto-complete field will be reset
+      if text:find("Неверно введен пароль! .+1/3") and color == -872414977 then
+         local _, id = sampGetPlayerIdByCharHandle(playerPed)
+         local nickname = sampGetPlayerNickname(id)
+         hookdialogpassw = true
+         cfg.Hashtable[nickname] = nil
+      end
    end
 end
 
