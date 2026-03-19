@@ -4,7 +4,7 @@ script_authors("xWivar", "1NS")
 script_dependencies('lib.samp.events')
 script_url("https://forum.training-server.com/d/17909-lua-autologin-v1")
 script_version_number(4)
-script_version("4.2")
+script_version("4.2.1")
 -- Require CLEO 4.0+, SAMPFUNCS 5.4.0+, Moonloader 0.26+ (lib SAMP.Lua)
 -- editor options: tabsize 3, Windows (CR LF), encoding Windows-1251
 
@@ -30,6 +30,7 @@ ffi.C.GetVolumeInformationA(eax, eax, 0, ebx, eax, eax, eax, 0)
 local ecx = ebx[0]
 -- Flag to intercept the input dialog
 local hookdialogpassw = false
+local autologinfailed = false
 -- Script options (Change them for your own needs)
 local skiprulesdialog = true
 local skiplang = true
@@ -59,28 +60,13 @@ function ev.onShowDialog(dialogId, style, title, button1, button2, text)
             if defaultlangrus then
                sampSendDialogResponse(32700, 1, 1, "Russian")
             else
-               sampSendDialogResponse(32700, 1, 1, "English")
+               sampSendDialogResponse(32700, 1, 0, "English")
             end
             sampCloseCurrentDialogWithButton(0)
          end
       end
-      -- Hook login dialog
-      if text:find('Вы подключились к') and button1:find('>>>') then
-         local _, id = sampGetPlayerIdByCharHandle(playerPed)      
-         local nickname = sampGetPlayerNickname(id)
-         
-         if cfg.Hashtable[nickname] ~= nil then
-            local hash = fromHash(cfg.Hashtable[nickname])
-            local val = hash:gsub(tostring(ecx),"")
-            sampSendDialogResponse(dialogId, 1, nil, val)
-            return false
-         end
-      end
       
-      if text:find('Для начала регистрации укажите') then
-         hookdialogpassw = false
-      end
-      
+      -- Skip rules dialog
       if skiprulesdialog then 
          if text:find('1. Общие правила') and style == 0 and button1 == "Принимаю" then
             sampSendDialogResponse(32700, 1, nil)
@@ -91,32 +77,62 @@ function ev.onShowDialog(dialogId, style, title, button1, button2, text)
             sampCloseCurrentDialogWithButton(1)
          end
       end
+      
+      -- Hook login dialog
+      if text:find('Вы подключились к') or text:find('You have connected')
+      and button1:find('>>>') then
+         local _, id = sampGetPlayerIdByCharHandle(playerPed)      
+         local nickname = sampGetPlayerNickname(id)
+         
+         if not autologinfailed then
+            if cfg.Hashtable[nickname] ~= nil then
+               local hash = fromHash(cfg.Hashtable[nickname])
+               local val = hash:gsub(tostring(ecx),"")
+               sampSendDialogResponse(dialogId, 1, nil, val)
+               return false
+            end
+         end
+      end
+      
+      if text:find('Для начала регистрации укажите') then
+         hookdialogpassw = false
+         autologinfailed = true
+      end
    end
 end
 
 function ev.onSendDialogResponse(dialogId, button, listboxId, input)
-   -- Hook login dialog
+   -- Hook login dialog if success login
    if dialogId == 32700 then
-      if hookdialogpassw and button == 1 then
+      if hookdialogpassw and autologinfailed and button == 1 then
          local _, id = sampGetPlayerIdByCharHandle(playerPed)
          local nickname = sampGetPlayerNickname(id)
          hookdialogpassw = false
          cfg.Hashtable[nickname] = toHash(("%s%s"):format(input, ecx))
-         ini.save(cfg, "training-autologin")      
+         ini.save(cfg, "training-autologin")   
       end
    end
 end
 
 
 function ev.onServerMessage(color, text)
-   if text:find("Данный аккаунт зарегистрирован") then
-      -- If the password is entered incorrectly, the auto-complete field will be reset
-      if text:find("Неверно введен пароль! .+1/3") and color == -872414977 then
-         local _, id = sampGetPlayerIdByCharHandle(playerPed)
-         local nickname = sampGetPlayerNickname(id)
-         hookdialogpassw = true
-         cfg.Hashtable[nickname] = nil
-      end
+   local _, id = sampGetPlayerIdByCharHandle(playerPed)
+   local nickname = sampGetPlayerNickname(id)
+         
+   if text:find("Данный аккаунт зарегистрирован")
+   or text:find("This account is registered") then
+      autologinfailed = false
+   end
+   
+   if text:find("Неверно введен пароль! .+1/3") and color == -872414977 then
+      hookdialogpassw = true
+      autologinfailed = true
+      cfg.Hashtable[nickname] = nil
+   end
+   
+   if text:find("You need to log in to begin reducing your ban time") then
+      hookdialogpassw = true
+      autologinfailed = true
    end
 end
 
