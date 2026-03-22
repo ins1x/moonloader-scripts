@@ -4,7 +4,7 @@ script_authors("xWivar", "1NS")
 script_dependencies('lib.samp.events')
 script_url("https://forum.training-server.com/d/17909-lua-autologin-v1")
 script_version_number(4)
-script_version("4.2.1")
+script_version("4.2.2")
 -- Require CLEO 4.0+, SAMPFUNCS 5.4.0+, Moonloader 0.26+ (lib SAMP.Lua)
 -- editor options: tabsize 3, Windows (CR LF), encoding Windows-1251
 
@@ -48,8 +48,22 @@ function main()
    end)
 end
 
+function ev.onInitGame(playerId, hostName, settings, vehicleModels, unknown)
+   local configfile = io.open(getGameDirectory()..'/moonloader/config/training-autologin.ini', "r")
+   if configfile == nil then
+      print("restore broken configfile")   
+      configfile = io.open(getGameDirectory()..'/moonloader/config/training-autologin.ini', "w")
+      configfile:write("")
+      configfile:close()
+      autologinfailed = true
+   end
+end
+
 function ev.onPlayerJoin(playerid, color, isNpc, nickname)
-   hookdialogpassw = false
+   local _, id = sampGetPlayerIdByCharHandle(playerPed)
+   if playerid == id then 
+      hookdialogpassw = false 
+   end
 end
 
 function ev.onShowDialog(dialogId, style, title, button1, button2, text)
@@ -83,7 +97,7 @@ function ev.onShowDialog(dialogId, style, title, button1, button2, text)
       and button1:find('>>>') then
          local _, id = sampGetPlayerIdByCharHandle(playerPed)      
          local nickname = sampGetPlayerNickname(id)
-         
+         hookdialogpassw = true
          if not autologinfailed then
             if cfg.Hashtable[nickname] ~= nil then
                local hash = fromHash(cfg.Hashtable[nickname])
@@ -104,13 +118,25 @@ end
 function ev.onSendDialogResponse(dialogId, button, listboxId, input)
    -- Hook login dialog if success login
    if dialogId == 32700 then
-      if hookdialogpassw and autologinfailed and button == 1 then
-         local _, id = sampGetPlayerIdByCharHandle(playerPed)
-         local nickname = sampGetPlayerNickname(id)
-         hookdialogpassw = false
-         cfg.Hashtable[nickname] = toHash(("%s%s"):format(input, ecx))
-         ini.save(cfg, "training-autologin")   
+      local _, id = sampGetPlayerIdByCharHandle(playerPed)
+      local nickname = sampGetPlayerNickname(id)
+      
+      if hookdialogpassw and button == 1 then    
+         if cfg.Hashtable[nickname] == nil then
+            hookdialogpassw = false
+            cfg.Hashtable[nickname] = toHash(("%s%s"):format(input, ecx))
+            ini.save(cfg, "training-autologin")   
+            print("no nickname")
+         else
+            if autologinfailed then
+               hookdialogpassw = false
+               cfg.Hashtable[nickname] = toHash(("%s%s"):format(input, ecx))
+               ini.save(cfg, "training-autologin") 
+               print("autologin failed")
+            end
+         end
       end
+
    end
 end
 
@@ -119,19 +145,17 @@ function ev.onServerMessage(color, text)
    local _, id = sampGetPlayerIdByCharHandle(playerPed)
    local nickname = sampGetPlayerNickname(id)
          
-   if text:find("Данный аккаунт зарегистрирован")
-   or text:find("This account is registered") then
-      autologinfailed = false
-   end
+   -- if text:find("Данный аккаунт зарегистрирован")
+   -- or text:find("This account is registered") then
+   -- end
    
-   if text:find("Неверно введен пароль! .+1/3") and color == -872414977 then
-      hookdialogpassw = true
+   if text:find("Неверно введен пароль! .+1/3") or text:find("Incorrect password! .+1/3") and color == -872414977 then
+      -- hookdialogpassw = true
       autologinfailed = true
       cfg.Hashtable[nickname] = nil
    end
    
    if text:find("You need to log in to begin reducing your ban time") then
-      hookdialogpassw = true
       autologinfailed = true
    end
 end
