@@ -193,7 +193,11 @@ function main()
          sampTextdrawDelete(420)
          sampTextdrawDelete(549)
       end
-   
+      
+      -- remove txd with site logo
+      sampTextdrawDelete(551)
+      sampTextdrawDelete(559)
+         
 	  if ini.settings.antiafk then
          -- dirty hack nop F1 and F4 keys functions
          memory.setuint8(getModuleHandle('samp.dll') + 0x67450, 0xC3, true)
@@ -733,6 +737,18 @@ function sampev.onServerMessage(color, text)
          return false
       end
       
+      if text:find("Аудиоклиент") then
+         return false
+      end
+      
+      if text:find("Скачать SA.MP Addon") then
+         return false
+      end
+      
+      if text:find("Проигрывается музыка") then
+         return false
+      end
+      
       if text:find("Рекорд игроков на сервере") then
          return false
       end
@@ -752,6 +768,14 @@ function sampev.onServerMessage(color, text)
       end
       
       if text:find("Рекомендуется скачать последнюю версию с нашего сайта") then
+         return false
+      end
+      
+      if text:find("Всем игрокам настоятельно рекомендуется") then
+         return false
+      end
+      
+      if text:find("IP нашего сервера") then
          return false
       end
       
@@ -805,6 +829,10 @@ function sampev.onServerMessage(color, text)
       end
       
       if text:find("использовал телепорт") and isWorldHoster then
+         return false
+      end
+      
+      if text:find("Такой команды не существует") then
          return false
       end
       
