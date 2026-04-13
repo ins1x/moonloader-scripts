@@ -34,7 +34,7 @@ It introduces the ability to load Lua scripts into the game, has all the functio
 | [mini-calc](https://github.com/ins1x/moonloader-scripts/tree/main/mini-calc) | A simple calculator with a minimal set of functions |
 | [ModCompatibilityChecker](https://github.com/ins1x/moonloader-scripts/tree/main/debug/modchecker/ModCompatibilityChecker.lua) | Checks the mods that can cause crashes |
 | [moonloader-templates](https://github.com/ins1x/moonloader-scripts/tree/main/templates) | templates and snippets for moonloader |
-| [MP helper](https://github.com/ins1x/mphelper) | Helper for event makers |
+| [MP helper](https://github.com/ins1x/moonloader-scripts/tree/main/absolute-play/mphelper) | Helper for event makers |
 | [noEmptyMessages](https://github.com/ins1x/moonloader-scripts/tree/main/training-sandbox/noEmptyMessages.lua) | Ignores sending and receiving empty chat messages |
 | [noGameTexts](https://github.com/ins1x/moonloader-scripts/tree/main/uif-fixes/noGameTexts.lua) | Hides annoying gametext in the middle of the screen on the UIF server |
 | [noPostFX.lua](https://github.com/ins1x/moonloader-scripts/tree/main/uif-fixes/noPostFX.lua) | Disables post-processing (Post-FX) and fix dark timecycle |
