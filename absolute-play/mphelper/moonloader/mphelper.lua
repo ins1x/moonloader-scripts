@@ -24,6 +24,7 @@ local ini = inicfg.load({
       menukey = "0x2D", -- INS key
       disconnectreminder = false,
       playerwarnings = false,
+      checkupdates = false,
    },
    warnings = {
       afk = true,
@@ -394,7 +395,10 @@ function main()
       PlayerWarnings()
    end
    --textbuffer.mpadd.v = u8'Проходит МП "<название>" '
-   checkScriptUpdates()
+   
+   if ini.settings.checkupdates then
+      checkScriptUpdates()
+   end
    
    while true do
       wait(0)
