@@ -3,7 +3,7 @@ script_name("AbsoluteFix")
 script_description("Set of fixes for Absolute Play servers")
 script_properties("work-in-pause")
 script_url("https://github.com/ins1x/moonloader-scripts")
-script_version("3.8") -- r1 
+script_version("3.8") -- r2 
 -- script_moonloader(16) moonloader v.0.26
 
 -- If your don't play on Absolute Play servers
@@ -1209,22 +1209,12 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
       "- Управление камерой. Вы можете работать в режиме полета свободной камерой, либо зафиксировать камеру над собой.\n"..
       "- Смена текстур. Применяйте ретекстур к различным объектам чтобы преобразить их до неузнаваемости.\n"..
       "- Настройка доступа. Ваш мир может быть открыт для всех игроков 24/7. Либо же вы можете задать пароль на вход, или вовсе сделать мир персональным.\n"..
-      "\n{FFD700}VIP игроки{FFFFFF} могут:\n"..
-      "- телепортироваться по метке на карте в ESC\n"..
-      "- расширять мир до 2000 объектов\n"..
-      "- выбирать шрифт и цвет текста\n"..
-      "- выбирать точку появления в мире\n"..
       "\nУправление:\n"..text
      
       sampAddChatMessage("Подробнее на {696969}https://forum.sa-mp.ru/index.php?/topic/1016832-миры-описание-работы-редактора-карт.", -1)
       sampAddChatMessage("Ссылка на топик скопирована в буфер обмена", -1)
       setClipboardText("https://forum.sa-mp.ru/index.php?/topic/1016832-миры-описание-работы-редактора-карт")
       return {dialogId, style, title, button1, button2, newtext}
-   end
-   
-   if dialogId == 1498 then
-      return {dialogId, style, title, button1, button2,
-      "Введи размер шрифта от 1 до 255"}
    end
    
    if dialogId == 1401 then     
@@ -1358,6 +1348,28 @@ function sampev.onSendCommand(command)
          if bTargetResult then
             sampSendChat(string.format("/ngr %.2f %.2f %.2f", bX, bY, bZ+1.5))
          end
+      end
+   end
+   
+   -- fix vehicle delete command
+   if command:find("/ev$") then
+      local minDist = 20
+      local closestId = -1
+      local x, y, z = getCharCoordinates(playerPed)
+      for i, k in ipairs(getAllVehicles()) do
+         local streamed, carId = sampGetVehicleIdByCarHandle(k)
+         if streamed then
+            local xi, yi, zi = getCarCoordinates(k)
+            local dist = math.sqrt( (xi - x) ^ 2 + (yi - y) ^ 2 + (zi - z) ^ 2 )
+            if dist < minDist then
+               minDist = dist
+               closestId = carId
+            end
+         end
+      end
+      if closestId > 0 then
+         sampSendChat("/ev "..closestId)
+         return false
       end
    end
    
